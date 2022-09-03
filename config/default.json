@@ -1,0 +1,10 @@
+{
+    "MYSQL_DB": {
+        "name": "db",
+        "user": "user",
+        "password": "password",
+        "host": "localhost",
+        "port": "3306"
+    },
+    "API_PORT": 3000
+}
