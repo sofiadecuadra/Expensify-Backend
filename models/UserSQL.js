@@ -1,20 +1,11 @@
 const DataTypes = require("sequelize/lib/data-types");
-// const Family = require("./Family");
-const SQLModel = require("./SQLModel");
+const SQLModel = require("./sqlModel");
 
 class UserSQL extends SQLModel {
-    instance;
-    constructor(sequelizeContext, familyInstance) {
-        super(sequelizeContext);
-        this.familyInstance = familyInstance;
-    }
+    static instance;
 
-    async createInstance() {
-        this.instance = await this.sequelizeContext.connection.define("User", {
-            id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-            },
+    static async createInstance(sequelizeContext, familyInstance) {
+        UserSQL.instance = await sequelizeContext.connection.define("User", {
             name: {
                 type: DataTypes.STRING(50),
                 allowNull: false,
@@ -22,13 +13,14 @@ class UserSQL extends SQLModel {
             email: {
                 type: DataTypes.STRING(50),
                 allowNull: false,
+                primaryKey: true,
             },
             role: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
         });
-        this.instance.belongsTo(this.familyInstance, { foreignKey: { allowNull: false, name: "name" } });
+        UserSQL.instance.belongsTo(familyInstance, { foreignKey: { allowNull: false, name: "familyName" } });
     }
 }
 

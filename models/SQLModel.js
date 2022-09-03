@@ -1,8 +1,5 @@
 class SQLModel {
-    constructor(sequelizeContext) {
-        this.sequelizeContext = sequelizeContext;
-    }
-    async createInstance() {}
+    static async createInstance() {}
 }
 
 module.exports = SQLModel;

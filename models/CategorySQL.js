@@ -1,16 +1,11 @@
 const DataTypes = require("sequelize/lib/data-types");
-const SQLModel = require("./SQLModel");
+const SQLModel = require("./sqlModel");
 
 class CategorySQL extends SQLModel {
     instance;
 
-    constructor(sequelizeContext, familyInstance) {
-        super(sequelizeContext);
-        this.familyInstance = familyInstance;
-    }
-
-    async createInstance() {
-        this.instance = await this.sequelizeContext.connection.define("Category", {
+    static async createInstance(sequelizeContext, familyInstance) {
+        CategorySQL.instance = await sequelizeContext.connection.define("Category", {
             name: {
                 type: DataTypes.STRING(50),
                 primaryKey: true,
@@ -28,9 +23,9 @@ class CategorySQL extends SQLModel {
                 allowNull: true,
             },
         });
-        this.instance.belongsTo(this.familyInstance, {
+        CategorySQL.instance.belongsTo(familyInstance, {
             foreignKey: {
-                name: "name",
+                name: "categoryName",
                 allowNull: false,
             },
             primaryKey: true,

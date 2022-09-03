@@ -19,6 +19,9 @@ class SequelizeContext {
                 idle: 200000,
                 acquire: 1000000,
             },
+            define: {
+                timestamps: false,
+            },
         });
         try {
             this.connection.authenticate();
