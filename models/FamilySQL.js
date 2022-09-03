@@ -1,13 +1,11 @@
 const DataTypes = require("sequelize/lib/data-types");
-const SQLModel = require("./SQLModel");
-class FamilySQL extends SQLModel {
-    instance;
-    constructor(sequelizeContext) {
-        super(sequelizeContext);
-    }
+const SQLModel = require("./sqlModel");
 
-    async createInstance() {
-        this.instance = await this.sequelizeContext.connection.define("Family", {
+class FamilySQL extends SQLModel {
+    static instance;
+
+    static async createInstance(sequelizeContext) {
+        FamilySQL.instance = await sequelizeContext.connection.define("Family", {
             name: {
                 type: DataTypes.STRING(50),
                 primaryKey: true,

@@ -1,21 +1,11 @@
 const DataTypes = require("sequelize/lib/data-types");
-const SQLModel = require("./SQLModel");
+const SQLModel = require("./sqlModel");
 
 class ExpenseSQL extends SQLModel {
-    instance;
+    static instance;
 
-    constructor(sequelizeContext, categoryInstance, userInstance) {
-        super(sequelizeContext);
-        this.categoryInstance = categoryInstance;
-        this.userInstance = userInstance;
-    }
-
-    async createInstance() {
-        this.instance = await this.sequelizeContext.connection.define("Expense", {
-            id: {
-                type: DataTypes.INTEGER,
-                primaryKey: true,
-            },
+    static async createInstance(sequelizeContext, categoryInstance, userInstance) {
+        ExpenseSQL.instance = await sequelizeContext.connection.define("Expense", {
             amount: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
@@ -29,8 +19,8 @@ class ExpenseSQL extends SQLModel {
                 allowNull: false,
             },
         });
-        this.instance.belongsTo(this.categoryInstance, { foreignKey: { allowNull: false, name: "name" } });
-        this.instance.belongsTo(this.userInstance, { foreignKey: { allowNull: false, name: "id" } });
+        ExpenseSQL.instance.belongsTo(categoryInstance, { foreignKey: { allowNull: false, name: "categoryName" } });
+        ExpenseSQL.instance.belongsTo(userInstance, { foreignKey: { allowNull: false, name: "userEmail" } });
     }
 }
 
