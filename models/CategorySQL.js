@@ -23,6 +23,10 @@ class CategorySQL extends SQLModel {
                     type: DataTypes.INTEGER,
                     allowNull: true,
                 },
+                active: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: true,
+                },
             }, {
                 uniqueKeys: {
                     unique_category_family: {
