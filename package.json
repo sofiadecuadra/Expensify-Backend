@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "config": "^3.3.7",
     "cors": "^2.8.5",
     "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
     "sequelize": "^6.21.4"
   },
