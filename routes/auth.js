@@ -1,6 +1,6 @@
 const Router = require("express");
 const router = Router({ mergeParams: true });
-const loginController = require("../auth/controllers/loginController");
+const loginController = require("../controllers/loginController");
 
 router.post("/", loginController.logIn);
 

@@ -6,6 +6,6 @@ const routes = Router({ mergeParams: true });
 
 routes.use("/users", users);
 routes.use("/expenses", expenses);
-routes.user("/logIn", login);
+routes.use("/logIn", login);
 
 module.exports = routes;
