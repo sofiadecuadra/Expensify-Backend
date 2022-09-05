@@ -11,16 +11,16 @@ class ExpenseSQL extends SQLModel {
                 allowNull: false,
             },
             registeredDate: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: false,
             },
             producedDate: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: false,
             },
         });
-        ExpenseSQL.instance.belongsTo(categoryInstance, { foreignKey: { allowNull: false, name: "categoryName" } });
-        ExpenseSQL.instance.belongsTo(userInstance, { foreignKey: { allowNull: false, name: "userEmail" } });
+        ExpenseSQL.instance.belongsTo(categoryInstance, { foreignKey: { allowNull: false, name: "categoryId" } });
+        ExpenseSQL.instance.belongsTo(userInstance, { foreignKey: { allowNull: false, name: "userId" } });
     }
 }
 

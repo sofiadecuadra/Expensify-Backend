@@ -4,7 +4,8 @@ class FamilyController {
 
     static async createNewFamily(name) {
         try {
-            await FamilySql.instance.create({ name });
+            const family = await FamilySql.instance.create({ name });
+            return family;
         } catch (err) {
             console.log(err);
         }
