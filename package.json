@@ -1,31 +1,31 @@
 {
-  "name": "monolithic-backend",
-  "version": "1.0.0",
-  "description": "Obligatorio de la materia Arquitectura de Software en la Práctica",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ArqSoftPractica/Monolithic-Backend.git"
-  },
-  "author": "Noelia Bentancor, Sofía Decuadra & Agustín Ferrari",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ArqSoftPractica/Monolithic-Backend/issues"
-  },
-  "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
-  "dependencies": {
-    "bcrypt": "^5.0.1",
-    "config": "^3.3.7",
-    "cors": "^2.8.5",
-    "express": "^4.18.1",
-    "jsonwebtoken": "^8.5.1",
-    "mysql2": "^2.3.3",
-    "sequelize": "^6.21.4"
-  },
-  "resolutions": {
-    "react-error-overlay": "6.0.9"
-  }
+    "name": "monolithic-backend",
+    "version": "1.0.0",
+    "description": "Obligatorio de la materia Arquitectura de Software en la Práctica",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ArqSoftPractica/Monolithic-Backend.git"
+    },
+    "author": "Noelia Bentancor, Sofía Decuadra & Agustín Ferrari",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ArqSoftPractica/Monolithic-Backend/issues"
+    },
+    "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
+    "dependencies": {
+        "bcrypt": "5.0.1",
+        "config": "3.3.7",
+        "cors": "2.8.5",
+        "express": "4.18.1",
+        "jsonwebtoken": "8.5.1",
+        "mysql2": "2.3.3",
+        "sequelize": "6.21.4"
+    },
+    "resolutions": {
+        "react-error-overlay": "6.0.9"
+    }
 }
