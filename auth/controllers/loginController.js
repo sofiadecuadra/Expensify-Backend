@@ -1,8 +1,10 @@
 const bcrypt = require("bcrypt");
-const UserSQL = require("../models/userSQL");
+const UserSQL = require("../../models/userSQL");
 const jwt = require("jsonwebtoken");
+const config = require("config");
 
-class loginController {
+class LoginController {
+
     static async logIn(req, res, next) {
         try {
             console.log(UserSQL);
@@ -10,17 +12,17 @@ class loginController {
 
             const isValidPassword = await bcrypt.compare(req.body.password, user.password);
             //TO DO: handle errors
-            const token = await loginController.createToken();
+            const token = await LoginController.createToken(user.id, user.role, user.email, user.familyId);
             res.send({ token: token });
         } catch (err) {
             next(err);
         }
     }
 
-    static async createToken(id, role) {
-        const token = jwt.sign({ id, role }, "secret");
+    static async createToken(id, role, email, familyId) {
+        const token = jwt.sign({ id, role, email, familyId }, config.get('SECRET_KEY'));
         return token;
     };
 }
 
-module.exports = loginController;
+module.exports = LoginController;
