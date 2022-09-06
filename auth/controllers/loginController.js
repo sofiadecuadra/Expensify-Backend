@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const UserSQL = require("../../models/userSQL");
-const jwt = require("jsonwebtoken");
-const config = require("config");
+const createToken = require("../../library/tokenManager");
 
 class LoginController {
 
@@ -12,17 +11,14 @@ class LoginController {
 
             const isValidPassword = await bcrypt.compare(req.body.password, user.password);
             //TO DO: handle errors
-            const token = await LoginController.createToken(user.id, user.role, user.email, user.familyId);
+            const token = await createToken(user.id, user.role, user.email, user.familyId);
             res.send({ token: token });
         } catch (err) {
             next(err);
         }
     }
 
-    static async createToken(userId, role, email, familyId) {
-        const token = jwt.sign({ userId, role, email, familyId }, config.get('SECRET_KEY'));
-        return token;
-    };
+
 }
 
 module.exports = LoginController;
