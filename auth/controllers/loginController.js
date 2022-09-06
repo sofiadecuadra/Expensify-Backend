@@ -19,8 +19,8 @@ class LoginController {
         }
     }
 
-    static async createToken(id, role, email, familyId) {
-        const token = jwt.sign({ id, role, email, familyId }, config.get('SECRET_KEY'));
+    static async createToken(userId, role, email, familyId) {
+        const token = jwt.sign({ userId, role, email, familyId }, config.get('SECRET_KEY'));
         return token;
     };
 }
