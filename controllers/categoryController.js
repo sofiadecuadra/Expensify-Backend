@@ -16,7 +16,7 @@ class CategoryController {
             });
             res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
-            console.log(err);
+            console.log(err.message);
             next(err);
         }
     }
@@ -24,11 +24,35 @@ class CategoryController {
     static async deleteCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
-            console.log(categoryId);
-            await CategorySQL.instance.update({
+            const categoryDeleted = await CategorySQL.instance.update({
                 active: false
             }, { where: { id: categoryId } });
-            res.status(200).json({ message: 'Category deleted successfully' });
+            if(categoryDeleted[0] === 0) {
+                res.status(404).json({ message: 'Category not found' });
+            } else {
+                res.status(200).json({ message: 'Category deleted successfully' });
+            }
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
+    static async updateCategory(req, res, next) {
+        try {
+            const { categoryId } = req.params;
+            const { name, description, image, monthlyBudget } = req.body;
+            const categoryUpdated = await CategorySQL.instance.update({
+                name: name,
+                description: description,
+                image: image,
+                monthlyBudget: monthlyBudget
+            }, { where: { id: categoryId } });
+            if(categoryUpdated[0] === 0) {
+                res.status(400).json({ message: 'Failed to update the category' });
+            } else {
+                res.status(200).json({ message: 'Category updated successfully' });
+            }
         } catch (err) {
             console.log(err.message);
             next(err);
