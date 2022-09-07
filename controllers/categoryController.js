@@ -1,6 +1,7 @@
 const CategorySQL = require('../models/categorySQL');
 const CategoryDTO = require("../DTO/categoryDTO");
-
+const ExpenseSQL = require('../models/expenseSQL');
+const sequelize = require('sequelize');
 class CategoryController {
 
     static async createCategory(req, res, next) {
@@ -27,7 +28,7 @@ class CategoryController {
             const categoryDeleted = await CategorySQL.instance.update({
                 active: false
             }, { where: { id: categoryId } });
-            if(categoryDeleted[0] === 0) {
+            if (categoryDeleted[0] === 0) {
                 res.status(404).json({ message: 'Category not found' });
             } else {
                 res.status(200).json({ message: 'Category deleted successfully' });
@@ -48,7 +49,7 @@ class CategoryController {
                 image: image,
                 monthlyBudget: monthlyBudget
             }, { where: { id: categoryId } });
-            if(categoryUpdated[0] === 0) {
+            if (categoryUpdated[0] === 0) {
                 res.status(400).json({ message: 'Failed to update the category' });
             } else {
                 res.status(200).json({ message: 'Category updated successfully' });
@@ -70,6 +71,30 @@ class CategoryController {
                     familyId: familyId,
                     active: true // only active ones?
                 }
+            });
+            res.json(categories);
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
+    static async getCategoriesWithMoreExpenses(req, res, next) {
+        try {
+            const categories = await ExpenseSQL.instance.findAll({
+                attributes: [
+                    'categoryId', [sequelize.fn('sum', sequelize.col('amount')), 'total'],
+                ],
+                include: [{
+                    model: CategorySQL.instance,
+                    attributes: ['name', 'description', 'image', 'monthlyBudget', 'familyId', 'active'],
+                    where: {
+                        active: true
+                    }
+                }],
+                group: ['categoryId'],
+                order: sequelize.literal('total DESC'),
+                limit: 3
             });
             res.json(categories);
         } catch (err) {

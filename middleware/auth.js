@@ -3,11 +3,13 @@ const config = require('config');
 
 const authMiddleware = (array) => (req, res, next) => {
     try {
-        const authHeader = req.header('Authorization');
-        const token = authHeader.split(' ')[1];
+        const authHeaderToken = req.header('Authorization');
+        console.log(authHeaderToken)
+        const token = authHeaderToken.split(' ')[1];
         if (!token) {
             //TO DO: handle errors
         }
+        console.log(token)
         const user = jwt.verify(token, config.get('SECRET_KEY'));
         req.user = user;
         // TO DO: handle roles
