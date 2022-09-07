@@ -7,5 +7,6 @@ const Roles = require('../library/roles');
 router.post('/', authMiddleware([Roles.Member, Roles.Administrator]), expenseController.createNewExpense);
 router.delete('/:expenseId', authMiddleware([Roles.Administrator]), expenseController.deleteExpense);
 router.put('/:expenseId', authMiddleware([Roles.Administrator]), expenseController.updateExpense);
+router.get('/:categoryId', authMiddleware([Roles.Administrator]), expenseController.getExpensesByCategory);
 
 module.exports = router;

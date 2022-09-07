@@ -5,7 +5,7 @@ class FamilyController {
 
     static async createNewFamily(name) {
         try {
-            const apiKey = await createApiKey(name);
+            const apiKey = await FamilyController.createApiKey(name);
             const family = await FamilySql.instance.create({ name, apiKey });
             return family;
         } catch (err) {
