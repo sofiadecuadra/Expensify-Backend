@@ -58,6 +58,25 @@ class CategoryController {
             next(err);
         }
     }
+
+    static async getCategories(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            const categories = await CategorySQL.instance.findAll({
+                attributes: [
+                    'name',
+                ],
+                where: {
+                    familyId: familyId,
+                    active: true // only active ones?
+                }
+            });
+            res.json(categories);
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
 }
 
 module.exports = CategoryController;
