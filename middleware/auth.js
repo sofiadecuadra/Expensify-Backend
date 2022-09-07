@@ -4,6 +4,7 @@ const config = require('config');
 const authMiddleware = (array) => (req, res, next) => {
     try {
         const authHeaderToken = req.header('Authorization');
+        console.log(authHeaderToken);
         const token = authHeaderToken.split(' ')[1] || authHeaderToken;
         if (!token) {
             //TO DO: handle errors

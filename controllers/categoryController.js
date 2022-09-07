@@ -102,6 +102,7 @@ class CategoryController {
             next(err);
         }
     }
+
 }
 
 module.exports = CategoryController;

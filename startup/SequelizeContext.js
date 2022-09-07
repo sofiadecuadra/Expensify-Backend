@@ -12,7 +12,6 @@ class SequelizeContext {
         const dbName = config.get("MYSQL_DB.name");
 
         this.connection = new Sequelize(`mysql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`, {
-            logging: false,
             pool: {
                 max: 500,
                 min: 0,
