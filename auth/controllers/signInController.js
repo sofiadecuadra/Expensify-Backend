@@ -1,8 +1,8 @@
 const bcrypt = require("bcrypt");
 const UserSQL = require("../../models/userSQL");
-const createToken = require("../../library/tokenManager");
+const createToken = require("../../library/jwtSupplier");
 
-class LoginController {
+class SignInController {
 
     static async logIn(req, res, next) {
         try {
@@ -21,4 +21,4 @@ class LoginController {
 
 }
 
-module.exports = LoginController;
+module.exports = SignInController;

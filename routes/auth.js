@@ -1,7 +1,7 @@
 const Router = require("express");
 const router = Router({ mergeParams: true });
-const loginController = require("../auth/controllers/loginController");
+const signInController = require("../auth/controllers/signInController");
 
-router.post("/", loginController.logIn);
+router.post("/", signInController.logIn);
 
 module.exports = router;
