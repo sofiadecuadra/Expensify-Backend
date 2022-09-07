@@ -1,7 +1,10 @@
 const Router = require('express');
 const router = Router({ mergeParams: true });
 const categoryController = require('../controllers/categoryController');
+const authMiddleware = require('../middleware/auth');
+const Roles = require('../library/roles');
 
-router.post('/', categoryController.createCategory);
+router.post('/', authMiddleware([Roles.Administrator]), categoryController.createCategory);
+router.delete('/:categoryId', authMiddleware([Roles.Administrator]), categoryController.deleteCategory);
 
 module.exports = router;
