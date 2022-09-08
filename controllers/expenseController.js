@@ -68,6 +68,41 @@ class ExpenseController {
             next(err);
         }
     }
+
+    static async getExpensesPaginated(req, res, next) {
+        try {
+            let { startDate, endDate, page, pageSize } = req.body;
+            if (!startDate || !endDate) {
+                endDate = new Date();
+                startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+            }
+            const expenses = await ExpenseSQL.instance.findAll(ExpenseController.paginate({
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
+                    }
+                },
+                order: [["producedDate", "ASC"]]
+            }, { page, pageSize }));
+            res.status(200).json(expenses);
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
+    static paginate(query, { page, pageSize }) {
+        const offset = page * pageSize;
+        const limit = pageSize;
+
+        return {
+            ...query,
+            offset,
+            limit,
+        };
+    };
+
 }
 
 module.exports = ExpenseController;
