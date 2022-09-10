@@ -71,8 +71,10 @@ class ExpenseController {
     }
 
     static async getExpensesPaginated(req, res, next) {
+        console.log({ req, res, next })
         try {
-            let { startDate, endDate, page, pageSize } = req.body;
+            let { startDate, endDate, page, pageSize } = req.query;
+            console.log({ startDate, endDate, page, pageSize });
             if (!startDate || !endDate) {
                 endDate = new Date();
                 startDate = new Date();
@@ -106,9 +108,32 @@ class ExpenseController {
         }
     }
 
+    static async getExpensesCount(req, res, next) {
+        try {
+            let { startDate, endDate } = req.query;
+            if (!startDate || !endDate) {
+                endDate = new Date();
+                startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+            }
+            const expenses = await ExpenseSQL.instance.findAll({
+                attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
+                    }
+                },
+            });
+            res.status(200).json(expenses);
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
     static paginate(query, { page, pageSize }) {
-        const offset = page * pageSize;
-        const limit = pageSize;
+        const offset = parseInt(page) * parseInt(pageSize);
+        const limit = parseInt(pageSize);
 
         return {
             ...query,

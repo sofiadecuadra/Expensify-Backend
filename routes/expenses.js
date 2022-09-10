@@ -8,6 +8,7 @@ router.post('/', authMiddleware([Roles.Member, Roles.Administrator]), expenseCon
 router.delete('/:expenseId', authMiddleware([Roles.Administrator]), expenseController.deleteExpense);
 router.put('/:expenseId', authMiddleware([Roles.Administrator]), expenseController.updateExpense);
 router.get('/', authMiddleware([Roles.Member, Roles.Administrator]), expenseController.getExpensesPaginated);
+router.get('/count', authMiddleware([Roles.Member, Roles.Administrator]), expenseController.getExpensesCount);
 router.get('/:categoryId', authMiddleware([Roles.Administrator]), expenseController.getExpensesByCategory);
 
 
