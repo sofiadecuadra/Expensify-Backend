@@ -1,6 +1,7 @@
 const ExpenseSQL = require("../models/expenseSQL");
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
+const CategorySQL = require("../models/categorySQL");
 
 class ExpenseController {
     static async createNewExpense(req, res, next) {
@@ -78,12 +79,25 @@ class ExpenseController {
                 startDate.setDate(startDate.getDate() - 30);
             }
             const expenses = await ExpenseSQL.instance.findAll(ExpenseController.paginate({
+                attributes: ["amount", "id", "producedDate"],
                 where: {
                     producedDate: {
                         [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
                     }
                 },
-                order: [["producedDate", "ASC"]]
+                order: [["producedDate", "ASC"]],
+                include: [
+                    {
+                        model: CategorySQL.instance,
+                        attributes: [
+                            "name", "image", "description"
+                            /*, "description", "image", "monthlyBudget", "familyId", "active"*/
+                        ],
+                        where: {
+                            active: true,
+                        },
+                    },
+                ],
             }, { page, pageSize }));
             res.status(200).json(expenses);
         } catch (err) {
