@@ -1,5 +1,7 @@
 const FamilySql = require('../models/familySQL');
 const createKey = require('../library/jwtSupplier');
+const DuplicateError = require('../errors/DuplicateFamilyError');
+const sequelize = require("sequelize");
 
 class FamilyController {
 
@@ -10,6 +12,7 @@ class FamilyController {
             return family;
         } catch (err) {
             console.log(err);
+            if (err instanceof sequelize.UniqueConstraintError) throw (new DuplicateError(name));
         }
     }
 

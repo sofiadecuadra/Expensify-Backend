@@ -3,6 +3,9 @@ const FamilyController = require("./familyController");
 const bcrypt = require("bcrypt");
 const UserDTO = require("../DTO/userDTO");
 const createKey = require("../library/jwtSupplier");
+const ValidationError = require('../errors/ValidationError');
+const DuplicateError = require('../errors/DuplicateUserError');
+const sequelize = require("sequelize");
 
 class UserController {
     static async createNewUser(req, res, next) {
@@ -17,7 +20,10 @@ class UserController {
             res.send({ token: token });
         } catch (err) {
             console.log(err);
-            next(err);
+            const { email } = req.body;
+            if (err instanceof sequelize.UniqueConstraintError) next(new DuplicateError(email));
+            if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
+            else next(err);
         }
     }
 }
