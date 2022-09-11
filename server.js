@@ -3,6 +3,7 @@ const express = require('express');
 const apiPort = config.get("API_PORT");
 const cors = require("cors");
 const routes = require("./routes");
+const error = require("./middleware/error");
 
 class Server {
     app;
@@ -21,6 +22,7 @@ class Server {
         this.app.use(express.json());
         this.app.use(cors());
         this.app.use("/", routes);
+        this.app.use(error);
     }
 
 }

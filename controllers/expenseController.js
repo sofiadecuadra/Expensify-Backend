@@ -2,6 +2,8 @@ const ExpenseSQL = require("../models/expenseSQL");
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 const CategorySQL = require("../models/categorySQL");
+const ValidationError = require("../errors/ValidationError");
+const ForeignKeyError = require("../errors/ForeignKeyError");
 
 class ExpenseController {
     static async createNewExpense(req, res, next) {
@@ -17,8 +19,11 @@ class ExpenseController {
             });
             res.status(201).json({ message: 'Expense created successfully' });
         } catch (err) {
-            console.log(err.message);
-            next(err);
+            console.log(err);
+            const { categoryId } = req.body;
+            if (err instanceof sequelize.ForeignKeyConstraintError) next(new ForeignKeyError(categoryId));
+            else if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
+            else next(err);
         }
     }
 
@@ -45,8 +50,11 @@ class ExpenseController {
             }, { where: { id: expenseId } });
             res.status(200).json({ message: 'Expense updated successfully' });
         } catch (err) {
-            console.log(err.message);
-            next(err);
+            console.log(err);
+            const { categoryId } = req.body;
+            if (err instanceof sequelize.ForeignKeyConstraintError) next(new ForeignKeyError(categoryId));
+            else if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
+            else next(err);
         }
     }
 
