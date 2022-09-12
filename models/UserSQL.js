@@ -3,6 +3,7 @@ const SQLModel = require("./sqlModel");
 
 class UserSQL extends SQLModel {
     static instance;
+    static connection;
 
     static async createInstance(sequelizeContext, familyInstance) {
         UserSQL.instance = await sequelizeContext.connection.define("User", {
@@ -26,6 +27,7 @@ class UserSQL extends SQLModel {
             },
         });
         UserSQL.instance.belongsTo(familyInstance, { foreignKey: { allowNull: false, name: "familyId" } });
+        UserSQL.connection = sequelizeContext.connection;
     }
 }
 

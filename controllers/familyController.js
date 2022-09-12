@@ -5,10 +5,10 @@ const sequelize = require("sequelize");
 
 class FamilyController {
 
-    static async createNewFamily(name) {
+    static async createNewFamily(name, transaction) {
         try {
             const apiKey = await FamilyController.createApiKey(name);
-            const family = await FamilySql.instance.create({ name, apiKey });
+            const family = await FamilySql.instance.create({ name, apiKey }, transaction);
             return family;
         } catch (err) {
             console.log(err);
