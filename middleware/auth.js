@@ -16,7 +16,6 @@ const authMiddleware = (roleArray) => (req, res, next) => {
     if (!role) {
         const availableRoles = roleArray.map((role) => role.name);
         throw new RoleError(availableRoles.join(", "));
-        // res.status(401).send("User not authorized. Authorized roles: " + roleArray.join(", "));
     }
     next();
 };
