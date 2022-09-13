@@ -11,7 +11,8 @@ class SignInController {
 
             const isValidPassword = await bcrypt.compare(req.body.password, user.password);
             //TO DO: handle errors
-            const token = await createToken(user.id, user.role, user.email, user.familyId);
+            const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
+            const token = await createToken(data);
             res.send({ token: token });
         } catch (err) {
             next(err);
