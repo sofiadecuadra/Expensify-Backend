@@ -2,12 +2,15 @@ const FamilySql = require('../models/familySQL');
 const createKey = require('../library/jwtSupplier');
 const DuplicateError = require('../errors/DuplicateFamilyError');
 const sequelize = require("sequelize");
+const { WordValidator } = require("../utilities/inputValidators");
+
 
 class FamilyController {
 
     static async createNewFamily(name, transaction) {
         try {
             const apiKey = await FamilyController.createApiKey(name);
+            WordValidator.validate(name, "family name", 20);
             const family = await FamilySql.instance.create({ name, apiKey }, transaction);
             return family;
         } catch (err) {

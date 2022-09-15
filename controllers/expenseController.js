@@ -4,11 +4,13 @@ const sequelize = require("sequelize");
 const CategorySQL = require("../models/categorySQL");
 const ValidationError = require("../errors/ValidationError");
 const ForeignKeyError = require("../errors/ForeignKeyError");
+const { NumberValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
     static async createNewExpense(req, res, next) {
         try {
             const { amount, producedDate, categoryId } = req.body;
+            NumberValidator.validate(amount, "expense amount", 1000000000);
             const { userId } = req.user;
             await ExpenseSQL.instance.create({
                 amount,
@@ -30,7 +32,6 @@ class ExpenseController {
     static async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
-            console.log(expenseId);
             await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
             res.status(200).json({ message: 'Expense deleted successfully' });
         } catch (err) {
@@ -43,6 +44,7 @@ class ExpenseController {
         try {
             const { expenseId } = req.params;
             const { amount, producedDate, categoryId } = req.body;
+            NumberValidator.validate(amount, "expense amount", 1000000000);
             await ExpenseSQL.instance.update({
                 amount,
                 producedDate: parseDate(producedDate),
@@ -79,7 +81,6 @@ class ExpenseController {
     }
 
     static async getExpensesPaginated(req, res, next) {
-        console.log({ req, res, next })
         try {
             let { startDate, endDate, page, pageSize } = req.query;
             console.log({ startDate, endDate, page, pageSize });
