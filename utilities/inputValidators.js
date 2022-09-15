@@ -24,4 +24,4 @@ class NumberValidator {
     }
 }
 
-module.exports = WordValidator, ParagraphValidator;
+module.exports = WordValidator, ParagraphValidator, NumberValidator;
