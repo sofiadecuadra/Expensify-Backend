@@ -40,6 +40,7 @@ class CategoryController {
     static async deleteCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
+            NumberValidator.validate(categoryId, "category id", 100000000000);
             await CategorySQL.instance.update(
                 {
                     active: false,
@@ -60,6 +61,7 @@ class CategoryController {
     static async updateCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
+            NumberValidator.validate(categoryId, "category id", 100000000000);
             const { name, description, image, monthlyBudget } = req.body;
             WordValidator.validate(name, "name", 20);
             ParagraphValidator.validate(description, "description", 100);
@@ -87,6 +89,7 @@ class CategoryController {
     static async getCategories(req, res, next) {
         try {
             const { familyId } = req.user;
+            NumberValidator.validate(familyId, "family id", 100000000000);
             const categories = await CategorySQL.instance.findAll({
                 attributes: ["name"],
                 where: {
