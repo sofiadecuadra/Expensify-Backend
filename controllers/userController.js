@@ -5,9 +5,7 @@ const createKey = require("../library/jwtSupplier");
 const ValidationError = require('../errors/ValidationError');
 const DuplicateError = require('../errors/DuplicateUserError');
 const sequelize = require("sequelize");
-const WordValidator = require("../utilities/inputValidators");
-const EmailValidator = require("../utilities/inputValidators");
-const PasswordValidator = require("../utilities/inputValidators");
+const { WordValidator, EmailValidator, PasswordValidator } = require("../utilities/inputValidators");
 
 class UserController {
     static async createNewUser(req, res, next) {

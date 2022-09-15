@@ -26,7 +26,8 @@ class NumberValidator {
 
 class EmailValidator {
     static validate = (input) => {
-        const regex = new RegExp(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`);
+        const regex = new RegExp(`^[^ ]+@[^ ]+\.[^ ]+$`);
+        console.log(input, regex)
         if (!regex.test(input))
             throw new InputValidationError(`Please enter a valid email!`);
     }
@@ -39,4 +40,4 @@ class PasswordValidator {
             throw new InputValidationError(`Please enter a password between 4 and 64 characters (letters, numbers or symbols)!`);
     }
 }
-module.exports = WordValidator, ParagraphValidator, NumberValidator, EmailValidator, PasswordValidator;
+module.exports = { WordValidator, ParagraphValidator, NumberValidator, EmailValidator, PasswordValidator };

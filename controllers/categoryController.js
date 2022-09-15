@@ -4,9 +4,7 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
-const WordValidator = require("../utilities/inputValidators");
-const ParagraphValidator = require("../utilities/inputValidators");
-const NumberValidator = require("../utilities/inputValidators");
+const { WordValidator, ParagraphValidator, NumberValidator } = require("../utilities/inputValidators");
 
 class CategoryController {
     static async createCategory(req, res, next) {

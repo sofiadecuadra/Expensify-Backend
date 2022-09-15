@@ -4,7 +4,7 @@ const sequelize = require("sequelize");
 const CategorySQL = require("../models/categorySQL");
 const ValidationError = require("../errors/ValidationError");
 const ForeignKeyError = require("../errors/ForeignKeyError");
-const NumberValidator = require("../utilities/inputValidators");
+const { NumberValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
     static async createNewExpense(req, res, next) {

@@ -2,7 +2,7 @@ const FamilySql = require('../models/familySQL');
 const createKey = require('../library/jwtSupplier');
 const DuplicateError = require('../errors/DuplicateFamilyError');
 const sequelize = require("sequelize");
-const WordValidator = require("../utilities/inputValidators");
+const { WordValidator } = require("../utilities/inputValidators");
 
 
 class FamilyController {
