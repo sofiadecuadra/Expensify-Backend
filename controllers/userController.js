@@ -19,8 +19,8 @@ class UserController {
             const user = await UserSQL.connection.transaction(async (t) => {
                 const family = await FamilyController.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
-                const encriptedPassword = await bcrypt.hash(password.toString(), salt);
-                const user = await UserSQL.instance.create({ name, email, role, familyId: family.dataValues.id, password: encriptedPassword }, { transaction: t });
+                const encryptedPassword = await bcrypt.hash(password.toString(), salt);
+                const user = await UserSQL.instance.create({ name, email, role, familyId: family.dataValues.id, password: encryptedPassword }, { transaction: t });
                 return user;
             });
 
