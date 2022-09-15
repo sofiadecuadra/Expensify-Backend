@@ -2,23 +2,28 @@ const UserSQL = require("../models/userSQL");
 const FamilyController = require("./familyController");
 const bcrypt = require("bcrypt");
 const createKey = require("../library/jwtSupplier");
-const ValidationError = require('../errors/ValidationError');
-const DuplicateError = require('../errors/DuplicateUserError');
+const ValidationError = require("../errors/ValidationError");
+const DuplicateError = require("../errors/DuplicateUserError");
 const sequelize = require("sequelize");
 const { WordValidator, EmailValidator, PasswordValidator } = require("../utilities/inputValidators");
 
 class UserController {
+    static nameLength = 20;
+
     static async createNewUser(req, res, next) {
         try {
             const { name, email, role, familyName, password } = req.body;
-            WordValidator.validate(name, "name", 20);
+            WordValidator.validate(name, "name", UserController.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
             const user = await UserSQL.connection.transaction(async (t) => {
                 const family = await FamilyController.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
                 const encryptedPassword = await bcrypt.hash(password.toString(), salt);
-                const user = await UserSQL.instance.create({ name, email, role, familyId: family.dataValues.id, password: encryptedPassword }, { transaction: t });
+                const user = await UserSQL.instance.create(
+                    { name, email, role, familyId: family.dataValues.id, password: encryptedPassword },
+                    { transaction: t }
+                );
                 return user;
             });
 

@@ -7,11 +7,14 @@ const ForeignKeyError = require("../errors/ForeignKeyError");
 const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
+    static numberLength = 1000000000;
+
     static async createNewExpense(req, res, next) {
         try {
             const { amount, producedDate, categoryId } = req.body;
-            NumberValidator.validate(amount, "expense amount", 1000000000);
+            NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
+            NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
 
             const { userId } = req.user;
             await ExpenseSQL.instance.create({
@@ -34,6 +37,8 @@ class ExpenseController {
     static async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
+
             await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
             res.status(200).json({ message: "Expense deleted successfully" });
         } catch (err) {
@@ -45,8 +50,11 @@ class ExpenseController {
     static async updateExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
             const { amount, producedDate, categoryId } = req.body;
             NumberValidator.validate(amount, "expense amount", 1000000000);
+            ISODateValidator.validate(producedDate, "produced date");
+
             await ExpenseSQL.instance.update(
                 {
                     amount,
@@ -69,7 +77,9 @@ class ExpenseController {
         try {
             const { categoryId } = req.params;
             const { startDate, endDate } = req.query;
-            console.log(startDate, endDate);
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+
             const expenses = await ExpenseSQL.instance.findAll({
                 where: {
                     categoryId: categoryId,
@@ -88,7 +98,11 @@ class ExpenseController {
     static async getExpensesPaginated(req, res, next) {
         try {
             let { startDate, endDate, page, pageSize } = req.query;
-            console.log({ startDate, endDate, page, pageSize });
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+            NumberValidator.validate(page, "page", 100000);
+            NumberValidator.validate(pageSize, "page size", 50);
+
             if (!startDate || !endDate) {
                 endDate = new Date();
                 startDate = new Date();
@@ -132,6 +146,9 @@ class ExpenseController {
     static async getExpensesCount(req, res, next) {
         try {
             let { startDate, endDate } = req.query;
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+
             if (!startDate || !endDate) {
                 endDate = new Date();
                 startDate = new Date();
