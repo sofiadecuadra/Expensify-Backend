@@ -4,7 +4,12 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
-const { WordValidator, ParagraphValidator, NumberValidator } = require("../utilities/inputValidators");
+const {
+    WordValidator,
+    ParagraphValidator,
+    NumberValidator,
+    ISODateValidator,
+} = require("../utilities/inputValidators");
 
 class CategoryController {
     static async createCategory(req, res, next) {
@@ -22,7 +27,7 @@ class CategoryController {
                 monthlyBudget,
                 familyId,
             });
-            res.status(201).json({ message: 'Category created successfully' });
+            res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             console.log(err);
             const { name } = req.body;
@@ -42,9 +47,10 @@ class CategoryController {
                 {
                     where: {
                         id: categoryId,
-                    }
-                });
-            res.status(200).json({ message: 'Category deleted successfully' });
+                    },
+                }
+            );
+            res.status(200).json({ message: "Category deleted successfully" });
         } catch (err) {
             console.log(err.message);
             next(err);
@@ -112,6 +118,8 @@ class CategoryController {
     static async getCategoriesExpensesByPeriod(req, res, next) {
         try {
             let { startDate, endDate } = req.query;
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
             const categories = await ExpenseSQL.instance.findAll({
                 ...CategoryController.groupByCategory(CategorySQL.instance),
                 where: {
