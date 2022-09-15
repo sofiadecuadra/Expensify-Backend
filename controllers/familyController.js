@@ -2,13 +2,16 @@ const FamilySql = require("../models/familySQL");
 const createKey = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
-const { WordValidator } = require("../utilities/inputValidators");
+const { WordValidator, NumberValidator } = require("../utilities/inputValidators");
 
 class FamilyController {
+    static nameLength = 20;
+    static numberLength = 1000000000;
+
     static async createNewFamily(name, transaction) {
         try {
             const apiKey = await FamilyController.createApiKey(name);
-            WordValidator.validate(name, "family name", 20);
+            WordValidator.validate(name, "family name", FamilyController.nameLength);
             const family = await FamilySql.instance.create({ name, apiKey }, transaction);
             return family;
         } catch (err) {
@@ -20,7 +23,7 @@ class FamilyController {
     static async updateApiKey(req, res, next) {
         try {
             const { familyId } = req.params;
-            NumberValidator.validate(familyId, "family id", 1000000000);
+            NumberValidator.validate(familyId, "family id", FamilyController.numberLength);
 
             const family = await FamilySql.instance.findOne({ where: { id: familyId } });
             const apiKey = await FamilyController.createApiKey(family.name);

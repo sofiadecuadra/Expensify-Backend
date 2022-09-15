@@ -24,14 +24,15 @@ class NumberValidator {
     static validate = (input, fieldName, length) => {
         const regex = new RegExp(`^(?:(?:[0-9])|(?:[1-9][0-9]{0,${length}}))$`);
         if (!regex.test(input))
-            throw new InputValidationError(`Please enter a non-empty ${fieldName} containing only ${length} digits!`);
+            throw new InputValidationError(
+                `Please enter a non-empty ${fieldName} containing a maximum of ${length} digits!`
+            );
     };
 }
 
 class EmailValidator {
     static validate = (input) => {
         const regex = new RegExp(`^[^ ]+@[^ ]+\.[^ ]+$`);
-        console.log(input, regex);
         if (!regex.test(input)) throw new InputValidationError(`Please enter a valid email!`);
     };
 }
@@ -49,7 +50,6 @@ class PasswordValidator {
 class ISODateValidator {
     static validate = (input, fieldName) => {
         const regex = new RegExp("^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d.\\d\\d\\dZ$");
-        console.log(input, regex);
         if (!regex.test(input)) throw new InputValidationError(`Please enter a valid ${fieldName} in ISO format!`);
     };
 }

@@ -7,12 +7,14 @@ const ForeignKeyError = require("../errors/ForeignKeyError");
 const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
+    static numberLength = 1000000000;
+
     static async createNewExpense(req, res, next) {
         try {
             const { amount, producedDate, categoryId } = req.body;
-            NumberValidator.validate(amount, "expense amount", 1000000000);
+            NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
-            NumberValidator.validate(categoryId, "category id", 1000000000);
+            NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
 
             const { userId } = req.user;
             await ExpenseSQL.instance.create({
@@ -35,7 +37,7 @@ class ExpenseController {
     static async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
-            NumberValidator.validate(expenseId, "expense id", 1000000000);
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
 
             await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
             res.status(200).json({ message: "Expense deleted successfully" });
@@ -48,7 +50,7 @@ class ExpenseController {
     static async updateExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
-            NumberValidator.validate(expenseId, "expense id", 1000000000);
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
             const { amount, producedDate, categoryId } = req.body;
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
