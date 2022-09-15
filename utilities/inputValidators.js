@@ -24,4 +24,19 @@ class NumberValidator {
     }
 }
 
-module.exports = WordValidator, ParagraphValidator, NumberValidator;
+class EmailValidator {
+    static validate = (input) => {
+        const regex = new RegExp(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`);
+        if (!regex.test(input))
+            throw new InputValidationError(`Please enter a valid email!`);
+    }
+}
+
+class PasswordValidator {
+    static validate = (input) => {
+        const regex = new RegExp(`^[^ ]{10,64}$`);
+        if (!regex.test(input))
+            throw new InputValidationError(`Please enter a password between 10 and 64 characters (letters, numbers or symbols)!`);
+    }
+}
+module.exports = WordValidator, ParagraphValidator, NumberValidator, EmailValidator, PasswordValidator;

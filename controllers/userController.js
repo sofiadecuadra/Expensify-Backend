@@ -5,12 +5,17 @@ const createKey = require("../library/jwtSupplier");
 const ValidationError = require('../errors/ValidationError');
 const DuplicateError = require('../errors/DuplicateUserError');
 const sequelize = require("sequelize");
+const WordValidator = require("../utilities/inputValidators");
+const EmailValidator = require("../utilities/inputValidators");
+const PasswordValidator = require("../utilities/inputValidators");
 
 class UserController {
     static async createNewUser(req, res, next) {
         try {
             const { name, email, role, familyName, password } = req.body;
-
+            WordValidator.validate(name, "name", 20);
+            EmailValidator.validate(email);
+            PasswordValidator.validate(password);
             const user = await UserSQL.connection.transaction(async (t) => {
                 const family = await FamilyController.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
