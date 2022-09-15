@@ -12,6 +12,7 @@ class ExpenseController {
             const { amount, producedDate, categoryId } = req.body;
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
+            NumberValidator.validate(categoryId, "category id", 1000000000);
 
             const { userId } = req.user;
             await ExpenseSQL.instance.create({
@@ -34,6 +35,8 @@ class ExpenseController {
     static async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
+            NumberValidator.validate(expenseId, "expense id", 1000000000);
+
             await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
             res.status(200).json({ message: "Expense deleted successfully" });
         } catch (err) {
@@ -45,6 +48,7 @@ class ExpenseController {
     static async updateExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
+            NumberValidator.validate(expenseId, "expense id", 1000000000);
             const { amount, producedDate, categoryId } = req.body;
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
