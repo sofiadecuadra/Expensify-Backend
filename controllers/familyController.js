@@ -4,7 +4,6 @@ const DuplicateError = require('../errors/DuplicateFamilyError');
 const sequelize = require("sequelize");
 const { WordValidator } = require("../utilities/inputValidators");
 
-
 class FamilyController {
 
     static async createNewFamily(name, transaction) {
@@ -14,8 +13,8 @@ class FamilyController {
             const family = await FamilySql.instance.create({ name, apiKey }, transaction);
             return family;
         } catch (err) {
-            console.log(err);
-            if (err instanceof sequelize.UniqueConstraintError) throw (new DuplicateError(name));
+            if (err instanceof sequelize.UniqueConstraintError) throw (new DuplicateError(name))
+            throw err;
         }
     }
 
