@@ -4,6 +4,7 @@ const AuthError = require("../errors/auth/AuthError");
 const errorMiddleware = (err, req, res, next) => {
 
     if (err instanceof HttpRequestError || err instanceof AuthError) {
+        console.log(err)
         return res.status(err.StatusCode).send(err.body());
     }
     return res.status(500).send({
