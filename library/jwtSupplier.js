@@ -6,4 +6,9 @@ const createKey = async (data) => {
     return token;
 };
 
-module.exports = createKey;
+const decryptKey = async (token) => {
+    const data = jwt.verify(token, config.get('SECRET_KEY'));
+    return data;
+};
+
+module.exports = { createKey, decryptKey };

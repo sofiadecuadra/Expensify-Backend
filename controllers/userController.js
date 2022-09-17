@@ -1,7 +1,7 @@
 const UserSQL = require("../models/userSQL");
 const FamilyController = require("./familyController");
 const bcrypt = require("bcrypt");
-const createKey = require("../library/jwtSupplier");
+const { createKey } = require("../library/jwtSupplier");
 const ValidationError = require("../errors/ValidationError");
 const DuplicateError = require("../errors/DuplicateUserError");
 const sequelize = require("sequelize");
