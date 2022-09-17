@@ -12,13 +12,14 @@ const {
 } = require("../utilities/inputValidators");
 
 class CategoryController {
+
     static nameLength = 20;
     static descriptionLength = 100;
     static numberLength = 1000000000;
 
     static async createCategory(req, res, next) {
         try {
-            const { name, description, image, monthlyBudget } = req.body;
+            const { name, description, monthlyBudget } = req.body;
             WordValidator.validate(name, "name", CategoryController.nameLength);
             ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
             NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
@@ -31,6 +32,7 @@ class CategoryController {
                 monthlyBudget,
                 familyId,
             });
+
             res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             console.log(err);
@@ -44,6 +46,7 @@ class CategoryController {
     static async deleteCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
+
             NumberValidator.validate(categoryId, "category id", CategoryController.numberLength);
             await CategorySQL.instance.update(
                 {
@@ -93,6 +96,7 @@ class CategoryController {
     static async getCategories(req, res, next) {
         try {
             const { familyId } = req.user;
+
             NumberValidator.validate(familyId, "family id", CategoryController.numberLength);
             const categories = await CategorySQL.instance.findAll({
                 attributes: ["name"],
@@ -144,6 +148,7 @@ class CategoryController {
 
     static groupByCategory = (categoryInstance) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
+
         include: [
             {
                 model: categoryInstance,

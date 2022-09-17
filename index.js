@@ -19,3 +19,4 @@ const dbPort = config.get("MYSQL_DB.port");
 const Server = require("./server");
 const server = new Server();
 server.start();
+server.config(); // <-- this is the line that is causing the error
