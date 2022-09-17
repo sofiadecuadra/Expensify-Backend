@@ -4,20 +4,27 @@ const sequelize = require("sequelize");
 const CategorySQL = require("../models/categorySQL");
 const ValidationError = require("../errors/ValidationError");
 const ForeignKeyError = require("../errors/ForeignKeyError");
+const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
+    static numberLength = 1000000000;
+
     static async createNewExpense(req, res, next) {
         try {
             const { amount, producedDate, categoryId } = req.body;
+            NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
+            ISODateValidator.validate(producedDate, "produced date");
+            NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
+
             const { userId } = req.user;
             await ExpenseSQL.instance.create({
                 amount,
                 producedDate: parseDate(producedDate),
                 categoryId,
                 userId,
-                registeredDate: parseDate(new Date())
+                registeredDate: parseDate(new Date()),
             });
-            res.status(201).json({ message: 'Expense created successfully' });
+            res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
             console.log(err);
             const { categoryId } = req.body;
@@ -30,9 +37,10 @@ class ExpenseController {
     static async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
-            console.log(expenseId);
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
+
             await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
-            res.status(200).json({ message: 'Expense deleted successfully' });
+            res.status(200).json({ message: "Expense deleted successfully" });
         } catch (err) {
             console.log(err.message);
             next(err);
@@ -42,13 +50,20 @@ class ExpenseController {
     static async updateExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
             const { amount, producedDate, categoryId } = req.body;
-            await ExpenseSQL.instance.update({
-                amount,
-                producedDate: parseDate(producedDate),
-                categoryId
-            }, { where: { id: expenseId } });
-            res.status(200).json({ message: 'Expense updated successfully' });
+            NumberValidator.validate(amount, "expense amount", 1000000000);
+            ISODateValidator.validate(producedDate, "produced date");
+
+            await ExpenseSQL.instance.update(
+                {
+                    amount,
+                    producedDate: parseDate(producedDate),
+                    categoryId,
+                },
+                { where: { id: expenseId } }
+            );
+            res.status(200).json({ message: "Expense updated successfully" });
         } catch (err) {
             console.log(err);
             const { categoryId } = req.body;
@@ -62,14 +77,16 @@ class ExpenseController {
         try {
             const { categoryId } = req.params;
             const { startDate, endDate } = req.query;
-            console.log(startDate, endDate);
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+
             const expenses = await ExpenseSQL.instance.findAll({
                 where: {
                     categoryId: categoryId,
                     producedDate: {
-                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
-                    }
-                }
+                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+                    },
+                },
             });
             res.status(200).json(expenses);
         } catch (err) {
@@ -79,36 +96,46 @@ class ExpenseController {
     }
 
     static async getExpensesPaginated(req, res, next) {
-        console.log({ req, res, next })
         try {
             let { startDate, endDate, page, pageSize } = req.query;
-            console.log({ startDate, endDate, page, pageSize });
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+            NumberValidator.validate(page, "page", 100000);
+            NumberValidator.validate(pageSize, "page size", 50);
+
             if (!startDate || !endDate) {
                 endDate = new Date();
                 startDate = new Date();
                 startDate.setDate(startDate.getDate() - 30);
             }
-            const expenses = await ExpenseSQL.instance.findAll(ExpenseController.paginate({
-                attributes: ["amount", "id", "producedDate"],
-                where: {
-                    producedDate: {
-                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
-                    }
-                },
-                order: [["producedDate", "ASC"]],
-                include: [
+            const expenses = await ExpenseSQL.instance.findAll(
+                ExpenseController.paginate(
                     {
-                        model: CategorySQL.instance,
-                        attributes: [
-                            "name", "image", "description"
-                            /*, "description", "image", "monthlyBudget", "familyId", "active"*/
-                        ],
+                        attributes: ["amount", "id", "producedDate"],
                         where: {
-                            active: true,
+                            producedDate: {
+                                [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+                            },
                         },
+                        order: [["producedDate", "ASC"]],
+                        include: [
+                            {
+                                model: CategorySQL.instance,
+                                attributes: [
+                                    "name",
+                                    "image",
+                                    "description",
+                                    /*, "description", "image", "monthlyBudget", "familyId", "active"*/
+                                ],
+                                where: {
+                                    active: true,
+                                },
+                            },
+                        ],
                     },
-                ],
-            }, { page, pageSize }));
+                    { page, pageSize }
+                )
+            );
             res.status(200).json(expenses);
         } catch (err) {
             console.log(err.message);
@@ -119,6 +146,9 @@ class ExpenseController {
     static async getExpensesCount(req, res, next) {
         try {
             let { startDate, endDate } = req.query;
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+
             if (!startDate || !endDate) {
                 endDate = new Date();
                 startDate = new Date();
@@ -128,8 +158,8 @@ class ExpenseController {
                 attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
                 where: {
                     producedDate: {
-                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)]
-                    }
+                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+                    },
                 },
             });
             res.status(200).json(expenses);
@@ -148,8 +178,7 @@ class ExpenseController {
             offset,
             limit,
         };
-    };
-
+    }
 }
 
 module.exports = ExpenseController;

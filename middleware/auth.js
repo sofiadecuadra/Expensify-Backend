@@ -1,16 +1,13 @@
-const jwt = require('jsonwebtoken');
-const config = require('config');
 const RoleError = require('../errors/auth/RoleError');
+const { decryptKey } = require('../library/jwtSupplier');
 
-const authMiddleware = (roleArray) => (req, res, next) => {
+const authMiddleware = (roleArray) => async (req, res, next) => {
     const authHeaderToken = req.header('Authorization');
-    console.log(authHeaderToken);
     const token = authHeaderToken.split(' ')[1] || authHeaderToken;
     if (!token) {
         //TO DO: handle errors
     }
-    console.log(token)
-    const user = jwt.verify(token, config.get('SECRET_KEY'));
+    const user = await decryptKey(token);
     req.user = user;
     const role = roleArray.find((role) => role.id === user.role);
     // if (!role) {

@@ -4,14 +4,26 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
+const {
+    WordValidator,
+    ParagraphValidator,
+    NumberValidator,
+    ISODateValidator,
+} = require("../utilities/inputValidators");
 
 class CategoryController {
+
+    static nameLength = 20;
+    static descriptionLength = 100;
+    static numberLength = 1000000000;
+
     static async createCategory(req, res, next) {
         try {
-            console.log(req);
-            console.log(req.body);
-            console.log(req);
             const { name, description, monthlyBudget } = req.body;
+            WordValidator.validate(name, "name", CategoryController.nameLength);
+            ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
+            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
+            //TODO Ver si validar imagen
             const { familyId } = req.user;
             await CategorySQL.instance.create({
                 name,
@@ -20,7 +32,8 @@ class CategoryController {
                 monthlyBudget,
                 familyId,
             });
-            res.status(201).json({ message: 'Category created successfully' });
+
+            res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             console.log(err);
             const { name } = req.body;
@@ -33,14 +46,19 @@ class CategoryController {
     static async deleteCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
-            await CategorySQL.instance.update({
-                active: false,
-            }, {
-                where: {
-                    id: categoryId,
+
+            NumberValidator.validate(categoryId, "category id", CategoryController.numberLength);
+            await CategorySQL.instance.update(
+                {
+                    active: false,
+                },
+                {
+                    where: {
+                        id: categoryId,
+                    },
                 }
-            });
-            res.status(200).json({ message: 'Category deleted successfully' });
+            );
+            res.status(200).json({ message: "Category deleted successfully" });
         } catch (err) {
             console.log(err.message);
             next(err);
@@ -50,13 +68,21 @@ class CategoryController {
     static async updateCategory(req, res, next) {
         try {
             const { categoryId } = req.params;
+            NumberValidator.validate(categoryId, "category id", CategoryController.numberLength);
             const { name, description, image, monthlyBudget } = req.body;
-            await CategorySQL.instance.update({
-                name: name,
-                description: description,
-                image: image,
-                monthlyBudget: monthlyBudget,
-            }, { where: { id: categoryId } });
+            WordValidator.validate(name, "name", CategoryController.nameLength);
+            ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
+            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.nameLength);
+            //TODO Ver si validar imagen
+            await CategorySQL.instance.update(
+                {
+                    name: name,
+                    description: description,
+                    image: image,
+                    monthlyBudget: monthlyBudget,
+                },
+                { where: { id: categoryId } }
+            );
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             console.log(err);
@@ -70,6 +96,8 @@ class CategoryController {
     static async getCategories(req, res, next) {
         try {
             const { familyId } = req.user;
+
+            NumberValidator.validate(familyId, "family id", CategoryController.numberLength);
             const categories = await CategorySQL.instance.findAll({
                 attributes: ["name"],
                 where: {
@@ -101,6 +129,8 @@ class CategoryController {
     static async getCategoriesExpensesByPeriod(req, res, next) {
         try {
             let { startDate, endDate } = req.query;
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
             const categories = await ExpenseSQL.instance.findAll({
                 ...CategoryController.groupByCategory(CategorySQL.instance),
                 where: {
@@ -118,16 +148,19 @@ class CategoryController {
 
     static groupByCategory = (categoryInstance) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
-        include: [{
-            model: categoryInstance,
-            attributes: [
-                "name",
-                /*, "description", "image", "monthlyBudget", "familyId", "active"*/
-            ],
-            where: {
-                active: true,
+
+        include: [
+            {
+                model: categoryInstance,
+                attributes: [
+                    "name",
+                    /*, "description", "image", "monthlyBudget", "familyId", "active"*/
+                ],
+                where: {
+                    active: true,
+                },
             },
-        }, ],
+        ],
         group: ["categoryId"],
     });
 }
