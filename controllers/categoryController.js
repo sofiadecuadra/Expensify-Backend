@@ -4,6 +4,12 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
+const multer = require("multer");
+var AWS = require('aws-sdk');
+var multerS3 = require('multer-s3');
+
+
+const s3 = new AWS.S3();
 const {
     WordValidator,
     ParagraphValidator,
@@ -17,8 +23,33 @@ class CategoryController {
     static descriptionLength = 100;
     static numberLength = 1000000000;
 
+
+
     static async createCategory(req, res, next) {
         try {
+            const upload = multer({
+                storage: multerS3({
+                    s3: s3,
+                    acl: 'public-read',
+                    bucket: 'backend-category',
+                    key: function(req, file, cb) {
+                        console.log(file);
+                        cb(null, file.originalname); //use Date.now() for unique file keys
+                    },
+
+                })
+            });
+            let image = '';
+            const singleUpload = upload.single('image');
+            singleUpload(req, res, function(err) {
+                if (err) {
+                    next({ error: { title: 'File Upload Error', detail: err.message } });
+                } else {
+                    image = req.file.location;
+                    next(null, { url: req.file.location, key: req.file.key });
+                };
+            });
+
             const { name, description, monthlyBudget } = req.body;
             WordValidator.validate(name, "name", CategoryController.nameLength);
             ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
@@ -48,16 +79,13 @@ class CategoryController {
             const { categoryId } = req.params;
 
             NumberValidator.validate(categoryId, "category id", CategoryController.numberLength);
-            await CategorySQL.instance.update(
-                {
-                    active: false,
+            await CategorySQL.instance.update({
+                active: false,
+            }, {
+                where: {
+                    id: categoryId,
                 },
-                {
-                    where: {
-                        id: categoryId,
-                    },
-                }
-            );
+            });
             res.status(200).json({ message: "Category deleted successfully" });
         } catch (err) {
             console.log(err.message);
@@ -74,15 +102,12 @@ class CategoryController {
             ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
             NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.nameLength);
             //TODO Ver si validar imagen
-            await CategorySQL.instance.update(
-                {
-                    name: name,
-                    description: description,
-                    image: image,
-                    monthlyBudget: monthlyBudget,
-                },
-                { where: { id: categoryId } }
-            );
+            await CategorySQL.instance.update({
+                name: name,
+                description: description,
+                image: image,
+                monthlyBudget: monthlyBudget,
+            }, { where: { id: categoryId } });
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             console.log(err);
@@ -99,7 +124,7 @@ class CategoryController {
 
             NumberValidator.validate(familyId, "family id", CategoryController.numberLength);
             const categories = await CategorySQL.instance.findAll({
-                attributes: ["name"],
+                attributes: ["name", "description", "image", "monthlyBudget"],
                 where: {
                     familyId: familyId,
                     active: true, // only active ones?
@@ -149,18 +174,16 @@ class CategoryController {
     static groupByCategory = (categoryInstance) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
 
-        include: [
-            {
-                model: categoryInstance,
-                attributes: [
-                    "name",
-                    /*, "description", "image", "monthlyBudget", "familyId", "active"*/
-                ],
-                where: {
-                    active: true,
-                },
+        include: [{
+            model: categoryInstance,
+            attributes: [
+                "name",
+                /*, "description", "image", "monthlyBudget", "familyId", "active"*/
+            ],
+            where: {
+                active: true,
             },
-        ],
+        }, ],
         group: ["categoryId"],
     });
 }
