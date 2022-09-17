@@ -2,7 +2,7 @@ const FamilySql = require("../models/familySQL");
 const createKey = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
-const { WordValidator, NumberValidator } = require("../utilities/inputValidators");
+const { WordValidator, NumberValidator, InArrayValidator } = require("../utilities/inputValidators");
 
 class FamilyController {
     static nameLength = 20;
@@ -40,6 +40,27 @@ class FamilyController {
         const data = { createdAt: todayDate, name: familyName };
         const apiKey = await createKey({ data });
         return apiKey;
+    }
+
+    static async createInvite(req, res, next) {
+        try {
+            const { familyId, userType } = req.params;
+            InArrayValidator.validate(userType, "user type", ["administrator", "member"]);
+            NumberValidator.validate(familyId, "family id", FamilyController.numberLength);
+            const { userId } = req.user;
+
+            const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
+            res.status(200).json({ inviteToken });
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
+    static async generateInvite(familyId, userId, userType) {
+        const data = { familyId, userId, userType, date: new Date() };
+        const invite = await createKey({ data });
+        return invite;
     }
 }
 
