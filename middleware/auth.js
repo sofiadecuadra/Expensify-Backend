@@ -1,23 +1,23 @@
 const RoleError = require('../errors/auth/RoleError');
-const AuthError = require('../errors/auth/AuthError');
+const TokenError = require('../errors/auth/TokenError');
 const { decryptKey } = require('../library/jwtSupplier');
 
 const authMiddleware = (roleArray) => async (req, res, next) => {
     const authHeaderToken = req.header('Authorization');
-    if (!authHeaderToken){
-        throw new AuthError('No token provided');
+
+    const token = (!authHeaderToken) ? null : authHeaderToken.split(' ')[1] || authHeaderToken;
+    let user;
+    try {
+        user = await decryptKey(token);
     }
-    console.log(authHeaderToken);
-    const token = authHeaderToken.split(' ')[1] || authHeaderToken;
-    if (!token) {
-        //TO DO: handle errors
+    catch (err) {
+        return next(new TokenError());
     }
-    const user = await decryptKey(token);
     req.user = user;
     const role = roleArray.find((role) => role.id === user.role);
     if (!role) {
-     const availableRoles = roleArray.map((role) => role.name);
-        throw new RoleError(availableRoles.join(", "));
+        const availableRoles = roleArray.map((role) => role.name);
+        return next(new RoleError(availableRoles.join(", ")));
     }
     next();
 };

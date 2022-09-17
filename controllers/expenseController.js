@@ -106,9 +106,8 @@ class ExpenseController {
 
             NumberValidator.validate(page, "page", 100000);
             NumberValidator.validate(pageSize, "page size", 50);
-            
+
             if (startDate && endDate) {
-                console.log(startDate, endDate);
                 ISODateValidator.validate(startDate, "start date");
                 ISODateValidator.validate(endDate, "end date");
             }
@@ -169,7 +168,6 @@ class ExpenseController {
             let { startDate, endDate } = req.query;
 
             if (startDate && endDate) {
-                console.log(startDate, endDate);
                 ISODateValidator.validate(startDate, "start date");
                 ISODateValidator.validate(endDate, "end date");
             }
