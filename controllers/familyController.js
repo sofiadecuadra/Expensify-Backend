@@ -1,5 +1,5 @@
 const FamilySql = require("../models/familySQL");
-const createKey = require("../library/jwtSupplier");
+const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const { WordValidator, NumberValidator, InArrayValidator } = require("../utilities/inputValidators");
@@ -61,6 +61,17 @@ class FamilyController {
         const data = { familyId, userId, userType, date: new Date() };
         const invite = await createKey({ data });
         return invite;
+    }
+
+    static async validateInviteToken(req, res, next) {
+        try {
+            const { inviteToken } = req.params;
+            const decryptedToken = await decryptKey(inviteToken);
+            res.status(200).json({ inviteData: decryptedToken.data });
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
     }
 }
 

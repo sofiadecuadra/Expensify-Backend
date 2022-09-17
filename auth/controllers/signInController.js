@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const UserSQL = require("../../models/userSQL");
-const createToken = require("../../library/jwtSupplier");
+const { createToken } = require("../../library/jwtSupplier");
 
 class SignInController {
 
