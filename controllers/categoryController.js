@@ -29,52 +29,62 @@ class CategoryController {
 
     static async createCategory(req, res, next) {
         try {
+
             let form = new multiparty.Form();
+            let name = '';
+            let description = '';
+            let monthlyBudget = -1;
+            form.parse(req, async function(err, fields, files) {
+                name = fields['name'][0];
+                description = fields['description'][0];
+                monthlyBudget = fields['monthlyBudget'][0];
+                console.log(name);
+                // Object.keys(fields).forEach(function(name) {
 
-            form.parse(req, function(err, fields, files) {
-                Object.keys(fields).forEach(function(name) {
-                    console.log('got field named ' + fields[name]);
+                //     console.log('got field named ' + fields[name]);
+                // });
+                console.log('info', name);
+                const upload = multer({
+                    storage: multerS3({
+                        s3: s3,
+                        acl: 'public-read',
+                        bucket: 'backend-category',
+                        key: function(req, file, cb) {
+                            console.log(file);
+                            //cb(null, file.originalname); //use Date.now() for unique file keys
+                        },
+
+                    })
                 });
-            });
-            const { name, description, monthlyBudget } = req.body;
-            console.log('info', req);
-            const upload = multer({
-                storage: multerS3({
-                    s3: s3,
-                    acl: 'public-read',
-                    bucket: 'backend-category',
-                    key: function(req, file, cb) {
-                        console.log(file);
-                        cb(null, file.originalname); //use Date.now() for unique file keys
-                    },
+                let image = '';
+                const singleUpload = upload.single('image');
 
-                })
-            });
-            let image = '';
-            const singleUpload = upload.single('image');
+                singleUpload(req, res, async function(err) {
+                    if (err) {
+                        console.log(err.message);
+                        throw new FileUploadError(name);
+                    } else {
+                        image = req.file.location;
+                        WordValidator.validate(name, "name", CategoryController.nameLength);
+                        ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
+                        NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
 
-            singleUpload(req, res, function(err) {
-                if (err) {
-                    throw new FileUploadError(name);
-                } else {
-                    image = req.file.location;
-                };
-            });
+                        const { familyId } = req.user;
+                        await CategorySQL.instance.create({
+                            name,
+                            description,
+                            image,
+                            monthlyBudget,
+                            familyId,
+                        });
 
-            WordValidator.validate(name, "name", CategoryController.nameLength);
-            ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
-            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
+                        res.status(201).json({ message: "Category created successfully" });
+                    };
+                });
 
-            const { familyId } = req.user;
-            await CategorySQL.instance.create({
-                name,
-                description,
-                image,
-                monthlyBudget,
-                familyId,
+
             });
 
-            res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             console.log(err);
             const { name } = req.body;
