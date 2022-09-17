@@ -7,11 +7,11 @@ class ForeignKeyError extends HTTPRequestError {
         super();
         this.message = `The category with id '${id}' was not found. Please try again.`;
     }
-    
+
     body() {
         return {
-            ErrorType: `Not found error`,
-            Message: this.message,
+            errorType: `Not found error`,
+            message: this.message,
         };
     }
 }

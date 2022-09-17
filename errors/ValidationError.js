@@ -14,11 +14,11 @@ class ValidationError extends HTTPRequestError {
         }
         this.message = `Missing fields: ${missingFields}. Please fill all and try again.`;
     }
-    
+
     body() {
         return {
-            ErrorType: `Validation error`,
-            Message: this.message,
+            errorType: `Validation error`,
+            message: this.message,
         };
     }
 }

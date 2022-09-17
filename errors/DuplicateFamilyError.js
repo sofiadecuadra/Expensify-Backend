@@ -5,13 +5,13 @@ class DuplicateFamilyError extends HTTPRequestError {
 
     constructor(name) {
         super();
-        this.message = `A family named '${name}' already exists. Please try again.`; 
+        this.message = `A family named '${name}' already exists. Please try again.`;
     }
-    
+
     body() {
         return {
-            ErrorType: `Duplicate error`,
-            Message: this.message,
+            errorType: `Duplicate error`,
+            message: this.message,
         };
     }
 }

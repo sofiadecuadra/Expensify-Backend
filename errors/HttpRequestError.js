@@ -3,8 +3,8 @@ class HTTPRequestError extends Error {
 
     body() {
         return {
-            ErrorType: `Server error`,
-            Message: this.message,
+            errorType: `Server error`,
+            message: this.message,
         };
     }
 

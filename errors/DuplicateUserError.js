@@ -5,13 +5,13 @@ class DuplicateUserError extends HTTPRequestError {
 
     constructor(email) {
         super();
-        this.message = `The email '${email}' is already in use. Please try again.`; 
+        this.message = `The email '${email}' is already in use. Please try again.`;
     }
-    
+
     body() {
         return {
-            ErrorType: `Duplicate error`,
-            Message: this.message,
+            errorType: `Duplicate error`,
+            message: this.message,
         };
     }
 }
