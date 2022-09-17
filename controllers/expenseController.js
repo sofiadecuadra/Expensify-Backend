@@ -1,9 +1,13 @@
 const ExpenseSQL = require("../models/expenseSQL");
+const CategorySQL = require("../models/categorySQL");
+const UserSQL = require("../models/userSQL");
+
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
-const CategorySQL = require("../models/categorySQL");
+
 const ValidationError = require("../errors/ValidationError");
 const ForeignKeyError = require("../errors/ForeignKeyError");
+
 const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
 
 class ExpenseController {
@@ -77,6 +81,7 @@ class ExpenseController {
         try {
             const { categoryId } = req.params;
             const { startDate, endDate } = req.query;
+
             ISODateValidator.validate(startDate, "start date");
             ISODateValidator.validate(endDate, "end date");
 
@@ -98,20 +103,30 @@ class ExpenseController {
     static async getExpensesPaginated(req, res, next) {
         try {
             let { startDate, endDate, page, pageSize } = req.query;
-            ISODateValidator.validate(startDate, "start date");
-            ISODateValidator.validate(endDate, "end date");
+
             NumberValidator.validate(page, "page", 100000);
             NumberValidator.validate(pageSize, "page size", 50);
-
-            if (!startDate || !endDate) {
+            
+            if (startDate && endDate) {
+                console.log(startDate, endDate);
+                ISODateValidator.validate(startDate, "start date");
+                ISODateValidator.validate(endDate, "end date");
+            }
+            else {
                 endDate = new Date();
                 startDate = new Date();
                 startDate.setDate(startDate.getDate() - 30);
             }
+
             const expenses = await ExpenseSQL.instance.findAll(
                 ExpenseController.paginate(
                     {
-                        attributes: ["amount", "id", "producedDate"],
+                        attributes: [
+                            "amount",
+                            "id",
+                            "producedDate",
+                            "registeredDate"
+                        ],
                         where: {
                             producedDate: {
                                 [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
@@ -131,6 +146,12 @@ class ExpenseController {
                                     active: true,
                                 },
                             },
+                            {
+                                model: UserSQL.instance,
+                                attributes: [
+                                    "name"
+                                ],
+                            }
                         ],
                     },
                     { page, pageSize }
@@ -146,10 +167,13 @@ class ExpenseController {
     static async getExpensesCount(req, res, next) {
         try {
             let { startDate, endDate } = req.query;
-            ISODateValidator.validate(startDate, "start date");
-            ISODateValidator.validate(endDate, "end date");
 
-            if (!startDate || !endDate) {
+            if (startDate && endDate) {
+                console.log(startDate, endDate);
+                ISODateValidator.validate(startDate, "start date");
+                ISODateValidator.validate(endDate, "end date");
+            }
+            else {
                 endDate = new Date();
                 startDate = new Date();
                 startDate.setDate(startDate.getDate() - 30);
