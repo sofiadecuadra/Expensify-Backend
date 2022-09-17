@@ -4,7 +4,7 @@ const InputValidationError = require("../utilities/InputValidationError");
 
 const errorMiddleware = (err, req, res, next) => {
 
-    console.log(err.message)
+    console.error(err.message);
     if (err instanceof HttpRequestError || err instanceof AuthError || err instanceof InputValidationError) {
         return res.status(err.StatusCode).send(err.body());
     }

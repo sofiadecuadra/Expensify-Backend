@@ -7,6 +7,7 @@ const ValidationError = require("../errors/ValidationError");
 const multer = require("multer");
 var AWS = require('aws-sdk');
 var multerS3 = require('multer-s3');
+const multiparty = require('multiparty');
 
 
 const s3 = new AWS.S3();
@@ -16,6 +17,7 @@ const {
     NumberValidator,
     ISODateValidator,
 } = require("../utilities/inputValidators");
+const FileUploadError = require("../errors/FileUploadError");
 
 class CategoryController {
 
@@ -27,6 +29,15 @@ class CategoryController {
 
     static async createCategory(req, res, next) {
         try {
+            let form = new multiparty.Form();
+
+            form.parse(req, function(err, fields, files) {
+                Object.keys(fields).forEach(function(name) {
+                    console.log('got field named ' + fields[name]);
+                });
+            });
+            const { name, description, monthlyBudget } = req.body;
+            console.log('info', req);
             const upload = multer({
                 storage: multerS3({
                     s3: s3,
@@ -41,20 +52,19 @@ class CategoryController {
             });
             let image = '';
             const singleUpload = upload.single('image');
+
             singleUpload(req, res, function(err) {
                 if (err) {
-                    next({ error: { title: 'File Upload Error', detail: err.message } });
+                    throw new FileUploadError(name);
                 } else {
                     image = req.file.location;
-                    next(null, { url: req.file.location, key: req.file.key });
                 };
             });
 
-            const { name, description, monthlyBudget } = req.body;
             WordValidator.validate(name, "name", CategoryController.nameLength);
             ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
             NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
-            //TODO Ver si validar imagen
+
             const { familyId } = req.user;
             await CategorySQL.instance.create({
                 name,

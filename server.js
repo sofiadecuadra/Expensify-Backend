@@ -19,7 +19,9 @@ class Server {
 
     config() {
         this.app.set("port", apiPort || 3003);
+
         this.app.use(express.json());
+
         this.app.use(cors());
         this.app.use("/", routes);
         this.app.use(error);
