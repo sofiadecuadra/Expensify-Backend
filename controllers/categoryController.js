@@ -11,7 +11,7 @@ class CategoryController {
             console.log(req);
             console.log(req.body);
             console.log(req);
-            const { name, description, image, monthlyBudget } = req.body;
+            const { name, description, monthlyBudget } = req.body;
             const { familyId } = req.user;
             await CategorySQL.instance.create({
                 name,

@@ -8,14 +8,6 @@ var AWS = require('aws-sdk');
 var multerS3 = require('multer-s3');
 
 
-AWS.config.update({
-    accessKeyId: "ASIASXAD43NDUO5UYFJY", // Access key ID
-    secretAccesskey: "zPkl9jTSKCGsXHsz5YBpVW5ImoG3LajQMCV/BP9L", // Secret access key,
-    region: 'us-east-1',
-    sessionToken: 'FwoGZXIvYXdzEG8aDGHIrnyhywQvJViHSyLBASKOxNxaxFHBAuOf/VOA+oMpEc9NiXam4Emlqa+SZNJXOfu+/+ZRx0meB4Oqpu+y/XV6UMIT7p2/JPKiXnP2GpUIFh1p+JvVVTYLEw9EJ0H7l87IVGFV6ITHK668ZUrXf6GNHAmypHUQE1kUBdvic8wIS0souL8exqUXucjRYDl56deDq0Uz3TkHlO8sG6J6KJoyqC4yJCKkuxJrpsc27nmCSC1sMOPwLdPUQP+e9j60faGAjWArwaWC9Cn/t9pMzgYo2N+TmQYyLSNIfvmJdRpEsIpw++8lQM1yCbH3tubpB1+C+WiEjqdSs8y03kv5GpxVtk0lAA=='
-
-})
-
 const s3 = new AWS.S3();
 s3.listBuckets(function(err, data) {
     if (err) {
@@ -36,7 +28,7 @@ var upload = multer({
 
     })
 });
-
+//TO DO: changes middleware for uploading images
 router.post("/", upload.single('image'), authMiddleware([Roles.Administrator]), categoryController.createCategory);
 router.delete("/:categoryId", authMiddleware([Roles.Administrator]), categoryController.deleteCategory);
 router.put("/:categoryId", authMiddleware([Roles.Administrator]), categoryController.updateCategory);
