@@ -2,6 +2,7 @@ const FamilySql = require("../models/familySQL");
 const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
+const sendEmail = require("../library/emailSender");
 const { WordValidator, NumberValidator, InArrayValidator } = require("../utilities/inputValidators");
 
 class FamilyController {
@@ -67,6 +68,8 @@ class FamilyController {
 
             const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
             //mailing the inviteToken to the user
+
+            await sendEmail(users, inviteToken);
             res.status(200).json({ inviteToken });
         } catch (err) {
             console.log(err.message);
