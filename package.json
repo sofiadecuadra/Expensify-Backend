@@ -17,11 +17,13 @@
     },
     "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.171.0",
         "aws": "^0.0.3-2",
         "aws-sdk": "^2.1217.0",
         "bcrypt": "5.0.1",
         "config": "3.3.7",
         "cors": "2.8.5",
+        "dotenv": "^16.0.2",
         "express": "4.18.1",
         "jsonwebtoken": "8.5.1",
         "multer": "^1.4.5-lts.1",

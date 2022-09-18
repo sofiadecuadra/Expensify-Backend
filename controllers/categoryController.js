@@ -4,20 +4,32 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
-const multer = require("multer");
-var AWS = require('aws-sdk');
-var multerS3 = require('multer-s3');
-const multiparty = require('multiparty');
-
-
-const s3 = new AWS.S3();
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3")
 const {
     WordValidator,
     ParagraphValidator,
     NumberValidator,
     ISODateValidator,
 } = require("../utilities/inputValidators");
+const dotenv = require('dotenv')
 const FileUploadError = require("../errors/FileUploadError");
+
+dotenv.config()
+
+const bucketName = process.env.AWS_BUCKET_NAME
+const region = process.env.AWS_BUCKET_REGION
+const accessKeyId = process.env.AWS_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+const sessionToken = process.env.AWS_SESSION_TOKEN
+
+const s3 = new S3Client({
+    region: region,
+    credentials: {
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
+        sessionToken: sessionToken
+    },
+});
 
 class CategoryController {
 
@@ -25,66 +37,38 @@ class CategoryController {
     static descriptionLength = 100;
     static numberLength = 1000000000;
 
-
-
     static async createCategory(req, res, next) {
         try {
+            const imageFile = req.file;
+            const { name, description, monthlyBudget } = req.body;
 
-            let form = new multiparty.Form();
-            let name = '';
-            let description = '';
-            let monthlyBudget = -1;
-            form.parse(req, async function(err, fields, files) {
-                name = fields['name'][0];
-                description = fields['description'][0];
-                monthlyBudget = fields['monthlyBudget'][0];
-                console.log(name);
-                // Object.keys(fields).forEach(function(name) {
+            WordValidator.validate(name, "name", CategoryController.nameLength);
+            ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
+            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
 
-                //     console.log('got field named ' + fields[name]);
-                // });
-                console.log('info', name);
-                const upload = multer({
-                    storage: multerS3({
-                        s3: s3,
-                        acl: 'public-read',
-                        bucket: 'backend-category',
-                        key: function(req, file, cb) {
-                            console.log(file);
-                            //cb(null, file.originalname); //use Date.now() for unique file keys
-                        },
+            const params = {
+                Bucket: bucketName,
+                Key: Date.now() + '-' + req.file.originalname,
+                Body: imageFile.buffer,
+            };
 
-                    })
-                });
-                let image = '';
-                const singleUpload = upload.single('image');
+            const command = new PutObjectCommand(params);
 
-                singleUpload(req, res, async function(err) {
-                    if (err) {
-                        console.log(err.message);
-                        throw new FileUploadError(name);
-                    } else {
-                        image = req.file.location;
-                        WordValidator.validate(name, "name", CategoryController.nameLength);
-                        ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
-                        NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
+            await s3.send(command);
+            const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
 
-                        const { familyId } = req.user;
-                        await CategorySQL.instance.create({
-                            name,
-                            description,
-                            image,
-                            monthlyBudget,
-                            familyId,
-                        });
+            console.info("[S3] Uploaded: " + image);
 
-                        res.status(201).json({ message: "Category created successfully" });
-                    };
-                });
-
-
+            const { familyId } = req.user;
+            await CategorySQL.instance.create({
+                name,
+                description,
+                image,
+                monthlyBudget,
+                familyId,
             });
 
+            res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             console.log(err);
             const { name } = req.body;
@@ -203,7 +187,7 @@ class CategoryController {
             where: {
                 active: true,
             },
-        }, ],
+        },],
         group: ["categoryId"],
     });
 }
