@@ -44,12 +44,14 @@ class FamilyController {
 
     static async createInvite(req, res, next) {
         try {
-            const { familyId, userType } = req.params;
+            const { userType, users } = req.body;
+            const { userId, familyId } = req.user;
+
             InArrayValidator.validate(userType, "user type", ["administrator", "member"]);
             NumberValidator.validate(familyId, "family id", FamilyController.numberLength);
-            const { userId } = req.user;
 
             const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
+            //mailing the inviteToken to the user
             res.status(200).json({ inviteToken });
         } catch (err) {
             console.log(err.message);
