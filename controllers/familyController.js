@@ -3,7 +3,7 @@ const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const sendEmail = require("../library/emailSender");
-const { WordValidator, NumberValidator, InArrayValidator ,EmailValidator} = require("../utilities/inputValidators");
+const { WordValidator, NumberValidator, InArrayValidator, EmailValidator } = require("../utilities/inputValidators");
 const Roles = require("../library/roles");
 class FamilyController {
     static nameLength = 20;
@@ -42,7 +42,7 @@ class FamilyController {
             const apiKey = await FamilySql.instance.findOne({
                 where: { id: familyId },
                 attributes: ["apiKey"],
-            }); 
+            });
             res.json(apiKey);
         } catch (err) {
             console.log(err.message);
@@ -60,21 +60,20 @@ class FamilyController {
     static async getFamily(familyId) {
         const family = await FamilySql.instance.findOne({ where: { id: familyId } });
         return family;
-
     }
 
     static async createInvite(req, res, next) {
         try {
             const { userType, users } = req.body;
             const { userId, familyId } = req.user;
-            InArrayValidator.validate(userType, "user type",Object.keys(Roles));
-            users.forEach(user => {
+            InArrayValidator.validate(userType, "user type", Object.keys(Roles));
+            users.forEach((user) => {
                 EmailValidator.validate(user, "user email");
             });
-            
-            const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
-            //mailing the inviteToken to the user
             const { name } = await FamilyController.getFamily(familyId);
+
+            const inviteToken = await FamilyController.generateInvite(familyId, name, userId, userType);
+            //mailing the inviteToken to the user
 
             await sendEmail(users, inviteToken, name);
             res.status(200).json({ inviteToken });
@@ -84,8 +83,8 @@ class FamilyController {
         }
     }
 
-    static async generateInvite(familyId, userId, userType) {
-        const data = { familyId, userId, userType, date: new Date() };
+    static async generateInvite(familyId, familyName, userId, userType) {
+        const data = { familyId, familyName, userId, userType, date: new Date() };
         const invite = await createKey({ data });
         return invite;
     }
