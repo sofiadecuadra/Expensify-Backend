@@ -54,7 +54,7 @@ class FamilyController {
             const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
             //mailing the inviteToken to the user
 
-            await sendEmail();
+            await sendEmail(users, inviteToken);
             res.status(200).json({ inviteToken });
         } catch (err) {
             console.log(err.message);

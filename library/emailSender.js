@@ -1,20 +1,28 @@
-const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey("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");
+const sgMail = require('@sendgrid/mail');
+const config = require('config');
+const emailApiKey = config.get("EMAIL_SERVICE.api_key");
+const emailSender = config.get("EMAIL_SERVICE.sender");
+const url=config.get()
+sgMail.setApiKey(emailApiKey);
 
-const message = {
-    to: 'noeliabentancor1@gmail.com', // Change to your recipient
-    from: 'expense@vera.com.uy', // Change to your verified sender
-    subject: 'Sending with SendGrid is Fun',
-    text: 'and easy to do anywhere, even with Node.js',
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-}
+const getMessage = async (emails, inviteToken) => {
+    const message = {
+        to: emails,
+        from: emailSender,
+        subject: 'Invitation to join the family',
+        text: 'You have been invited to join the family',
+        html: `<strong>Click on the link to join the family: http://localhost:3000/families/${inviteToken}</strong>`,
+    };
+    return message;
+};
 
-const sendEmail = async () => {
+
+const sendEmail = async (emails, inviteToken) => {
+    const message = await getMessage(emails, inviteToken);
     sgMail
         .send(message)
         .then((response) => {
-            console.log(response[0].statusCode)
-            console.log(response[0].headers)
+           
         })
         .catch((error) => {
             console.error(error)
