@@ -5,7 +5,7 @@ const FamilyController = require('../controllers/familyController');
 const Roles = require('../library/roles');
 
 router.patch('/:familyId/apiKey/', FamilyController.updateApiKey);
-router.post('/:familyId/invite/:userType/', authMiddleware([Roles.Administrator]), FamilyController.createInvite);
+router.post('/invitations/', authMiddleware([Roles.Administrator]), FamilyController.createInvite);
 router.get('/:inviteToken/', FamilyController.validateInviteToken);
 
 
