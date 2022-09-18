@@ -22,13 +22,28 @@ class FamilyController {
 
     static async updateApiKey(req, res, next) {
         try {
-            const { familyId } = req.params;
+            const { familyId } = req.user;
             NumberValidator.validate(familyId, "family id", FamilyController.numberLength);
 
             const family = await FamilySql.instance.findOne({ where: { id: familyId } });
             const apiKey = await FamilyController.createApiKey(family.name);
             await FamilySql.instance.update({ apiKey }, { where: { id: familyId } });
             res.status(200).json({ message: "Family API KEY updated successfully" });
+        } catch (err) {
+            console.log(err.message);
+            next(err);
+        }
+    }
+
+    static async getApiKey(req, res, next) {
+        try {
+            const { familyId } = req.user;
+
+            const apiKey = await FamilySql.instance.findOne({
+                where: { id: familyId },
+                attributes: ["apiKey"],
+            }); 
+            res.json(apiKey);
         } catch (err) {
             console.log(err.message);
             next(err);
