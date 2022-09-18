@@ -3,7 +3,7 @@ const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const sendEmail = require("../library/emailSender");
-const { WordValidator, NumberValidator, InArrayValidator } = require("../utilities/inputValidators");
+const { WordValidator, NumberValidator, InArrayValidator ,EmailValidator} = require("../utilities/inputValidators");
 
 class FamilyController {
     static nameLength = 20;
@@ -54,8 +54,10 @@ class FamilyController {
             const { userId, familyId } = req.user;
 
             InArrayValidator.validate(userType, "user type", ["administrator", "member"]);
-            NumberValidator.validate(familyId, "family id", FamilyController.numberLength);
-
+            users.forEach(user => {
+                EmailValidator.validate(user, "user email");
+            });
+            
             const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
             //mailing the inviteToken to the user
             const { name } = await FamilyController.getFamily(familyId);
