@@ -1,19 +1,19 @@
 const AuthError = require('./AuthError');
 
-class RoleError extends AuthError {
+class TokenError extends AuthError {
     StatusCode = 401;
 
     constructor(authorizedRoles) {
         super();
-        this.message = `User not authorized. Authorized roles: ${authorizedRoles}`;
+        this.message = 'Invalid token format or token expired';
     }
 
     body() {
         return {
-            errorType: `Role error`,
+            errorType: `Token error`,
             message: this.message,
         };
     }
 }
 
-module.exports = RoleError
+module.exports = TokenError

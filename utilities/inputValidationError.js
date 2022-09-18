@@ -3,8 +3,8 @@ class InputValidationError extends Error {
 
     body() {
         return {
-            ErrorType: `Input validation error`,
-            Message: this.message,
+            errorType: `Input validation error`,
+            message: this.message,
         };
     }
 

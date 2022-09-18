@@ -128,7 +128,7 @@ class CategoryController {
 
             NumberValidator.validate(familyId, "family id", CategoryController.numberLength);
             const categories = await CategorySQL.instance.findAll({
-                attributes: ["name", "description", "image", "monthlyBudget"],
+                attributes: ["id","name", "description", "image", "monthlyBudget"],
                 where: {
                     familyId: familyId,
                     active: true, // only active ones?

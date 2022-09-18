@@ -5,13 +5,13 @@ class DuplicateCategoryError extends HTTPRequestError {
 
     constructor(name) {
         super();
-        this.message = `A category named '${name}' already exists. Please try again.`; 
+        this.message = `A category named '${name}' already exists. Please try again.`;
     }
-    
+
     body() {
         return {
-            ErrorType: `Duplicate error`,
-            Message: this.message,
+            errorType: `Duplicate error`,
+            message: this.message,
         };
     }
 }
