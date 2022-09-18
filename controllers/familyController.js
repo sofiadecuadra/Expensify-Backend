@@ -31,7 +31,6 @@ class FamilyController {
             await FamilySql.instance.update({ apiKey }, { where: { id: familyId } });
             res.status(200).json({ message: "Family API KEY updated successfully" });
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
@@ -41,6 +40,12 @@ class FamilyController {
         const data = { createdAt: todayDate, name: familyName };
         const apiKey = await createKey({ data });
         return apiKey;
+    }
+
+    static async getFamily(familyId) {
+        const family = await FamilySql.instance.findOne({ where: { id: familyId } });
+        return family;
+
     }
 
     static async createInvite(req, res, next) {
@@ -53,8 +58,9 @@ class FamilyController {
 
             const inviteToken = await FamilyController.generateInvite(familyId, userId, userType);
             //mailing the inviteToken to the user
+            const { name } = await FamilyController.getFamily(familyId);
 
-            await sendEmail(users, inviteToken);
+            await sendEmail(users, inviteToken, name);
             res.status(200).json({ inviteToken });
         } catch (err) {
             console.log(err.message);
