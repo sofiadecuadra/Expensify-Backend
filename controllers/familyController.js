@@ -4,7 +4,7 @@ const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const sendEmail = require("../library/emailSender");
 const { WordValidator, NumberValidator, InArrayValidator ,EmailValidator} = require("../utilities/inputValidators");
-
+const Roles = require("../library/roles");
 class FamilyController {
     static nameLength = 20;
     static numberLength = 1000000000;
@@ -67,8 +67,7 @@ class FamilyController {
         try {
             const { userType, users } = req.body;
             const { userId, familyId } = req.user;
-
-            InArrayValidator.validate(userType, "user type", ["administrator", "member"]);
+            InArrayValidator.validate(userType, "user type",Object.keys(Roles));
             users.forEach(user => {
                 EmailValidator.validate(user, "user email");
             });
