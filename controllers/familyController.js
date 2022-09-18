@@ -85,6 +85,7 @@ class FamilyController {
 
     static async generateInvite(familyId, familyName, userId, userType) {
         const data = { familyId, familyName, userId, userType, date: new Date() };
+        console.log(data);
         const invite = await createKey({ data });
         return invite;
     }
