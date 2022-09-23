@@ -10,7 +10,7 @@ const {
     ParagraphValidator,
     NumberValidator,
     ISODateValidator,
-} = require("../../utilities/inputValidators");
+} = require("../../errors/inputValidators");
 const dotenv = require("dotenv");
 const FileUploadError = require("../../errors/FileUploadError");
 

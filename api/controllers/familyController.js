@@ -3,7 +3,7 @@ const { createKey, decryptKey } = require("../../library/jwtSupplier");
 const DuplicateError = require("../../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const sendEmail = require("../../library/emailSender");
-const { WordValidator, NumberValidator, InArrayValidator, EmailValidator } = require("../../utilities/inputValidators");
+const { WordValidator, NumberValidator, InArrayValidator, EmailValidator } = require("../../errors/inputValidators");
 const Roles = require("../../library/roles");
 class FamilyController {
     static nameLength = 20;

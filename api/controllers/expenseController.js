@@ -8,7 +8,7 @@ const sequelize = require("sequelize");
 const ValidationError = require("../../errors/ValidationError");
 const ForeignKeyError = require("../../errors/ForeignKeyError");
 
-const { NumberValidator, ISODateValidator } = require("../../utilities/inputValidators");
+const { NumberValidator, ISODateValidator } = require("../../errors/inputValidators");
 
 class ExpenseController {
     static numberLength = 1000000000;

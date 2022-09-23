@@ -1,4 +1,4 @@
-const InputValidationError = require("../utilities/inputValidationError");
+const InputValidationError = require("./inputValidationError");
 
 class WordValidator {
     static validate = (input, fieldName, length) => {
@@ -60,7 +60,6 @@ class InArrayValidator {
         if (!array.includes(input))
             throw new InputValidationError(`Please enter a valid ${fieldName} from the list [${array}]!`);
     };
-
 }
 module.exports = {
     WordValidator,
@@ -69,5 +68,5 @@ module.exports = {
     EmailValidator,
     PasswordValidator,
     ISODateValidator,
-    InArrayValidator
+    InArrayValidator,
 };

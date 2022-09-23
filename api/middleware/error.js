@@ -1,6 +1,6 @@
 const HttpRequestError = require("../../errors/HttpRequestError");
 const AuthError = require("../../errors/auth/AuthError");
-const InputValidationError = require("../../utilities/inputValidationError");
+const InputValidationError = require("../../errors/inputValidationError");
 const HealthCheckError = require("../../errors/HealthCheckError");
 
 const errorMiddleware = (err, req, res, next) => {
