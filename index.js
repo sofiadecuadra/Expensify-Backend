@@ -5,7 +5,7 @@ const config = require("config");
 const dbPort = config.get("MYSQL_DB.port");
 
 (async () => {
-    const SequelizeContext = require("./startup/SequelizeContext");
+    const SequelizeContext = require("./dataAccess/startup/SequelizeContext");
     const sequelizeContext = new SequelizeContext(dbPort);
     await FamilySQL.createInstance(sequelizeContext);
     await UserSQL.createInstance(sequelizeContext, FamilySQL.instance);
