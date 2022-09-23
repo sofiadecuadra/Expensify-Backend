@@ -110,8 +110,7 @@ class ExpenseController {
             if (startDate && endDate) {
                 ISODateValidator.validate(startDate, "start date");
                 ISODateValidator.validate(endDate, "end date");
-            }
-            else {
+            } else {
                 endDate = new Date();
                 startDate = new Date();
                 startDate.setDate(startDate.getDate() - 30);
@@ -120,12 +119,7 @@ class ExpenseController {
             const expenses = await ExpenseSQL.instance.findAll(
                 ExpenseController.paginate(
                     {
-                        attributes: [
-                            "amount",
-                            "id",
-                            "producedDate",
-                            "registeredDate"
-                        ],
+                        attributes: ["amount", "id", "producedDate", "registeredDate"],
                         where: {
                             producedDate: {
                                 [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
@@ -141,16 +135,11 @@ class ExpenseController {
                                     "description",
                                     /*, "description", "image", "monthlyBudget", "familyId", "active"*/
                                 ],
-                                where: {
-                                    active: true,
-                                },
                             },
                             {
                                 model: UserSQL.instance,
-                                attributes: [
-                                    "name"
-                                ],
-                            }
+                                attributes: ["name"],
+                            },
                         ],
                     },
                     { page, pageSize }
@@ -170,8 +159,7 @@ class ExpenseController {
             if (startDate && endDate) {
                 ISODateValidator.validate(startDate, "start date");
                 ISODateValidator.validate(endDate, "end date");
-            }
-            else {
+            } else {
                 endDate = new Date();
                 startDate = new Date();
                 startDate.setDate(startDate.getDate() - 30);
