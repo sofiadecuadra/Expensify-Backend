@@ -1,13 +1,13 @@
-const UserSQL = require("../dataAccess/models/userSQL");
+const UserSQL = require("../../dataAccess/models/userSQL");
 const FamilyController = require("./familyController");
 const bcrypt = require("bcryptjs");
-const { createKey } = require("../library/jwtSupplier");
-const ValidationError = require("../errors/ValidationError");
-const DuplicateError = require("../errors/DuplicateUserError");
-const InviteTokenError = require("../errors/auth/InviteTokenError");
+const { createKey } = require("../../library/jwtSupplier");
+const ValidationError = require("../../errors/ValidationError");
+const DuplicateError = require("../../errors/DuplicateUserError");
+const InviteTokenError = require("../../errors/auth/InviteTokenError");
 const sequelize = require("sequelize");
-const { WordValidator, EmailValidator, PasswordValidator } = require("../utilities/inputValidators");
-const { decryptKey } = require("../library/jwtSupplier");
+const { WordValidator, EmailValidator, PasswordValidator } = require("../../utilities/inputValidators");
+const { decryptKey } = require("../../library/jwtSupplier");
 
 class UserController {
     static nameLength = 20;

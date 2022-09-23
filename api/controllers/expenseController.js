@@ -1,14 +1,14 @@
-const ExpenseSQL = require("../dataAccess/models/expenseSQL");
-const CategorySQL = require("../dataAccess/models/categorySQL");
-const UserSQL = require("../dataAccess/models/userSQL");
+const ExpenseSQL = require("../../dataAccess/models/expenseSQL");
+const CategorySQL = require("../../dataAccess/models/categorySQL");
+const UserSQL = require("../../dataAccess/models/userSQL");
 
-const parseDate = require("../utilities/dateUtils");
+const parseDate = require("../../utilities/dateUtils");
 const sequelize = require("sequelize");
 
-const ValidationError = require("../errors/ValidationError");
-const ForeignKeyError = require("../errors/ForeignKeyError");
+const ValidationError = require("../../errors/ValidationError");
+const ForeignKeyError = require("../../errors/ForeignKeyError");
 
-const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
+const { NumberValidator, ISODateValidator } = require("../../utilities/inputValidators");
 
 class ExpenseController {
     static numberLength = 1000000000;

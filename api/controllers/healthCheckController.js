@@ -1,4 +1,4 @@
-const HealthCheckError = require("../errors/HealthCheckError");
+const HealthCheckError = require("../../errors/HealthCheckError");
 
 class HealthCheckController {
     static connection;
@@ -10,14 +10,12 @@ class HealthCheckController {
                 uptime: process.uptime(),
                 message: "OK",
                 timestamp: Date.now(),
-            }
+            };
             res.status(200).json(result);
-        }
-        catch (err) {
+        } catch (err) {
             next(new HealthCheckError(err.message));
         }
     }
-
 }
 
 module.exports = HealthCheckController;

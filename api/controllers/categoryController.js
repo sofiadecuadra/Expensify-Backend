@@ -1,18 +1,18 @@
-const CategorySQL = require("../dataAccess/models/categorySQL");
-const ExpenseSQL = require("../dataAccess/models/expenseSQL");
+const CategorySQL = require("../../dataAccess/models/categorySQL");
+const ExpenseSQL = require("../../dataAccess/models/expenseSQL");
 const sequelize = require("sequelize");
-const parseDate = require("../utilities/dateUtils");
-const DuplicateError = require("../errors/DuplicateCategoryError");
-const ValidationError = require("../errors/ValidationError");
+const parseDate = require("../../utilities/dateUtils");
+const DuplicateError = require("../../errors/DuplicateCategoryError");
+const ValidationError = require("../../errors/ValidationError");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const {
     WordValidator,
     ParagraphValidator,
     NumberValidator,
     ISODateValidator,
-} = require("../utilities/inputValidators");
+} = require("../../utilities/inputValidators");
 const dotenv = require("dotenv");
-const FileUploadError = require("../errors/FileUploadError");
+const FileUploadError = require("../../errors/FileUploadError");
 
 dotenv.config();
 
