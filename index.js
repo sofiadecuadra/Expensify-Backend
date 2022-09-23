@@ -1,5 +1,5 @@
 const express = require("express");
-const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./models");
+const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
 const HealthCheckController = require("./controllers/healthCheckController");
 const config = require("config");
 const dbPort = config.get("MYSQL_DB.port");

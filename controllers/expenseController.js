@@ -1,6 +1,6 @@
-const ExpenseSQL = require("../models/expenseSQL");
-const CategorySQL = require("../models/categorySQL");
-const UserSQL = require("../models/userSQL");
+const ExpenseSQL = require("../dataAccess/models/expenseSQL");
+const CategorySQL = require("../dataAccess/models/categorySQL");
+const UserSQL = require("../dataAccess/models/userSQL");
 
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");

@@ -1,4 +1,4 @@
-const FamilySql = require("../models/familySQL");
+const FamilySql = require("../dataAccess/models/familySQL");
 const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");

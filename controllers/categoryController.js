@@ -1,5 +1,5 @@
-const CategorySQL = require("../models/categorySQL");
-const ExpenseSQL = require("../models/expenseSQL");
+const CategorySQL = require("../dataAccess/models/categorySQL");
+const ExpenseSQL = require("../dataAccess/models/expenseSQL");
 const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
@@ -45,16 +45,17 @@ class CategoryController {
             ParagraphValidator.validate(description, "description", CategoryController.descriptionLength);
             NumberValidator.validate(monthlyBudget, "monthly budget", CategoryController.numberLength);
 
-            const params = {
-                Bucket: bucketName,
-                Key: Date.now() + "-" + req.file.originalname,
-                Body: imageFile.buffer,
-            };
+            // const params = {
+            //     Bucket: bucketName,
+            //     Key: Date.now() + "-" + req.file.originalname,
+            //     Body: imageFile.buffer,
+            // };
 
-            const command = new PutObjectCommand(params);
+            // const command = new PutObjectCommand(params);
 
-            await s3.send(command);
-            const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
+            // await s3.send(command);
+            // const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
+            const image = "imageLink";
 
             console.info("[S3] Uploaded: " + image);
 

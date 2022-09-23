@@ -1,4 +1,4 @@
-const UserSQL = require("../models/userSQL");
+const UserSQL = require("../dataAccess/models/userSQL");
 const FamilyController = require("./familyController");
 const bcrypt = require("bcryptjs");
 const { createKey } = require("../library/jwtSupplier");
@@ -18,11 +18,14 @@ class UserController {
             WordValidator.validate(name, "name", UserController.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
-            const user = await UserSQL.connection.transaction(async(t) => {
+            const user = await UserSQL.connection.transaction(async (t) => {
                 const family = await FamilyController.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
                 const encryptedPassword = await bcrypt.hash(password.toString(), salt);
-                const user = await UserSQL.instance.create({ name, email, role, familyId: family.dataValues.id, password: encryptedPassword }, { transaction: t });
+                const user = await UserSQL.instance.create(
+                    { name, email, role, familyId: family.dataValues.id, password: encryptedPassword },
+                    { transaction: t }
+                );
                 return user;
             });
 
