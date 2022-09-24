@@ -3,8 +3,12 @@ class HealthCheckController {
     static connection;
 
     static async healthCheck(req, res, next) {
-        const result = await HealthCheckLogic.healthCheck();
-        res.status(200).json(result);
+        try {
+            const result = await HealthCheckLogic.healthCheck();
+            res.status(200).json(result);
+        } catch (err) {
+            next(err);
+        }
     }
 }
 

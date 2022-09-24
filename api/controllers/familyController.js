@@ -16,7 +16,6 @@ class FamilyController {
             const apiKey = await FamilyLogic.getApiKey(familyId);
             res.status(200).json(apiKey);
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
@@ -28,7 +27,6 @@ class FamilyController {
             const inviteToken = await FamilyLogic.createInvite(userType, users, userId, familyId);
             res.status(200).json({ inviteToken });
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
@@ -39,7 +37,6 @@ class FamilyController {
             const decryptedToken = await FamilyLogic.validateInviteToken(inviteToken);
             res.status(200).json({ inviteData: decryptedToken.data });
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }

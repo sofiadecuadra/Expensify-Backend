@@ -37,18 +37,24 @@ class ExpenseLogic {
     }
 
     static async updateExpense(amount, producedDate, categoryId, expenseId) {
-        NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
-        NumberValidator.validate(amount, "expense amount", 1000000000);
-        ISODateValidator.validate(producedDate, "produced date");
+        try {
+            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
+            NumberValidator.validate(amount, "expense amount", 1000000000);
+            ISODateValidator.validate(producedDate, "produced date");
 
-        await ExpenseSQL.instance.update(
-            {
-                amount,
-                producedDate: parseDate(producedDate),
-                categoryId,
-            },
-            { where: { id: expenseId } }
-        );
+            await ExpenseSQL.instance.update(
+                {
+                    amount,
+                    producedDate: parseDate(producedDate),
+                    categoryId,
+                },
+                { where: { id: expenseId } }
+            );
+        } catch (err) {
+            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
+            else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
+            else throw err;
+        }
     }
 
     static async getExpensesByCategory(categoryId, startDate, endDate) {

@@ -1,7 +1,3 @@
-const ValidationError = require("../../errors/ValidationError");
-const ForeignKeyError = require("../../errors/ForeignKeyError");
-const sequelize = require("sequelize");
-
 const ExpenseLogic = require("../../businessLogic/expenseLogic");
 class ExpenseController {
     static async createNewExpense(req, res, next) {
@@ -32,11 +28,7 @@ class ExpenseController {
             await ExpenseLogic.updateExpense(amount, producedDate, categoryId, expenseId);
             res.status(200).json({ message: "Expense updated successfully" });
         } catch (err) {
-            console.log(err);
-            const { categoryId } = req.body;
-            if (err instanceof sequelize.ForeignKeyConstraintError) next(new ForeignKeyError(categoryId));
-            else if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
-            else next(err);
+            next(err);
         }
     }
 
@@ -47,7 +39,6 @@ class ExpenseController {
             const expenses = await ExpenseLogic.getExpensesByCategory(categoryId, startDate, endDate);
             res.status(200).json(expenses);
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
@@ -58,7 +49,6 @@ class ExpenseController {
             const expenses = await ExpenseLogic.getExpensesPaginated(startDate, endDate, page, pageSize);
             res.status(200).json(expenses);
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
@@ -69,7 +59,6 @@ class ExpenseController {
             const expenses = await ExpenseLogic.getExpensesCount(startDate, endDate);
             res.status(200).json(expenses);
         } catch (err) {
-            console.log(err.message);
             next(err);
         }
     }
