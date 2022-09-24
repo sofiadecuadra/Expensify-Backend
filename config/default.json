@@ -3,13 +3,13 @@
         "name": "db",
         "user": "user",
         "password": "password",
-        "host": "my-expenses-app-test.c8njidzohjqg.us-east-1.rds.amazonaws.com",
+        "awshost": "my-expenses-app-test.c8njidzohjqg.us-east-1.rds.amazonaws.com",
+        "host": "localhost",
         "port": "3306"
     },
     "EMAIL_SERVICE": {
         "api_key": "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",
         "sender": "expense@vera.com.uy"
-
     },
     "URL_INVITATION": "http://localhost:3000/invite/",
     "API_PORT": 3001,
