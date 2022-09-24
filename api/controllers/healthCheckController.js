@@ -1,20 +1,10 @@
-const HealthCheckError = require("../../errors/HealthCheckError");
-
+const HealthCheckLogic = require("../../businessLogic/healthCheckLogic");
 class HealthCheckController {
     static connection;
 
     static async healthCheck(req, res, next) {
-        try {
-            await HealthCheckController.connection.authenticate();
-            const result = {
-                uptime: process.uptime(),
-                message: "OK",
-                timestamp: Date.now(),
-            };
-            res.status(200).json(result);
-        } catch (err) {
-            next(new HealthCheckError(err.message));
-        }
+        const result = await HealthCheckLogic.healthCheck();
+        res.status(200).json(result);
     }
 }
 

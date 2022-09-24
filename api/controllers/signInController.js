@@ -1,18 +1,12 @@
 const bcrypt = require("bcryptjs");
-const UserSQL = require("../../dataAccess/models/userSQL");
-const { createKey } = require("../../library/jwtSupplier");
+const SignInLogic = require("../../businessLogic/signInLogic");
 
 class SignInController {
-    static async logIn(req, res, next) {
+    static async signIn(req, res, next) {
         try {
-            let user = await UserSQL.instance.findOne({ email: req.body.email });
-
-            const isValidPassword = await bcrypt.compare(req.body.password, user.password);
-            //TO DO: handle errors
-            const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
-            const token = await createKey(data);
-            console.log(data);
-            res.send({ token: token });
+            const { email, password } = req.body;
+            const token = await SignInLogic.signIn(email, password);
+            res.status(200).send({ token: token });
         } catch (err) {
             next(err);
         }

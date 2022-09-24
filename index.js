@@ -1,6 +1,6 @@
 const express = require("express");
 const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
-const HealthCheckController = require("./api/controllers/healthCheckController");
+const HealthCheckLogic = require("./businessLogic/healthCheckLogic");
 const config = require("config");
 const dbPort = config.get("MYSQL_DB.port");
 
@@ -15,7 +15,7 @@ const dbPort = config.get("MYSQL_DB.port");
         .sync()
         .then(() => console.log("Database is connected!"))
         .catch((err) => console.error(err, "Something went wrong, database is not connected!"));
-    HealthCheckController.connection = sequelizeContext.connection;
+    HealthCheckLogic.connection = sequelizeContext.connection;
 })();
 
 const Server = require("./server");

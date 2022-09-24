@@ -1,13 +1,6 @@
-const UserSQL = require("../../dataAccess/models/userSQL");
-const FamilyController = require("./familyController");
-const bcrypt = require("bcryptjs");
-const { createKey } = require("../../library/jwtSupplier");
 const ValidationError = require("../../errors/ValidationError");
 const DuplicateError = require("../../errors/DuplicateUserError");
-const InviteTokenError = require("../../errors/auth/InviteTokenError");
 const sequelize = require("sequelize");
-const { WordValidator, EmailValidator, PasswordValidator } = require("../../errors/inputValidators");
-const { decryptKey } = require("../../library/jwtSupplier");
 const UserLogic = require("../../businessLogic/userLogic");
 
 class UserController {

@@ -1,5 +1,6 @@
 const ValidationError = require("../../errors/ValidationError");
 const ForeignKeyError = require("../../errors/ForeignKeyError");
+const sequelize = require("sequelize");
 
 const ExpenseLogic = require("../../businessLogic/expenseLogic");
 class ExpenseController {
