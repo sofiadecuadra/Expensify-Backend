@@ -11,10 +11,7 @@ class ExpenseController {
             await ExpenseLogic.createExpense(amount, producedDate, categoryId, userId);
             res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
-            const { categoryId } = req.body;
-            if (err instanceof sequelize.ForeignKeyConstraintError) next(new ForeignKeyError(categoryId));
-            else if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
-            else next(err);
+            next(err);
         }
     }
 

@@ -4,7 +4,7 @@ const InputValidationError = require("../../errors/inputValidationError");
 const HealthCheckError = require("../../errors/HealthCheckError");
 
 const errorMiddleware = (err, req, res, next) => {
-    console.error(err.message);
+    console.error(err, err.message);
     if (
         err instanceof HttpRequestError ||
         err instanceof AuthError ||
@@ -14,8 +14,8 @@ const errorMiddleware = (err, req, res, next) => {
         return res.status(err.StatusCode).send(err.body());
     }
     return res.status(500).send({
-        error_type: err.type,
-        msg: err.msg,
+        error_type: err.name,
+        msg: err.message,
     });
 };
 

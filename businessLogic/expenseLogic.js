@@ -5,26 +5,29 @@ const UserSQL = require("../dataAccess/models/userSQL");
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 
-const ValidationError = require("../errors/ValidationError");
-const ForeignKeyError = require("../errors/ForeignKeyError");
-
 const { NumberValidator, ISODateValidator } = require("../errors/inputValidators");
 
 class ExpenseLogic {
     static numberLength = 1000000000;
 
     static async createExpense(amount, producedDate, categoryId, userId) {
-        NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
-        ISODateValidator.validate(producedDate, "produced date");
-        NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
+        try {
+            NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
+            ISODateValidator.validate(producedDate, "produced date");
+            NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
 
-        await ExpenseSQL.instance.create({
-            amount,
-            producedDate: parseDate(producedDate),
-            categoryId,
-            userId,
-            registeredDate: parseDate(new Date()),
-        });
+            await ExpenseSQL.instance.create({
+                amount,
+                producedDate: parseDate(producedDate),
+                categoryId,
+                userId,
+                registeredDate: parseDate(new Date()),
+            });
+        } catch (err) {
+            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
+            else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
+            else throw err;
+        }
     }
 
     static async deleteExpense(expenseId) {
