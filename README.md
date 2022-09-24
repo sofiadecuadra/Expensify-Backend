@@ -1,11 +1,11 @@
 # Monolithic-Backend
 
-## Dockerhub
+## DockerHub
 ## 
 
-The image is uploaded in dockerhub repository noeliabentancor/my-expenses-app.
+The image is uploaded in DockerHub repository noeliabentancor/my-expenses-app.
 
-If any changes are maded , which needs to be applied to backend, use the following commands so as to build the image and push changes to dockerhub
+If any changes which need to be applied to the backend are made, use the following commands so as to build the image and push changes to DockerHub.
 
 1. `docker build --tag noeliabentancor/my-expenses-app`
 

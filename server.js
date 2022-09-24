@@ -1,9 +1,9 @@
 const config = require("config");
-const express = require('express');
+const express = require("express");
 const apiPort = config.get("API_PORT");
 const cors = require("cors");
-const routes = require("./routes");
-const error = require("./middleware/error");
+const routes = require("./api/routes");
+const error = require("./api/middleware/error");
 
 class Server {
     app;
@@ -26,7 +26,6 @@ class Server {
         this.app.use("/", routes);
         this.app.use(error);
     }
-
 }
 
 module.exports = Server;

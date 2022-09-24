@@ -1,16 +1,15 @@
-const RoleError = require('../errors/auth/RoleError');
-const TokenError = require('../errors/auth/TokenError');
-const { decryptKey } = require('../library/jwtSupplier');
+const RoleError = require("../../errors/auth/RoleError");
+const TokenError = require("../../errors/auth/TokenError");
+const { decryptKey } = require("../../library/jwtSupplier");
 
 const authMiddleware = (roleArray) => async (req, res, next) => {
-    const authHeaderToken = req.header('Authorization');
+    const authHeaderToken = req.header("Authorization");
 
-    const token = (!authHeaderToken) ? null : authHeaderToken.split(' ')[1] || authHeaderToken;
+    const token = !authHeaderToken ? null : authHeaderToken.split(" ")[1] || authHeaderToken;
     let user;
     try {
         user = await decryptKey(token);
-    }
-    catch (err) {
+    } catch (err) {
         return next(new TokenError());
     }
     req.user = user;

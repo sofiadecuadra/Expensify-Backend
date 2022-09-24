@@ -1,52 +1,46 @@
-const UserSQL = require("../models/userSQL");
-const FamilyController = require("./familyController");
+const UserSQL = require("../dataAccess/models/userSQL");
+const FamilyLogic = require("./familyLogic");
 const bcrypt = require("bcryptjs");
 const { createKey } = require("../library/jwtSupplier");
 const ValidationError = require("../errors/ValidationError");
 const DuplicateError = require("../errors/DuplicateUserError");
 const InviteTokenError = require("../errors/auth/InviteTokenError");
 const sequelize = require("sequelize");
-const { WordValidator, EmailValidator, PasswordValidator } = require("../utilities/inputValidators");
+const { WordValidator, EmailValidator, PasswordValidator } = require("../errors/inputValidators");
 const { decryptKey } = require("../library/jwtSupplier");
 
-class UserController {
+class UserLogic {
     static nameLength = 20;
 
-    static async createNewUser(req, res, next) {
+    static async createNewUser(name, email, role, familyName, password) {
         try {
-            const { name, email, role, familyName, password } = req.body;
-            WordValidator.validate(name, "name", UserController.nameLength);
+            WordValidator.validate(name, "name", UserLogic.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
-            const user = await UserSQL.connection.transaction(async(t) => {
-                const family = await FamilyController.createNewFamily(familyName, { transaction: t });
+            const user = await UserSQL.connection.transaction(async (t) => {
+                const family = await FamilyLogic.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
                 const encryptedPassword = await bcrypt.hash(password.toString(), salt);
-                const user = await UserSQL.instance.create({ name, email, role, familyId: family.dataValues.id, password: encryptedPassword }, { transaction: t });
+                const user = await UserSQL.instance.create(
+                    { name, email, role, familyId: family.dataValues.id, password: encryptedPassword },
+                    { transaction: t }
+                );
                 return user;
             });
 
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
-            res.send({ token: token });
+            return token;
         } catch (err) {
-            console.log(err);
-            const { email } = req.body;
-            if (err instanceof sequelize.UniqueConstraintError) next(new DuplicateError(email));
-            if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
-            else next(err);
+            if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
+            if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
+            else throw err;
         }
     }
 
-    static async createUserFromInvite(req, res, next) {
+    static async createUserFromInvite(name, email, role, familyId, password, inviteToken) {
         try {
-            const { name, email, role, familyId, password, inviteToken } = req.body;
             let inviteData = {};
-            console.log(inviteToken);
-            console.log(inviteToken);
-
-            console.log("inviteToken");
-
             try {
                 inviteData = await decryptKey(inviteToken);
                 if (inviteData.data.familyId != familyId) throw new InviteTokenError();
@@ -69,15 +63,13 @@ class UserController {
 
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
-            res.send({ token: token });
+            return token;
         } catch (err) {
-            console.log(err);
-            const { email } = req.body;
-            if (err instanceof sequelize.UniqueConstraintError) next(new DuplicateError(email));
-            if (err instanceof sequelize.ValidationError) next(new ValidationError(err.errors));
-            else next(err);
+            if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
+            if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
+            else throw err;
         }
     }
 }
 
-module.exports = UserController;
+module.exports = UserLogic;
