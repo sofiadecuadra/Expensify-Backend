@@ -15,9 +15,13 @@ After pushing the image, a new task should be started in order to apply changes 
 
 ## RDS
 
-**Endpoint for development**
+RDS is in a private subnet, for consequence it can't be accessed from Internet. 
+A tunnel connection needs to be set up, so as to connect to it.
+
+**Endpoint for production**
 
 
 ```
-ec2-34-207-214-227.compute-1.amazonaws.com
+my-expenses-prod.c8njidzohjqg.us-east-1.rds.amazonaws.com
+
 ```
