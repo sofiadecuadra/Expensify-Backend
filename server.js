@@ -2,7 +2,7 @@ const config = require("config");
 const express = require("express");
 const apiPort = config.get("API_PORT");
 const cors = require("cors");
-const error = require("./api/middleware/error");
+const errorMiddleware = require("./api/middleware/error");
 
 class Server {
     app;
@@ -22,7 +22,7 @@ class Server {
 
         this.app.use(cors());
         this.app.use("/", routes);
-        this.app.use(error);
+        this.app.use(errorMiddleware);
     }
 }
 
