@@ -1,10 +1,14 @@
 const HealthCheckLogic = require("../../businessLogic/healthCheckLogic");
 class HealthCheckController {
-    static connection;
+    healthCheckLogic;
 
-    static async healthCheck(req, res, next) {
+    constructor(healthCheckLogic) {
+        this.healthCheckLogic = healthCheckLogic;
+    }
+
+    async healthCheck(req, res, next) {
         try {
-            const result = await HealthCheckLogic.healthCheck();
+            const result = await this.healthCheckLogic.healthCheck();
             res.status(200).json(result);
         } catch (err) {
             next(err);

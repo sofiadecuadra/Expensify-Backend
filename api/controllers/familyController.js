@@ -1,40 +1,45 @@
-const FamilyLogic = require("../../businessLogic/familyLogic");
 class FamilyController {
-    static async updateApiKey(req, res, next) {
+    familyLogic;
+
+    constructor(familyLogic) {
+        this.familyLogic = familyLogic;
+    }
+
+    async updateApiKey(req, res, next) {
         try {
             const { familyId } = req.user;
-            await FamilyLogic.updateApiKey(familyId);
+            await this.familyLogic.updateApiKey(familyId);
             res.status(200).json({ message: "Family API KEY updated successfully" });
         } catch (err) {
             next(err);
         }
     }
 
-    static async getApiKey(req, res, next) {
+    async getApiKey(req, res, next) {
         try {
             const { familyId } = req.user;
-            const apiKey = await FamilyLogic.getApiKey(familyId);
+            const apiKey = await this.familyLogic.getApiKey(familyId);
             res.status(200).json(apiKey);
         } catch (err) {
             next(err);
         }
     }
 
-    static async createInvite(req, res, next) {
+    async createInvite(req, res, next) {
         try {
             const { userType, users } = req.body;
             const { userId, familyId } = req.user;
-            const inviteToken = await FamilyLogic.createInvite(userType, users, userId, familyId);
+            const inviteToken = await this.familyLogic.createInvite(userType, users, userId, familyId);
             res.status(200).json({ inviteToken });
         } catch (err) {
             next(err);
         }
     }
 
-    static async validateInviteToken(req, res, next) {
+    async validateInviteToken(req, res, next) {
         try {
             const { inviteToken } = req.params;
-            const decryptedToken = await FamilyLogic.validateInviteToken(inviteToken);
+            const decryptedToken = await this.familyLogic.validateInviteToken(inviteToken);
             res.status(200).json({ inviteData: decryptedToken.data });
         } catch (err) {
             next(err);

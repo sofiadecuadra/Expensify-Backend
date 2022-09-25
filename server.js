@@ -2,29 +2,27 @@ const config = require("config");
 const express = require("express");
 const apiPort = config.get("API_PORT");
 const cors = require("cors");
-const routes = require("./api/routes");
-const error = require("./api/middleware/error");
+const errorMiddleware = require("./api/middleware/error");
 
 class Server {
     app;
 
     constructor() {
         this.app = express();
-        this.config();
     }
 
     start() {
         this.app.listen(apiPort, () => console.log(`Listening on port ${apiPort}...`));
     }
 
-    config() {
+    config(routes) {
         this.app.set("port", apiPort || 3003);
 
         this.app.use(express.json());
 
         this.app.use(cors());
         this.app.use("/", routes);
-        this.app.use(error);
+        this.app.use(errorMiddleware);
     }
 }
 
