@@ -26,7 +26,7 @@ class FamilyLogic {
         }
     }
 
-    static async updateApiKey(familyId) {
+    async updateApiKey(familyId) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
 
         const family = await this.familySQL.findOne({ where: { id: familyId } });

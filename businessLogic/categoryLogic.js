@@ -74,7 +74,7 @@ class CategoryLogic {
         }
     }
 
-    static async deleteCategory(categoryId) {
+    async deleteCategory(categoryId) {
         NumberValidator.validate(categoryId, "category id", this.numberLength);
         await this.categorySQL.update(
             {
