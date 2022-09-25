@@ -47,7 +47,7 @@ class StartupHelper {
         const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance);
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
-        const userLogic = new UserLogic(userSQL.instance);
+        const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
         return { signInLogic, categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
     }
 
