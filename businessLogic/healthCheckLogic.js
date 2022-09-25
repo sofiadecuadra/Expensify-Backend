@@ -1,11 +1,15 @@
 const HealthCheckError = require("../errors/HealthCheckError");
 
 class HealthCheckLogic {
-    static connection;
+    sqlConnection;
 
-    static async healthCheck() {
+    constructor(sqlConnection) {
+        this.sqlConnection = sqlConnection;
+    }
+
+    async healthCheck() {
         try {
-            await HealthCheckLogic.connection.authenticate();
+            await this.sqlConnection.authenticate();
             const result = {
                 uptime: process.uptime(),
                 message: "OK",

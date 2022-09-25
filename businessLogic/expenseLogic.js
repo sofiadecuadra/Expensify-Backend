@@ -1,22 +1,27 @@
-const ExpenseSQL = require("../dataAccess/models/expenseSQL");
-const CategorySQL = require("../dataAccess/models/categorySQL");
-const UserSQL = require("../dataAccess/models/userSQL");
-
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 
-const { NumberValidator, ISODateValidator } = require("../errors/inputValidators");
+const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
 
 class ExpenseLogic {
-    static numberLength = 1000000000;
+    numberLength = 1000000000;
+    expenseSQL;
+    categorySQL;
+    userSQL;
 
-    static async createExpense(amount, producedDate, categoryId, userId) {
+    constructor(expenseSQL, categorySQL, userSQL) {
+        this.expenseSQL = expenseSQL;
+        this.categorySQL = categorySQL;
+        this.userSQL = userSQL;
+    }
+
+    async createExpense(amount, producedDate, categoryId, userId) {
         try {
-            NumberValidator.validate(amount, "expense amount", ExpenseController.numberLength);
+            NumberValidator.validate(amount, "expense amount", this.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
-            NumberValidator.validate(categoryId, "category id", ExpenseController.numberLength);
+            NumberValidator.validate(categoryId, "category id", this.numberLength);
 
-            await ExpenseSQL.instance.create({
+            await this.expenseSQL.create({
                 amount,
                 producedDate: parseDate(producedDate),
                 categoryId,
@@ -30,19 +35,19 @@ class ExpenseLogic {
         }
     }
 
-    static async deleteExpense(expenseId) {
-        NumberValidator.validate(expenseId, "expense id", ExpenseLogic.numberLength);
+    async deleteExpense(expenseId) {
+        NumberValidator.validate(expenseId, "expense id", this.numberLength);
 
-        await ExpenseSQL.instance.destroy({ where: { id: expenseId } });
+        await this.expenseSQL.destroy({ where: { id: expenseId } });
     }
 
-    static async updateExpense(amount, producedDate, categoryId, expenseId) {
+    async updateExpense(amount, producedDate, categoryId, expenseId) {
         try {
-            NumberValidator.validate(expenseId, "expense id", ExpenseController.numberLength);
+            NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
 
-            await ExpenseSQL.instance.update(
+            await this.expenseSQL.update(
                 {
                     amount,
                     producedDate: parseDate(producedDate),
@@ -57,11 +62,11 @@ class ExpenseLogic {
         }
     }
 
-    static async getExpensesByCategory(categoryId, startDate, endDate) {
+    async getExpensesByCategory(categoryId, startDate, endDate) {
         ISODateValidator.validate(startDate, "start date");
         ISODateValidator.validate(endDate, "end date");
 
-        return await ExpenseSQL.instance.findAll({
+        return await this.expenseSQL.findAll({
             where: {
                 categoryId: categoryId,
                 producedDate: {
@@ -71,7 +76,7 @@ class ExpenseLogic {
         });
     }
 
-    static async getExpensesPaginated(startDate, endDate, page, pageSize) {
+    async getExpensesPaginated(startDate, endDate, page, pageSize) {
         NumberValidator.validate(page, "page", 100000);
         NumberValidator.validate(pageSize, "page size", 50);
 
@@ -84,8 +89,8 @@ class ExpenseLogic {
             startDate.setDate(startDate.getDate() - 30);
         }
 
-        return await ExpenseSQL.instance.findAll(
-            ExpenseLogic.paginate(
+        return await this.expenseSQL.findAll(
+            this.paginate(
                 {
                     attributes: ["amount", "id", "producedDate", "registeredDate"],
                     where: {
@@ -96,11 +101,11 @@ class ExpenseLogic {
                     order: [["producedDate", "ASC"]],
                     include: [
                         {
-                            model: CategorySQL.instance,
+                            model: this.categorySQL,
                             attributes: ["name", "image", "description"],
                         },
                         {
-                            model: UserSQL.instance,
+                            model: this.userSQL,
                             attributes: ["name"],
                         },
                     ],
@@ -110,7 +115,7 @@ class ExpenseLogic {
         );
     }
 
-    static async getExpensesCount(startDate, endDate) {
+    async getExpensesCount(startDate, endDate) {
         if (startDate && endDate) {
             ISODateValidator.validate(startDate, "start date");
             ISODateValidator.validate(endDate, "end date");
@@ -119,7 +124,7 @@ class ExpenseLogic {
             startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
         }
-        return await ExpenseSQL.instance.findAll({
+        return await this.expenseSQL.findAll({
             attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
             where: {
                 producedDate: {
@@ -129,7 +134,7 @@ class ExpenseLogic {
         });
     }
 
-    static paginate(query, { page, pageSize }) {
+    paginate(query, { page, pageSize }) {
         const offset = parseInt(page) * parseInt(pageSize);
         const limit = parseInt(pageSize);
 

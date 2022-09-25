@@ -1,4 +1,4 @@
-const InputValidationError = require("./inputValidationError");
+const InputValidationError = require("../errors/inputValidationError");
 
 class WordValidator {
     static validate = (input, fieldName, length) => {

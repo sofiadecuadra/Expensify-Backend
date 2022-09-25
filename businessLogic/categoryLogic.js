@@ -1,11 +1,14 @@
-const CategorySQL = require("../dataAccess/models/categorySQL");
-const ExpenseSQL = require("../dataAccess/models/expenseSQL");
 const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { WordValidator, ParagraphValidator, NumberValidator, ISODateValidator } = require("../errors/inputValidators");
+const {
+    WordValidator,
+    ParagraphValidator,
+    NumberValidator,
+    ISODateValidator,
+} = require("../utilities/inputValidators");
 const dotenv = require("dotenv");
 const FileUploadError = require("../errors/FileUploadError");
 
@@ -27,15 +30,22 @@ const s3 = new S3Client({
 });
 
 class CategoryLogic {
-    static nameLength = 20;
-    static descriptionLength = 100;
-    static numberLength = 1000000000;
+    nameLength = 20;
+    descriptionLength = 100;
+    numberLength = 1000000000;
+    categorySQL;
+    expenseSQL;
 
-    static async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
+    constructor(categorySQL, expenseSQL) {
+        this.categorySQL = categorySQL;
+        this.expenseSQL = expenseSQL;
+    }
+
+    async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
-            WordValidator.validate(name, "name", CategoryLogic.nameLength);
-            ParagraphValidator.validate(description, "description", CategoryLogic.descriptionLength);
-            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryLogic.numberLength);
+            WordValidator.validate(name, "name", this.nameLength);
+            ParagraphValidator.validate(description, "description", this.descriptionLength);
+            NumberValidator.validate(monthlyBudget, "monthly budget", this.numberLength);
 
             const params = {
                 Bucket: bucketName,
@@ -50,7 +60,7 @@ class CategoryLogic {
 
             console.info("[S3] Uploaded: " + image);
 
-            await CategorySQL.instance.create({
+            await this.categorySQL.create({
                 name,
                 description,
                 image,
@@ -65,8 +75,8 @@ class CategoryLogic {
     }
 
     static async deleteCategory(categoryId) {
-        NumberValidator.validate(categoryId, "category id", CategoryLogic.numberLength);
-        await CategorySQL.instance.update(
+        NumberValidator.validate(categoryId, "category id", this.numberLength);
+        await this.categorySQL.update(
             {
                 active: false,
             },
@@ -78,14 +88,14 @@ class CategoryLogic {
         );
     }
 
-    static async updateCategory(categoryId, name, description, image, monthlyBudget) {
+    async updateCategory(categoryId, name, description, image, monthlyBudget) {
         try {
-            NumberValidator.validate(categoryId, "category id", CategoryLogic.numberLength);
-            WordValidator.validate(name, "name", CategoryLogic.nameLength);
-            ParagraphValidator.validate(description, "description", CategoryLogic.descriptionLength);
-            NumberValidator.validate(monthlyBudget, "monthly budget", CategoryLogic.nameLength);
+            NumberValidator.validate(categoryId, "category id", this.numberLength);
+            WordValidator.validate(name, "name", this.nameLength);
+            ParagraphValidator.validate(description, "description", this.descriptionLength);
+            NumberValidator.validate(monthlyBudget, "monthly budget", this.nameLength);
             //TODO Ver si validar imagen
-            await CategorySQL.instance.update(
+            await this.categorySQL.update(
                 {
                     name: name,
                     description: description,
@@ -101,9 +111,9 @@ class CategoryLogic {
         }
     }
 
-    static async getCategories(familyId) {
-        NumberValidator.validate(familyId, "family id", CategoryLogic.numberLength);
-        const categories = await CategorySQL.instance.findAll({
+    async getCategories(familyId) {
+        NumberValidator.validate(familyId, "family id", this.numberLength);
+        const categories = await this.categorySQL.findAll({
             attributes: ["id", "name", "description", "image", "monthlyBudget"],
             where: {
                 familyId: familyId,
@@ -113,20 +123,20 @@ class CategoryLogic {
         return categories;
     }
 
-    static async getCategoriesWithMoreExpenses(familyId) {
-        const categories = await ExpenseSQL.instance.findAll({
-            ...CategoryLogic.groupByCategory(CategorySQL.instance, familyId),
+    async getCategoriesWithMoreExpenses(familyId) {
+        const categories = await this.expenseSQL.findAll({
+            ...this.groupByCategory(this.categorySQL, familyId),
             order: sequelize.literal("total DESC"),
             limit: 3,
         });
         return categories;
     }
 
-    static async getCategoriesExpensesByPeriod(familyId, startDate, endDate) {
+    async getCategoriesExpensesByPeriod(familyId, startDate, endDate) {
         ISODateValidator.validate(startDate, "start date");
         ISODateValidator.validate(endDate, "end date");
-        const categories = await ExpenseSQL.instance.findAll({
-            ...CategoryLogic.groupByCategory(CategorySQL.instance, familyId),
+        const categories = await this.expenseSQL.findAll({
+            ...this.groupByCategory(this.categorySQL, familyId),
             where: {
                 producedDate: {
                     [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
@@ -136,7 +146,7 @@ class CategoryLogic {
         return categories;
     }
 
-    static groupByCategory = (categoryInstance, familyId) => ({
+    groupByCategory = (categoryInstance, familyId) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
 
         include: [
