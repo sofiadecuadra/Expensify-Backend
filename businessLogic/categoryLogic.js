@@ -22,11 +22,11 @@ const sessionToken = process.env.AWS_SESSION_TOKEN;
 
 const s3 = new S3Client({
     region: region,
-    credentials: {
-        accessKeyId: accessKeyId,
-        secretAccessKey: secretAccessKey,
-        sessionToken: sessionToken,
-    },
+    // credentials: {
+    //     accessKeyId: accessKeyId,
+    //     secretAccessKey: secretAccessKey,
+    //     sessionToken: sessionToken,
+    // },
 });
 
 class CategoryLogic {

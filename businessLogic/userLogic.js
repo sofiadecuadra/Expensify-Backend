@@ -54,7 +54,7 @@ class UserLogic {
             } catch (e) {
                 throw new InviteTokenError();
             }
-            WordValidator.validate(name, "name", UserController.nameLength);
+            WordValidator.validate(name, "name", this.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
             const salt = await bcrypt.genSalt(10);
