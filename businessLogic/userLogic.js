@@ -1,4 +1,3 @@
-const FamilyLogic = require("./familyLogic");
 const bcrypt = require("bcryptjs");
 const { createKey } = require("../library/jwtSupplier");
 const ValidationError = require("../errors/ValidationError");
@@ -11,9 +10,13 @@ const { decryptKey } = require("../library/jwtSupplier");
 class UserLogic {
     nameLength = 20;
     userSQL;
+    userConnection;
+    familyLogic;
 
-    constructor(userSQL) {
+    constructor(userSQL, userConnection, familyLogic) {
         this.userSQL = userSQL;
+        this.userConnection = userConnection;
+        this.familyLogic = familyLogic;
     }
 
     async createNewUser(name, email, role, familyName, password) {
@@ -21,8 +24,8 @@ class UserLogic {
             WordValidator.validate(name, "name", this.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
-            const user = await this.userSQL.connection.transaction(async (t) => {
-                const family = await FamilyLogic.createNewFamily(familyName, { transaction: t });
+            const user = await this.userConnection.transaction(async (t) => {
+                const family = await this.familyLogic.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
                 const encryptedPassword = await bcrypt.hash(password.toString(), salt);
                 const user = await this.userSQL.create(
