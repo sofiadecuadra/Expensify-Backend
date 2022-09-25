@@ -102,7 +102,7 @@ class ExpenseLogic {
                     include: [
                         {
                             model: this.categorySQL,
-                            attributes: ["name", "image", "description"],
+                            attributes: ["name", "image", "description", "id"],
                         },
                         {
                             model: this.userSQL,
