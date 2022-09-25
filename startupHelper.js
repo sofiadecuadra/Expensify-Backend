@@ -101,10 +101,6 @@ class StartupHelper {
         server.config(routes);
     }
 
-    createRoutes() {
-        routes.use("/auth", signIn);
-    }
-
     createSignInRoutes(signInController) {
         const routes = Router({ mergeParams: true });
         routes.post("/", signInController.signIn.bind(signInController));
