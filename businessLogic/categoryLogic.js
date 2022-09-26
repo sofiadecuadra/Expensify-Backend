@@ -3,14 +3,13 @@ const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const {
-    WordValidator,
-    ParagraphValidator,
-    NumberValidator,
-    ISODateValidator,
-} = require("../utilities/inputValidators");
 const dotenv = require("dotenv");
 const FileUploadError = require("../errors/FileUploadError");
+const WordValidator = require("../utilities/validators/wordValidator");
+const ParagraphValidator = require("../utilities/validators/paragraphValidator");
+const NumberValidator = require("../utilities/validators/numberValidator");
+const ISODateValidator = require("../utilities/validators/dateISOValidator");
+
 
 dotenv.config();
 

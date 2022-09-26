@@ -4,7 +4,9 @@ const ValidationError = require("../errors/ValidationError");
 const DuplicateError = require("../errors/DuplicateUserError");
 const InviteTokenError = require("../errors/auth/InviteTokenError");
 const sequelize = require("sequelize");
-const { WordValidator, EmailValidator, PasswordValidator } = require("../utilities/inputValidators");
+const WordValidator = require("../utilities/validators/wordValidator");
+const EmailValidator = require("../utilities/validators/emailValidator");
+const PasswordValidator = require("../utilities/validators/passwordValidator");
 const { decryptKey } = require("../library/jwtSupplier");
 
 class UserLogic {

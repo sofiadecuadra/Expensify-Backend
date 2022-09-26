@@ -1,7 +1,7 @@
 const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
-
-const { NumberValidator, ISODateValidator } = require("../utilities/inputValidators");
+const NumberValidator = require("../utilities/validators/numberValidator");
+const ISODateValidator = require("../utilities/validators/dateISOValidator");
 
 class ExpenseLogic {
     numberLength = 1000000000;
