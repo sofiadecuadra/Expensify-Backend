@@ -40,22 +40,28 @@ class CategoryLogic {
         this.expenseSQL = expenseSQL;
     }
 
+    async uploadImage(imageFile, originalName) {
+        try {
+            const params = {
+                Bucket: bucketName,
+                Key: Date.now() + "-" + originalName,
+                Body: imageFile.buffer,
+            };
+            const command = new PutObjectCommand(params);
+            await s3.send(command);
+            const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
+            return image;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
-            NumberValidator.validate(monthlyBudget, "monthly budget", this.numberLength);
 
-            const params = {
-                Bucket: bucketName,
-                Key: Date.now() + "-" + originalname,
-                Body: imageFile.buffer,
-            };
-
-            const command = new PutObjectCommand(params);
-
-            await s3.send(command);
-            const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
+            const image = await this.uploadImage(imageFile, originalname);
 
             console.info("[S3] Uploaded: " + image);
 
@@ -87,13 +93,16 @@ class CategoryLogic {
         );
     }
 
-    async updateCategory(categoryId, name, description, image, monthlyBudget) {
+    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget) {
         try {
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
-            NumberValidator.validate(monthlyBudget, "monthly budget", this.nameLength);
-            //TODO Ver si validar imagen
+
+            const image = await this.uploadImage(imageFile, originalname);
+
+            console.info("[S3] Uploaded: " + image);
+
             await this.categorySQL.update(
                 {
                     name: name,

@@ -37,9 +37,17 @@ class CategoryController {
 
     async updateCategory(req, res, next) {
         try {
+            const imageFile = req.file;
+            const originalName = req.file.originalName;
             const { categoryId } = req.params;
-            const { name, description, image, monthlyBudget } = req.body;
-            await this.categoryLogic.updateCategory(categoryId, name, description, image, monthlyBudget);
+            const { name, description, monthlyBudget } = req.body;
+            await this.categoryLogic.updateCategory(
+                imageFile,
+                categoryId,
+                name,
+                description,
+                originalName,
+                monthlyBudget);
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             next(err);
