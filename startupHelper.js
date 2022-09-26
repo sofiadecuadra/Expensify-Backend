@@ -128,6 +128,7 @@ class StartupHelper {
         routes.put(
             "/:categoryId",
             authMiddleware([Roles.Administrator]),
+            upload.single("image"),
             categoryController.updateCategory.bind(categoryController)
         );
         routes.get(
