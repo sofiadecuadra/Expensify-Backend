@@ -25,3 +25,8 @@ A tunnel connection needs to be set up, so as to connect to it.
 my-expenses-prod.c8njidzohjqg.us-east-1.rds.amazonaws.com
 
 ```
+
+## Backend configuration
+## 
+![](https://i.imgur.com/wpaRFuh.png)
+
