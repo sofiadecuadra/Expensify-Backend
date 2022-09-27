@@ -62,7 +62,7 @@ class CategoryLogic {
 
     async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
-            if(monthlyBudget == "") monthlyBudget = 0;
+            if (monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
@@ -98,16 +98,17 @@ class CategoryLogic {
         );
     }
 
-    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget) {
+    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
         try {
-            if(monthlyBudget == "") monthlyBudget = 0;
+            if (monthlyBudget == "") monthlyBudget = 0;
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
-
-            const image = await this.uploadImage(imageFile, originalname, name);
-
-            console.info("[S3] Uploaded: " + image);
+            let image = undefined;
+            if (!imageAlreadyUploaded) {
+                image = await this.uploadImage(imageFile, originalname, name);
+                console.info("[S3] Uploaded: " + image);
+            }
 
             await this.categorySQL.update(
                 {
@@ -139,7 +140,7 @@ class CategoryLogic {
         else {
             NumberValidator.validate(page, "page", 100000);
             NumberValidator.validate(pageSize, "page size", 50);
-    
+
             return await this.categorySQL.findAll(
                 this.paginate(
                     {
