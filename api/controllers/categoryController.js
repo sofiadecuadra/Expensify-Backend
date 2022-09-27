@@ -57,7 +57,8 @@ class CategoryController {
     async getCategories(req, res, next) {
         try {
             const { familyId } = req.user;
-            const categories = await this.categoryLogic.getCategories(familyId);
+            let { page, pageSize } = req.query;
+            const categories = await this.categoryLogic.getCategories(familyId, page, pageSize);
             res.status(200).json(categories);
         } catch (err) {
             next(err);
@@ -80,6 +81,16 @@ class CategoryController {
             let { startDate, endDate } = req.query;
             const categories = await this.categoryLogic.getCategoriesExpensesByPeriod(familyId, startDate, endDate);
             res.json(categories);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getCategoriesCount(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            const categories = await this.categoryLogic.getCategoriesCount(familyId);
+            res.status(200).json(categories);
         } catch (err) {
             next(err);
         }
