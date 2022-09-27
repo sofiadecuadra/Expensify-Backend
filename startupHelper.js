@@ -138,7 +138,7 @@ class StartupHelper {
         );
         routes.get(
             "/expenses",
-            authMiddleware([Roles.Administrator]),
+            // TODO add authMiddleware for api key,
             categoryController.getCategoriesWithMoreExpenses.bind(categoryController)
         );
         routes.get(
@@ -178,7 +178,7 @@ class StartupHelper {
         );
         routes.get(
             "/:categoryId",
-            authMiddleware([Roles.Administrator]),
+            // TODO add authMiddleware for api key,
             expenseController.getExpensesByCategory.bind(expenseController)
         );
         return routes;

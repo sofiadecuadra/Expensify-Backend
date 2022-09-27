@@ -65,6 +65,7 @@ class ExpenseLogic {
     async getExpensesByCategory(categoryId, startDate, endDate) {
         ISODateValidator.validate(startDate, "start date");
         ISODateValidator.validate(endDate, "end date");
+        NumberValidator.validate(categoryId, "category id", this.numberLength);
 
         return await this.expenseSQL.findAll({
             where: {
