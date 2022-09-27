@@ -19,14 +19,16 @@ describe("ExpenseController", () => {
             query: {
                 startDate: "2020-01-01",
                 endDate: "2020-01-02",
-            }
+            },
+            apiKey: 'apiKey',
+            familyName: 'familyName'
         };
         res = {
             send: jest.fn(),
         };
         next = jest.fn();
         expenseController.getExpensesByCategory(req, res, next);
-        expect(expenseLogic.getExpensesByCategory).toHaveBeenCalledWith(1, "2020-01-01", "2020-01-02");
+        expect(expenseLogic.getExpensesByCategory).toHaveBeenCalledWith(1, "2020-01-01", "2020-01-02", 'familyName', 'apiKey');
 
     });
 

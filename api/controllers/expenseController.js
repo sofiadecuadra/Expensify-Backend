@@ -41,7 +41,8 @@ class ExpenseController {
         try {
             const { categoryId } = req.params;
             const { startDate, endDate } = req.query;
-            const expenses = await this.expenseLogic.getExpensesByCategory(categoryId, startDate, endDate);
+            const { familyName, apiKey } = req;
+            const expenses = await this.expenseLogic.getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey);
             res.status(200).json(expenses);
         } catch (err) {
             next(err);

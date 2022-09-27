@@ -22,6 +22,7 @@ const ExpenseController = require("./api/controllers/expenseController");
 const FamilyController = require("./api/controllers/familyController");
 const UserController = require("./api/controllers/userController");
 const HealthCheckController = require("./api/controllers/healthCheckController");
+const apiKeyMiddleware = require("./api/middleware/apiKey");
 
 class StartupHelper {
     databaseConnection;
@@ -43,8 +44,8 @@ class StartupHelper {
     async initializeLogic() {
         const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL } = await this.initializeDatabase();
         const signInLogic = new SignInLogic(userSQL.instance);
-        const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance);
-        const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance);
+        const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance);
+        const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance);
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
@@ -138,7 +139,7 @@ class StartupHelper {
         );
         routes.get(
             "/expenses",
-            // TODO add authMiddleware for api key,
+            apiKeyMiddleware(),
             categoryController.getCategoriesWithMoreExpenses.bind(categoryController)
         );
         routes.get(
@@ -178,7 +179,7 @@ class StartupHelper {
         );
         routes.get(
             "/:categoryId",
-            // TODO add authMiddleware for api key,
+            apiKeyMiddleware(),
             expenseController.getExpensesByCategory.bind(expenseController)
         );
         return routes;
