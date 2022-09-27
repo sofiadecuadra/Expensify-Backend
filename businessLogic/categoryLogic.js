@@ -40,7 +40,7 @@ class CategoryLogic {
         this.expenseSQL = expenseSQL;
     }
 
-    async uploadImage(imageFile, originalName) {
+    async uploadImage(imageFile, originalName, categoryName) {
         try {
             const params = {
                 Bucket: bucketName,
@@ -52,16 +52,18 @@ class CategoryLogic {
             const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
             return image;
         } catch (err) {
-            throw err;
+            console.log(err);
+            throw new FileUploadError(categoryName);
         }
     }
 
     async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
+            if(monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const image = await this.uploadImage(imageFile, originalname);
+            const image = await this.uploadImage(imageFile, originalname, name);
 
             console.info("[S3] Uploaded: " + image);
 
@@ -95,11 +97,12 @@ class CategoryLogic {
 
     async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget) {
         try {
+            if(monthlyBudget == "") monthlyBudget = 0;
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const image = await this.uploadImage(imageFile, originalname);
+            const image = await this.uploadImage(imageFile, originalname, name);
 
             console.info("[S3] Uploaded: " + image);
 
@@ -125,7 +128,7 @@ class CategoryLogic {
             attributes: ["id", "name", "description", "image", "monthlyBudget"],
             where: {
                 familyId: familyId,
-                active: true, // only active ones?
+                active: true,
             },
         });
         return categories;
