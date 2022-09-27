@@ -73,7 +73,6 @@ class ExpenseLogic {
                 apiKey: apiKey,
             },
         });
-        console.log(family);
         if (!family)
             throw new InvalidApiKeyError(familyName);
 
