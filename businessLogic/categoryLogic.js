@@ -9,6 +9,7 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
+const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 
 
 dotenv.config();
@@ -34,10 +35,12 @@ class CategoryLogic {
     numberLength = 1000000000;
     categorySQL;
     expenseSQL;
+    familySQL;
 
-    constructor(categorySQL, expenseSQL) {
+    constructor(categorySQL, expenseSQL, familySQL) {
         this.categorySQL = categorySQL;
         this.expenseSQL = expenseSQL;
+        this.familySQL = familySQL;
     }
 
     async uploadImage(imageFile, originalName, categoryName) {
@@ -134,9 +137,19 @@ class CategoryLogic {
         return categories;
     }
 
-    async getCategoriesWithMoreExpenses(familyId) {
+    async getCategoriesWithMoreExpenses(familyName, apiKey) {
+        const family = await this.familySQL.findOne({
+            attributes: ["id"],
+            where: {
+                name: familyName,
+                apiKey: apiKey,
+            },
+        });
+        if (!family)
+            throw new InvalidApiKeyError(familyName);
+
         const categories = await this.expenseSQL.findAll({
-            ...this.groupByCategory(this.categorySQL, familyId),
+            ...this.groupByCategory(this.categorySQL, family.dataValues.id),
             order: sequelize.literal("total DESC"),
             limit: 3,
         });
@@ -166,7 +179,7 @@ class CategoryLogic {
                 attributes: ["name"],
                 where: {
                     familyId: familyId,
-                    active: true,
+                    //active: true, TODO VER SE ESTO VA
                 },
             },
         ],
