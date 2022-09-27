@@ -125,16 +125,43 @@ class CategoryLogic {
         }
     }
 
-    async getCategories(familyId) {
+    async getCategories(familyId, page, pageSize) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
-        const categories = await this.categorySQL.findAll({
-            attributes: ["id", "name", "description", "image", "monthlyBudget"],
+        if (page == null || pageSize == null) {
+            return await this.categorySQL.findAll({
+                attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                where: {
+                    familyId: familyId,
+                    active: true,
+                },
+            });
+        }
+        else {
+            NumberValidator.validate(page, "page", 100000);
+            NumberValidator.validate(pageSize, "page size", 50);
+    
+            return await this.categorySQL.findAll(
+                this.paginate(
+                    {
+                        attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                        where: {
+                            familyId: familyId,
+                            active: true,
+                        },
+                    },
+                    { page, pageSize }
+                )
+            );
+        }
+    }
+
+    async getCategoriesCount(familyId) {
+        return await this.categorySQL.findAll({
+            attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
             where: {
                 familyId: familyId,
-                active: true,
             },
         });
-        return categories;
     }
 
     async getCategoriesWithMoreExpenses(familyName, apiKey) {
@@ -185,6 +212,17 @@ class CategoryLogic {
         ],
         group: ["categoryId"],
     });
+
+    paginate(query, { page, pageSize }) {
+        const offset = parseInt(page) * parseInt(pageSize);
+        const limit = parseInt(pageSize);
+
+        return {
+            ...query,
+            offset,
+            limit,
+        };
+    }
 }
 
 module.exports = CategoryLogic;

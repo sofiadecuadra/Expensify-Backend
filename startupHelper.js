@@ -143,6 +143,11 @@ class StartupHelper {
             categoryController.getCategoriesWithMoreExpenses.bind(categoryController)
         );
         routes.get(
+            "/count",
+            authMiddleware([Roles.Member, Roles.Administrator]),
+            categoryController.getCategoriesCount.bind(categoryController)
+        );
+        routes.get(
             "/expenses/period",
             authMiddleware([Roles.Administrator]),
             categoryController.getCategoriesExpensesByPeriod.bind(categoryController)
