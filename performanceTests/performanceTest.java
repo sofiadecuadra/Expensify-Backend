@@ -31,7 +31,7 @@ public class PerformanceTest {
         threadGroup(
             10,
             10,
-            httpSampler("https://google.com/"),
+            httpSampler("api.expensify.ml"),
             uniformRandomTimer(500, 2000)),
         dashboardVisualizer(),
         htmlReporter(reportDir)).run();
