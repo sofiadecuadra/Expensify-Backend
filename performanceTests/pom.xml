@@ -11,15 +11,23 @@
   <properties>
     <!-- using Java 11 instead of 17 since is the latest LTS JMeter has support for -->
     <maven.compiler.release>11</maven.compiler.release>
+     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <build>
     <pluginManagement>
       <plugins>
+        <!-- We force to use the latest version of surefire plugin to properly run junit5 tests -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M7</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.6.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -51,4 +59,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>

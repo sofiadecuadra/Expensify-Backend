@@ -1,3 +1,4 @@
+package us.abstracta.jmeter.javadsl.sample;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
@@ -10,7 +11,7 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-import static us.abstracta.jmeter.javadsl.dashboard.DashboardVisualizer.*;
+//import static us.abstracta.jmeter.javadsl.dashboard.DashboardVisualizer.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +30,11 @@ public class PerformanceTest {
 
     TestPlanStats stats = testPlan(
         threadGroup(
-            10,
-            10,
-            httpSampler("api.expensify.ml"),
+            2,
+            2,
+            httpSampler("www.google.com.uy"),
             uniformRandomTimer(500, 2000)),
-        dashboardVisualizer(),
+        //dashboardVisualizer(),
         htmlReporter(reportDir)).run();
 
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(2));
