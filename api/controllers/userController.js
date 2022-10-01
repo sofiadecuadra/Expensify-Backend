@@ -26,6 +26,24 @@ class UserController {
             next(err);
         }
     }
+
+    async signIn(req, res, next) {
+        try {
+            const { email, password } = req.body;
+            const response = await this.userLogic.signIn(email, password);
+            const { token, role, expirationDate } = response;
+            res
+                .cookie("access_token", token, {
+                    httpOnly: true,
+                    secure: false, //TODO Poner en True para HTTPS
+                    expires: expirationDate,
+                })
+                .status(200)
+                .send({ role, expirationDate });
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = UserController;

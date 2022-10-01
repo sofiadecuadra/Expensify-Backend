@@ -10,8 +10,6 @@ const Roles = require("./library/roles");
 module.exports = routes;
 
 const Server = require("./server");
-const SignInLogic = require("./businessLogic/signInLogic");
-const SignInController = require("./api/controllers/signInController");
 const CategoryLogic = require("./businessLogic/categoryLogic");
 const ExpenseLogic = require("./businessLogic/expenseLogic");
 const FamilyLogic = require("./businessLogic/familyLogic");
@@ -43,26 +41,23 @@ class StartupHelper {
 
     async initializeLogic() {
         const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL } = await this.initializeDatabase();
-        const signInLogic = new SignInLogic(userSQL.instance);
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance);
         const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance);
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
-        return { signInLogic, categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
+        return { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
     }
 
     async initializeControllers() {
-        const { signInLogic, categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic } =
+        const { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic } =
             await this.initializeLogic();
-        const signInController = new SignInController(signInLogic);
         const categoryController = new CategoryController(categoryLogic);
         const expenseController = new ExpenseController(expenseLogic);
         const familyController = new FamilyController(familyLogic);
         const healthCheckController = new HealthCheckController(healthCheckLogic);
         const userController = new UserController(userLogic);
         return {
-            signInController,
             categoryController,
             expenseController,
             familyController,
@@ -73,15 +68,12 @@ class StartupHelper {
 
     async initializeRoutes() {
         const {
-            signInController,
             categoryController,
             expenseController,
             familyController,
             healthCheckController,
             userController,
         } = await this.initializeControllers();
-        const signInRoutes = this.createSignInRoutes(signInController);
-        routes.use("/auth", signInRoutes);
         const categoryRoutes = this.createCategoryRoutes(categoryController);
         routes.use("/categories", categoryRoutes);
         const expenseRoutes = this.createExpenseRoutes(expenseController);
@@ -100,12 +92,6 @@ class StartupHelper {
         const routes = await this.initializeRoutes();
         server.start();
         server.config(routes);
-    }
-
-    createSignInRoutes(signInController) {
-        const routes = Router({ mergeParams: true });
-        routes.post("/", signInController.signIn.bind(signInController));
-        return routes;
     }
 
     createCategoryRoutes(categoryController) {
@@ -221,6 +207,7 @@ class StartupHelper {
         const routes = Router({ mergeParams: true });
         routes.post("/", userController.createNewUser.bind(userController));
         routes.post("/invitations", userController.createUserFromInvite.bind(userController));
+        routes.post("/sign-in", userController.signIn.bind(userController));
         return routes;
     }
 }

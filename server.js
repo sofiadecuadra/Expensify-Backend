@@ -18,9 +18,9 @@ class Server {
 
     config(routes) {
         this.app.set("port", apiPort || 3003);
-        this.app.use(cookieParser());
 
         this.app.use(express.json());
+        this.app.use(cookieParser());
 
         this.app.use(cors());
         this.app.use("/", routes);
