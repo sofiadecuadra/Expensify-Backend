@@ -208,6 +208,7 @@ class StartupHelper {
         routes.post("/", userController.createNewUser.bind(userController));
         routes.post("/invitations", userController.createUserFromInvite.bind(userController));
         routes.post("/sign-in", userController.signIn.bind(userController));
+        routes.get("/log-out", userController.logOut.bind(userController));
         return routes;
     }
 }
