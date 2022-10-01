@@ -8,6 +8,7 @@ const sequelize = require("sequelize");
 const DuplicateUserError = require("../errors/DuplicateUserError");
 const ValidationError = require("../errors/ValidationError");
 const HTTPRequestError = require("../errors/HttpRequestError");
+const ForeignKeyError = require("../errors/ForeignKeyError");
 
 describe("UserLogic", () => {
     describe("createUserFromInvite", () => {
@@ -33,7 +34,7 @@ describe("UserLogic", () => {
             const inviteToken =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0";
 
-            const token = await userLogicInstance.createUserFromInvite(
+            const response = await userLogicInstance.createUserFromInvite(
                 name,
                 email,
                 role,
@@ -51,7 +52,9 @@ describe("UserLogic", () => {
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const expectedToken = await createKey(data);
-            expect(token).toEqual(expectedToken);
+            expect(response.token).toEqual(expectedToken);
+            expect(response.actualRole).toEqual(role);
+            expect(response.expirationDate).toBeInstanceOf(Date);
         });
     });
 
@@ -245,6 +248,7 @@ describe("UserLogic", () => {
                 // Fail test if above expression doesn't throw anything.
                 expect(true).toBe(false);
             } catch (e) {
+                const foreignKeyError = new ForeignKeyError("1");
                 expect(e).toBeInstanceOf(InputValidationError);
                 expect(e.message).toBe(
                     "Please enter a password between 4 and 64 characters (letters, numbers or symbols)!"
@@ -253,6 +257,11 @@ describe("UserLogic", () => {
                     errorType: `INPUT_VALIDATION_ERROR`,
                     message:
                         "Please enter a password between 4 and 64 characters (letters, numbers or symbols)!",
+                });
+                expect(foreignKeyError.body()).toEqual({
+                    errorType: `FOREIGN_KEY_ERROR`,
+                    message:
+                        "The category with id '1' was not found. Please try again.",
                 });
             }
         });
