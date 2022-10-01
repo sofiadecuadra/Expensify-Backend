@@ -10,7 +10,7 @@ class ForeignKeyError extends HTTPRequestError {
 
     body() {
         return {
-            errorType: `Not found error`,
+            errorType: `FOREIGN_KEY_ERROR`,
             message: this.message,
         };
     }

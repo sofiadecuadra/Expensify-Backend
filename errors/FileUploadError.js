@@ -10,7 +10,7 @@ class FileUploadError extends HTTPRequestError {
 
     body() {
         return {
-            ErrorType: `File Upload error`,
+            ErrorType: `FILE_UPLOAD_ERROR`,
             Message: this.message,
         };
     }
