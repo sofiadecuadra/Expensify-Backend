@@ -3,8 +3,7 @@ function parseDate(myDateStr) {
     if (myDateStr.includes("T") && myDateStr.charAt(myDateStr.length - 1)) {
         return new Date(myDateStr);
     }
-    const dateStr = myDateStr;
-    const [dateComponents, timeComponents] = dateStr.split(" ");
+    const [dateComponents, timeComponents] = myDateStr.split(" ");
 
     const [year, month, day] = dateComponents.split("-");
     const [hours, minutes, seconds] = timeComponents.split(":");

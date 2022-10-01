@@ -40,14 +40,15 @@ class CategoryController {
             const imageFile = req.file;
             const originalName = req.file.originalName;
             const { categoryId } = req.params;
-            const { name, description, monthlyBudget } = req.body;
+            const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
             await this.categoryLogic.updateCategory(
                 imageFile,
                 categoryId,
                 name,
                 description,
                 originalName,
-                monthlyBudget);
+                monthlyBudget,
+                imageAlreadyUploaded);
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             next(err);
@@ -57,7 +58,8 @@ class CategoryController {
     async getCategories(req, res, next) {
         try {
             const { familyId } = req.user;
-            const categories = await this.categoryLogic.getCategories(familyId);
+            let { page, pageSize } = req.query;
+            const categories = await this.categoryLogic.getCategories(familyId, page, pageSize);
             res.status(200).json(categories);
         } catch (err) {
             next(err);
@@ -66,8 +68,8 @@ class CategoryController {
 
     async getCategoriesWithMoreExpenses(req, res, next) {
         try {
-            const { familyId } = req.user;
-            const categories = await this.categoryLogic.getCategoriesWithMoreExpenses(familyId);
+            const { familyName, apiKey } = req;
+            const categories = await this.categoryLogic.getCategoriesWithMoreExpenses(familyName, apiKey);
             res.json(categories);
         } catch (err) {
             next(err);
@@ -80,6 +82,16 @@ class CategoryController {
             let { startDate, endDate } = req.query;
             const categories = await this.categoryLogic.getCategoriesExpensesByPeriod(familyId, startDate, endDate);
             res.json(categories);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getCategoriesCount(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            const categories = await this.categoryLogic.getCategoriesCount(familyId);
+            res.status(200).json(categories);
         } catch (err) {
             next(err);
         }

@@ -2,17 +2,20 @@ const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
+const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 
 class ExpenseLogic {
     numberLength = 1000000000;
     expenseSQL;
     categorySQL;
     userSQL;
+    familySQL;
 
-    constructor(expenseSQL, categorySQL, userSQL) {
+    constructor(expenseSQL, categorySQL, userSQL, familySQL) {
         this.expenseSQL = expenseSQL;
         this.categorySQL = categorySQL;
         this.userSQL = userSQL;
+        this.familySQL = familySQL;
     }
 
     async createExpense(amount, producedDate, categoryId, userId) {
@@ -62,17 +65,37 @@ class ExpenseLogic {
         }
     }
 
-    async getExpensesByCategory(categoryId, startDate, endDate) {
+    async getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey) {
+        const family = await this.familySQL.findOne({
+            attributes: ["id"],
+            where: {
+                name: familyName,
+                apiKey: apiKey,
+            },
+        });
+        if (!family)
+            throw new InvalidApiKeyError(familyName);
+
         ISODateValidator.validate(startDate, "start date");
         ISODateValidator.validate(endDate, "end date");
+        NumberValidator.validate(categoryId, "category id", this.numberLength);
 
         return await this.expenseSQL.findAll({
+            include: [
+                {
+                    model: this.categorySQL,
+                    where: {
+                        familyId: family.dataValues.id,
+                    }
+                },
+            ],
             where: {
                 categoryId: categoryId,
                 producedDate: {
                     [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
                 },
             },
+
         });
     }
 

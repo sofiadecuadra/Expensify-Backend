@@ -9,6 +9,7 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
+const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 
 
 dotenv.config();
@@ -34,13 +35,15 @@ class CategoryLogic {
     numberLength = 1000000000;
     categorySQL;
     expenseSQL;
+    familySQL;
 
-    constructor(categorySQL, expenseSQL) {
+    constructor(categorySQL, expenseSQL, familySQL) {
         this.categorySQL = categorySQL;
         this.expenseSQL = expenseSQL;
+        this.familySQL = familySQL;
     }
 
-    async uploadImage(imageFile, originalName) {
+    async uploadImage(imageFile, originalName, categoryName) {
         try {
             const params = {
                 Bucket: bucketName,
@@ -52,16 +55,18 @@ class CategoryLogic {
             const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
             return image;
         } catch (err) {
-            throw err;
+            console.log(err);
+            throw new FileUploadError(categoryName);
         }
     }
 
     async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
+            if (monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const image = await this.uploadImage(imageFile, originalname);
+            const image = await this.uploadImage(imageFile, originalname, name);
 
             console.info("[S3] Uploaded: " + image);
 
@@ -93,15 +98,17 @@ class CategoryLogic {
         );
     }
 
-    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget) {
+    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
         try {
+            if (monthlyBudget == "") monthlyBudget = 0;
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
-
-            const image = await this.uploadImage(imageFile, originalname);
-
-            console.info("[S3] Uploaded: " + image);
+            let image = undefined;
+            if (!imageAlreadyUploaded) {
+                image = await this.uploadImage(imageFile, originalname, name);
+                console.info("[S3] Uploaded: " + image);
+            }
 
             await this.categorySQL.update(
                 {
@@ -119,21 +126,58 @@ class CategoryLogic {
         }
     }
 
-    async getCategories(familyId) {
+    async getCategories(familyId, page, pageSize) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
-        const categories = await this.categorySQL.findAll({
-            attributes: ["id", "name", "description", "image", "monthlyBudget"],
-            where: {
-                familyId: familyId,
-                active: true, // only active ones?
-            },
-        });
-        return categories;
+        if (page == null || pageSize == null) {
+            return await this.categorySQL.findAll({
+                attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                where: {
+                    familyId: familyId,
+                    active: true,
+                },
+            });
+        }
+        else {
+            NumberValidator.validate(page, "page", 100000);
+            NumberValidator.validate(pageSize, "page size", 50);
+
+            return await this.categorySQL.findAll(
+                this.paginate(
+                    {
+                        attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                        where: {
+                            familyId: familyId,
+                            active: true,
+                        },
+                    },
+                    { page, pageSize }
+                )
+            );
+        }
     }
 
-    async getCategoriesWithMoreExpenses(familyId) {
+    async getCategoriesCount(familyId) {
+        return await this.categorySQL.findAll({
+            attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
+            where: {
+                familyId: familyId,
+            },
+        });
+    }
+
+    async getCategoriesWithMoreExpenses(familyName, apiKey) {
+        const family = await this.familySQL.findOne({
+            attributes: ["id"],
+            where: {
+                name: familyName,
+                apiKey: apiKey,
+            },
+        });
+        if (!family)
+            throw new InvalidApiKeyError(familyName);
+
         const categories = await this.expenseSQL.findAll({
-            ...this.groupByCategory(this.categorySQL, familyId),
+            ...this.groupByCategory(this.categorySQL, family.dataValues.id),
             order: sequelize.literal("total DESC"),
             limit: 3,
         });
@@ -163,12 +207,23 @@ class CategoryLogic {
                 attributes: ["name"],
                 where: {
                     familyId: familyId,
-                    active: true,
+                    //active: true, TODO VER SE ESTO VA
                 },
             },
         ],
         group: ["categoryId"],
     });
+
+    paginate(query, { page, pageSize }) {
+        const offset = parseInt(page) * parseInt(pageSize);
+        const limit = parseInt(pageSize);
+
+        return {
+            ...query,
+            offset,
+            limit,
+        };
+    }
 }
 
 module.exports = CategoryLogic;
