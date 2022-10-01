@@ -22,7 +22,7 @@ class Server {
         this.app.use(express.json());
         this.app.use(cookieParser());
 
-        this.app.use(cors());
+        this.app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
         this.app.use("/", routes);
         this.app.use(errorMiddleware);
     }

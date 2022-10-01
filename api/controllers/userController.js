@@ -54,6 +54,8 @@ class UserController {
                     httpOnly: true,
                     secure: false, //TODO Poner en True para HTTPS
                     expires: expirationDate,
+                    domain: "localhost",
+
                 })
                 .status(200)
                 .send({ role, expirationDate });
