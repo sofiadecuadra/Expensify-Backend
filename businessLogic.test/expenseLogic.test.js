@@ -204,7 +204,7 @@ describe("ExpenseLogicTest", () => {
                 expect(err).toBeInstanceOf(InvalidApiKeyError);
                 expect(err.message).toBe("Invalid api key");
                 expect(err.body()).toEqual({
-                    errorType: "Api key error",
+                    errorType: "API_KEY_ERROR",
                     message: "Invalid api key",
                 });
             }

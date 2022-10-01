@@ -10,7 +10,7 @@ class InvalidApiKeyError extends AuthError {
 
     body() {
         return {
-            errorType: `Api key error`,
+            errorType: `API_KEY_ERROR`,
             message: this.message,
         };
     }

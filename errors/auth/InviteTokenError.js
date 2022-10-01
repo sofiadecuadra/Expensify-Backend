@@ -10,7 +10,7 @@ class InviteTokenError extends AuthError {
 
     body() {
         return {
-            errorType: `Token error`,
+            errorType: `INVITE_TOKEN_ERROR`,
             message: this.message,
         };
     }

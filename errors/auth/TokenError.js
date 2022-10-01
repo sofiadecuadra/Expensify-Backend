@@ -10,7 +10,7 @@ class TokenError extends AuthError {
 
     body() {
         return {
-            errorType: `Token error`,
+            errorType: `TOKEN_ERROR`,
             message: this.message,
         };
     }

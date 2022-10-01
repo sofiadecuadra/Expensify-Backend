@@ -3,11 +3,10 @@ class HealthCheckError extends Error {
 
     body() {
         return {
-            errorType: `Health check error`,
+            errorType: `HEALTH_CHECK_ERROR`,
             message: this.message,
         };
     }
-
 }
 
 module.exports = HealthCheckError;

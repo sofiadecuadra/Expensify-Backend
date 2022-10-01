@@ -10,7 +10,7 @@ class DuplicateFamilyError extends HTTPRequestError {
 
     body() {
         return {
-            errorType: `Duplicate error`,
+            errorType: `DUPLICATE_FAMILY_ERROR`,
             message: this.message,
         };
     }
