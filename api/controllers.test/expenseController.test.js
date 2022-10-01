@@ -27,11 +27,10 @@ describe("ExpenseController", () => {
             send: jest.fn(),
         };
         next = jest.fn();
-        expenseController.getExpensesByCategory(req, res, next);
+        await expenseController.getExpensesByCategory(req, res, next);
         expect(expenseLogic.getExpensesByCategory).toHaveBeenCalledWith(1, "2020-01-01", "2020-01-02", 'familyName', 'apiKey');
 
     });
-
 
     it("should throw received error from get expenses by category", async () => {
         let expenseController;
@@ -58,7 +57,7 @@ describe("ExpenseController", () => {
             send: jest.fn(),
         };
         next = jest.fn();
-        expenseController.getExpensesByCategory(req, res, next);
+        await expenseController.getExpensesByCategory(req, res, next);
         expect(next).toHaveBeenCalled();
     });
 });

@@ -9,7 +9,11 @@ describe("UserController", () => {
         let next;
 
         userLogic = {
-            createUserFromInvite: jest.fn(),
+            createUserFromInvite: jest.fn().mockResolvedValue({
+                token: "token",
+                actualRole: "actualRole",
+                expirationDate: "expirationDate",
+            }),
         }
         userController = new UserController(userLogic);
         const body = {
@@ -24,14 +28,14 @@ describe("UserController", () => {
             body: body
         };
         res = {
+            cookie: jest.fn(),
             send: jest.fn(),
         };
         next = jest.fn();
-        userController.createUserFromInvite(req, res, next);
+        await userController.createUserFromInvite(req, res, next);
         expect(userLogic.createUserFromInvite).toHaveBeenCalledWith(body.name, body.email, body.role, body.familyId, body.password, body.inviteToken);
-
+        expect(res.cookie).toHaveBeenCalled();
     });
-
 
     it("should throw received error", async () => {
         let userController;
@@ -62,7 +66,7 @@ describe("UserController", () => {
         };
         next = jest.fn();
         try {
-            userController.createUserFromInvite(req, res, next);
+            await userController.createUserFromInvite(req, res, next);
         }
         catch (err) {
             expect(next).toHaveBeenCalled().With(err);
