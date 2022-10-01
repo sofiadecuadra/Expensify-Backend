@@ -8,6 +8,7 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const EmailValidator = require("../utilities/validators/emailValidator");
 const PasswordValidator = require("../utilities/validators/passwordValidator");
 const { decryptKey } = require("../library/jwtSupplier");
+const AuthError = require("../errors/auth/AuthError");
 
 class UserLogic {
     nameLength = 20;
