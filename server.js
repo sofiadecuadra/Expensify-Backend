@@ -4,6 +4,8 @@ const apiPort = config.get("API_PORT");
 const cors = require("cors");
 const errorMiddleware = require("./api/middleware/error");
 const cookieParser = require("cookie-parser");
+const dotenv = require("dotenv");
+dotenv.config();
 
 class Server {
     app;
@@ -22,7 +24,8 @@ class Server {
         this.app.use(express.json());
         this.app.use(cookieParser());
 
-        this.app.use(cors());
+
+        this.app.use(cors({ credentials: true, origin: process.env.FRONTEND_ORIGIN }));
         this.app.use("/", routes);
         this.app.use(errorMiddleware);
     }

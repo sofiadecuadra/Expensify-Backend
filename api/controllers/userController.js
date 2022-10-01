@@ -1,4 +1,5 @@
-const UserLogic = require("../../businessLogic/userLogic");
+const dotenv = require("dotenv");
+dotenv.config();
 
 class UserController {
     userLogic;
@@ -13,13 +14,14 @@ class UserController {
             const response = await this.userLogic.createNewUser(name, email, role, familyName, password);
             const { token, actualRole, expirationDate } = response;
             res
-            .cookie("access_token", token, {
-                httpOnly: true,
-                secure: false, //TODO Poner en True para HTTPS
-                expires: expirationDate,
-            })
-            .status(200)
-            .send({ role: actualRole, expirationDate });
+                .cookie("access_token", token, {
+                    httpOnly: true,
+                    secure: process.env.SECURE_COOKIES,
+                    expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
+                })
+                .status(200)
+                .send({ role: actualRole, expirationDate });
         } catch (err) {
             next(err);
         }
@@ -33,12 +35,13 @@ class UserController {
             res
                 .cookie("access_token", token, {
                     httpOnly: true,
-                    secure: false, //TODO Poner en True para HTTPS
+                    secure: process.env.SECURE_COOKIES,
                     expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
                 })
                 .status(200)
                 .send({ role: actualRole, expirationDate });
-            
+
         } catch (err) {
             next(err);
         }
@@ -52,8 +55,9 @@ class UserController {
             res
                 .cookie("access_token", token, {
                     httpOnly: true,
-                    secure: false, //TODO Poner en True para HTTPS
+                    secure: process.env.SECURE_COOKIES,
                     expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
                 })
                 .status(200)
                 .send({ role, expirationDate });
