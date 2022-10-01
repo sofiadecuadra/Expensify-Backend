@@ -39,8 +39,12 @@ class UserLogic {
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 30);
+            const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
             console.info("[USER_CREATE] User created id: " + user.id);
-            return token;
+            console.info("[SIGN_IN] User signed in id: " + user.id);
+            return response;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
             if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -72,8 +76,12 @@ class UserLogic {
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 30);
+            const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
             console.info("[USER_CREATE] User created id: " + user.id);
-            return token;
+            console.info("[SIGN_IN] User signed in id: " + user.id);
+            return response;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
             if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);

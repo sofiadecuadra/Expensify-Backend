@@ -10,8 +10,16 @@ class UserController {
     async createNewUser(req, res, next) {
         try {
             const { name, email, role, familyName, password } = req.body;
-            const token = await this.userLogic.createNewUser(name, email, role, familyName, password);
-            res.send({ token: token });
+            const response = await this.userLogic.createNewUser(name, email, role, familyName, password);
+            const { token, actualRole, expirationDate } = response;
+            res
+            .cookie("access_token", token, {
+                httpOnly: true,
+                secure: false, //TODO Poner en True para HTTPS
+                expires: expirationDate,
+            })
+            .status(200)
+            .send({ role: actualRole, expirationDate });
         } catch (err) {
             next(err);
         }
@@ -20,8 +28,17 @@ class UserController {
     async createUserFromInvite(req, res, next) {
         try {
             const { name, email, role, familyId, password, inviteToken } = req.body;
-            const token = await this.userLogic.createUserFromInvite(name, email, role, familyId, password, inviteToken);
-            res.send({ token: token });
+            const response = await this.userLogic.createUserFromInvite(name, email, role, familyId, password, inviteToken);
+            const { token, actualRole, expirationDate } = response;
+            res
+                .cookie("access_token", token, {
+                    httpOnly: true,
+                    secure: false, //TODO Poner en True para HTTPS
+                    expires: expirationDate,
+                })
+                .status(200)
+                .send({ role: actualRole, expirationDate });
+            
         } catch (err) {
             next(err);
         }
