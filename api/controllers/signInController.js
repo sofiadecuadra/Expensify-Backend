@@ -9,7 +9,15 @@ class SignInController {
         try {
             const { email, password } = req.body;
             const response = await this.signInLogic.signIn(email, password);
-            res.status(200).send(response);
+            const { token, role, expirationDate } = response;
+            res
+                .cookie("access_token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    expires: expirationDate,
+                })
+                .status(200)
+                .send({ role, expirationDate });
         } catch (err) {
             next(err);
         }
