@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.sample;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-//import static us.abstracta.jmeter.javadsl.dashboard.DashboardVisualizer.*;
+import static us.abstracta.jmeter.javadsl.dashboard.DashboardVisualizer.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,11 +33,14 @@ public class PerformanceTest {
         threadGroup(
             2,
             2,
-            httpSampler("www.google.com.uy"),
+            httpSampler("https://google.com/"),
             uniformRandomTimer(500, 2000)),
-        //dashboardVisualizer(),
+        dashboardVisualizer(),
         htmlReporter(reportDir)).run();
+        long miliseconds=stats.overall().sampleTime().perc95().toMillis();
+        long expected=Long.parseLong("300");
+        assertTrue(miliseconds<=expected);
+    
 
-    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(2));
-  }
+  } 
 }
