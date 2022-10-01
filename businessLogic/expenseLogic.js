@@ -109,7 +109,7 @@ class ExpenseLogic {
         });
     }
 
-    async getExpensesPaginated(startDate, endDate, page, pageSize) {
+    async getExpensesPaginated(familyId, startDate, endDate, page, pageSize) {
         NumberValidator.validate(page, "page", 100000);
         NumberValidator.validate(pageSize, "page size", 50);
 
@@ -129,7 +129,7 @@ class ExpenseLogic {
                     where: {
                         producedDate: {
                             [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                        },
+                        }
                     },
                     order: [["producedDate", "ASC"]],
                     include: [
@@ -140,6 +140,9 @@ class ExpenseLogic {
                         {
                             model: this.userSQL,
                             attributes: ["name"],
+                            where : {
+                                familyId: familyId,
+                            }
                         },
                     ],
                 },
