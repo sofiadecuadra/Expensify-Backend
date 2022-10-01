@@ -3,9 +3,7 @@ const TokenError = require("../../errors/auth/TokenError");
 const { decryptKey } = require("../../library/jwtSupplier");
 
 const authMiddleware = (roleArray) => async (req, res, next) => {
-    const authHeaderToken = req.header("Authorization");
-
-    const token = !authHeaderToken ? null : authHeaderToken.split(" ")[1] || authHeaderToken;
+    const token = req.cookies.access_token;
     let user;
     try {
         user = await decryptKey(token);
