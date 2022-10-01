@@ -22,6 +22,7 @@ class FamilyLogic {
             const apiKey = await this.createApiKey(name);
             WordValidator.validate(name, "family name", this.nameLength);
             const family = await this.familySQL.create({ name, apiKey }, transaction);
+            console.info("[FAMILY_CREATE] Family created id: " + family.id);
             return family;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
@@ -31,10 +32,10 @@ class FamilyLogic {
 
     async updateApiKey(familyId) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
-
         const family = await this.familySQL.findOne({ where: { id: familyId } });
         const apiKey = await this.createApiKey(family.name);
         await this.familySQL.update({ apiKey }, { where: { id: familyId } });
+        console.log("[API_KEY_UPDATE] Family updated id: " + familyId);
     }
 
     async getApiKey(familyId) {

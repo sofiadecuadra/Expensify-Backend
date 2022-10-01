@@ -3,7 +3,7 @@ class AuthError extends Error {
 
     body() {
         return {
-            errorType: `Auth error`,
+            errorType: `AUTH_ERROR`,
             message: this.message,
         };
     }

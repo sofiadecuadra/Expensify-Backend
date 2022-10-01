@@ -17,7 +17,7 @@ class ValidationError extends HTTPRequestError {
 
     body() {
         return {
-            errorType: `Validation error`,
+            errorType: `VALIDATION_ERROR`,
             message: this.message,
         };
     }

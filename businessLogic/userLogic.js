@@ -36,9 +36,9 @@ class UserLogic {
                 );
                 return user;
             });
-
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
+            console.info("[USER_CREATE] User created id: " + user.id);
             return token;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
@@ -69,9 +69,9 @@ class UserLogic {
                 familyId: familyId,
                 password: encryptedPassword,
             });
-
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const token = await createKey(data);
+            console.info("[USER_CREATE] User created id: " + user.id);
             return token;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
