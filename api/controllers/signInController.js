@@ -8,8 +8,8 @@ class SignInController {
     async signIn(req, res, next) {
         try {
             const { email, password } = req.body;
-            const token = await this.signInLogic.signIn(email, password);
-            res.status(200).send({ token: token });
+            const response = await this.signInLogic.signIn(email, password);
+            res.status(200).send(response);
         } catch (err) {
             next(err);
         }

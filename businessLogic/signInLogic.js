@@ -17,7 +17,10 @@ class SignInLogic {
 
         const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
         const token = await createKey(data);
-        return token;
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30);
+        const response = { token: token, role: user.role, expirationDate: expirationDate };
+        return response;
     }
 }
 
