@@ -1,6 +1,7 @@
 //const HealthCheckLogic = require("./businessLogic/healthCheckLogic");
+const newrelic = require('newrelic')
+
 const StartupHelper = require("./startupHelper");
-require('newrelic');
 
 (async() => {
     const startupHelper = new StartupHelper();

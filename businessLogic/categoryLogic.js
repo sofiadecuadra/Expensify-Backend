@@ -15,7 +15,7 @@ const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 dotenv.config();
 
 const bucketName = process.env.AWS_BUCKET_NAME;
-const region = process.env.AWS_BUCKET_REGION;
+const region = 'us-east-1';
 const accessKeyId = process.env.AWS_ACCESS_KEY;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 const sessionToken = process.env.AWS_SESSION_TOKEN;
@@ -85,16 +85,13 @@ class CategoryLogic {
 
     async deleteCategory(categoryId) {
         NumberValidator.validate(categoryId, "category id", this.numberLength);
-        await this.categorySQL.update(
-            {
-                active: false,
+        await this.categorySQL.update({
+            active: false,
+        }, {
+            where: {
+                id: categoryId,
             },
-            {
-                where: {
-                    id: categoryId,
-                },
-            }
-        );
+        });
         console.info("[CATEGORY_DELETE] Category deleted id: " + categoryId);
     }
 
@@ -109,15 +106,12 @@ class CategoryLogic {
                 image = await this.uploadImage(imageFile, originalname, name);
             }
 
-            await this.categorySQL.update(
-                {
-                    name: name,
-                    description: description,
-                    image: image,
-                    monthlyBudget: monthlyBudget,
-                },
-                { where: { id: categoryId } }
-            );
+            await this.categorySQL.update({
+                name: name,
+                description: description,
+                image: image,
+                monthlyBudget: monthlyBudget,
+            }, { where: { id: categoryId } });
             console.info("[CATEGORY_UPDATE] Category updated id: " + categoryId);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
@@ -136,29 +130,27 @@ class CategoryLogic {
                     active: true,
                 },
             });
-        }
-        else {
+        } else {
             NumberValidator.validate(page, "page", 100000);
             NumberValidator.validate(pageSize, "page size", 50);
 
             return await this.categorySQL.findAll(
-                this.paginate(
-                    {
-                        attributes: ["id", "name", "description", "image", "monthlyBudget"],
-                        where: {
-                            familyId: familyId,
-                            active: true,
-                        },
+                this.paginate({
+                    attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                    where: {
+                        familyId: familyId,
+                        active: true,
                     },
-                    { page, pageSize }
-                )
+                }, { page, pageSize })
             );
         }
     }
 
     async getCategoriesCount(familyId) {
         return await this.categorySQL.findAll({
-            attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
+            attributes: [
+                [sequelize.fn("count", sequelize.col("id")), "total"]
+            ],
             where: {
                 familyId: familyId,
             },
@@ -201,16 +193,14 @@ class CategoryLogic {
     groupByCategory = (categoryInstance, familyId) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
 
-        include: [
-            {
-                model: categoryInstance,
-                attributes: ["name"],
-                where: {
-                    familyId: familyId,
-                    //active: true, TODO VER SE ESTO VA
-                },
+        include: [{
+            model: categoryInstance,
+            attributes: ["name"],
+            where: {
+                familyId: familyId,
+                //active: true, TODO VER SE ESTO VA
             },
-        ],
+        }, ],
         group: ["categoryId"],
     });
 
