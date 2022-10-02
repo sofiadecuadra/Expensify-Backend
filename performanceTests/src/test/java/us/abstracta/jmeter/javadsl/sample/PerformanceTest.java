@@ -26,14 +26,14 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 public class PerformanceTest {
 
   @Test
-  public void testSimple() throws IOException {
+  public void testCategoriesWithMoreExpenses() throws IOException {
     String reportDir = "./report/testSimple";
 
     TestPlanStats stats = testPlan(
         threadGroup(
             2,
             2,
-            httpSampler("https://google.com/"),
+            httpSampler("https://api.expensify.ml/categories/expenses"),
             uniformRandomTimer(500, 2000)),
         dashboardVisualizer(),
         htmlReporter(reportDir)).run();
@@ -43,4 +43,22 @@ public class PerformanceTest {
     
 
   } 
+  @Test
+  public void testCategories() throws IOException {
+    String reportDir = "./report/testSimple";
+
+    TestPlanStats stats = testPlan(
+        threadGroup(
+            2,
+            2,
+            httpSampler("https://api.expensify.ml/categories/expenses"),
+            uniformRandomTimer(500, 2000)),
+        dashboardVisualizer(),
+        htmlReporter(reportDir)).run();
+        long miliseconds=stats.overall().sampleTime().perc95().toMillis();
+        long expected=Long.parseLong("300");
+        assertTrue(miliseconds<=expected);
+    
+
+  }
 }
