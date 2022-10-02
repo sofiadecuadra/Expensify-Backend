@@ -8,6 +8,7 @@ const sequelize = require("sequelize");
 const DuplicateUserError = require("../errors/DuplicateUserError");
 const ValidationError = require("../errors/ValidationError");
 const HTTPRequestError = require("../errors/HttpRequestError");
+const ForeignKeyError = require("../errors/ForeignKeyError");
 
 describe("UserLogic", () => {
     describe("createUserFromInvite", () => {
@@ -33,7 +34,7 @@ describe("UserLogic", () => {
             const inviteToken =
                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0";
 
-            const token = await userLogicInstance.createUserFromInvite(
+            const response = await userLogicInstance.createUserFromInvite(
                 name,
                 email,
                 role,
@@ -51,7 +52,9 @@ describe("UserLogic", () => {
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
             const expectedToken = await createKey(data);
-            expect(token).toEqual(expectedToken);
+            expect(response.token).toEqual(expectedToken);
+            expect(response.actualRole).toEqual(role);
+            expect(response.expirationDate).toBeInstanceOf(Date);
         });
     });
 
@@ -85,7 +88,7 @@ describe("UserLogic", () => {
                 expect(e).toBeInstanceOf(InviteTokenError);
                 expect(e.message).toBe("Invalid invite token");
                 expect(e.body()).toEqual({
-                    errorType: `Token error`,
+                    errorType: `INVITE_TOKEN_ERROR`,
                     message: "Invalid invite token",
                 });
             }
@@ -123,12 +126,12 @@ describe("UserLogic", () => {
                 expect(e).toBeInstanceOf(InviteTokenError);
                 expect(e.message).toBe("Invalid invite token");
                 expect(e.body()).toEqual({
-                    errorType: `Token error`,
+                    errorType: `INVITE_TOKEN_ERROR`,
                     message: "Invalid invite token",
                 });
                 const newInstance = new AuthError("message");
                 expect(newInstance.body()).toEqual({
-                    errorType: `Auth error`,
+                    errorType: `AUTH_ERROR`,
                     message: 'message',
                 });
             }
@@ -168,7 +171,7 @@ describe("UserLogic", () => {
                     "Please enter a non-empty name containing only letters, numbers or spaces with maximum length of 20!"
                 );
                 expect(e.body()).toEqual({
-                    errorType: `Input validation error`,
+                    errorType: `INPUT_VALIDATION_ERROR`,
                     message:
                         "Please enter a non-empty name containing only letters, numbers or spaces with maximum length of 20!",
                 });
@@ -209,7 +212,7 @@ describe("UserLogic", () => {
                     "Please enter a valid email!"
                 );
                 expect(e.body()).toEqual({
-                    errorType: `Input validation error`,
+                    errorType: `INPUT_VALIDATION_ERROR`,
                     message:
                         "Please enter a valid email!",
                 });
@@ -245,14 +248,20 @@ describe("UserLogic", () => {
                 // Fail test if above expression doesn't throw anything.
                 expect(true).toBe(false);
             } catch (e) {
+                const foreignKeyError = new ForeignKeyError("1");
                 expect(e).toBeInstanceOf(InputValidationError);
                 expect(e.message).toBe(
                     "Please enter a password between 4 and 64 characters (letters, numbers or symbols)!"
                 );
                 expect(e.body()).toEqual({
-                    errorType: `Input validation error`,
+                    errorType: `INPUT_VALIDATION_ERROR`,
                     message:
                         "Please enter a password between 4 and 64 characters (letters, numbers or symbols)!",
+                });
+                expect(foreignKeyError.body()).toEqual({
+                    errorType: `FOREIGN_KEY_ERROR`,
+                    message:
+                        "The category with id '1' was not found. Please try again.",
                 });
             }
         });
@@ -294,12 +303,12 @@ describe("UserLogic", () => {
                     "The email 'email@gmail.com' is already in use. Please try again."
                 );
                 expect(e.body()).toEqual({
-                    errorType: `Duplicate error`,
+                    errorType: `DUPLICATE_USER_ERROR`,
                     message:
                         "The email 'email@gmail.com' is already in use. Please try again.",
                 });
                 expect(httpRequestError.body()).toEqual({
-                    errorType: `Server error`,
+                    errorType: `HTTP_REQUEST_ERROR`,
                     message:
                         "Duplicate user email",
                 });
@@ -343,7 +352,7 @@ describe("UserLogic", () => {
                     "Missing fields: undefined, undefined. Please fill all and try again."
                 );
                 expect(e.body()).toEqual({
-                    errorType: `Validation error`,
+                    errorType: `VALIDATION_ERROR`,
                     message:
                         "Missing fields: undefined, undefined. Please fill all and try again.",
                 });

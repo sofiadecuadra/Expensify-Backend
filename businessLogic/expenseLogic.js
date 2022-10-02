@@ -3,6 +3,8 @@ const sequelize = require("sequelize");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
 const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
+const ForeignKeyError = require("../errors/ForeignKeyError");
+const { ValidationError } = require("sequelize");
 
 class ExpenseLogic {
     numberLength = 1000000000;
@@ -24,13 +26,14 @@ class ExpenseLogic {
             ISODateValidator.validate(producedDate, "produced date");
             NumberValidator.validate(categoryId, "category id", this.numberLength);
 
-            await this.expenseSQL.create({
+            const newExpense = await this.expenseSQL.create({
                 amount,
                 producedDate: parseDate(producedDate),
                 categoryId,
                 userId,
                 registeredDate: parseDate(new Date()),
             });
+            console.info("[EXPENSE_CREATE] Expense created id: " + newExpense.id);
         } catch (err) {
             if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -41,7 +44,13 @@ class ExpenseLogic {
     async deleteExpense(expenseId) {
         NumberValidator.validate(expenseId, "expense id", this.numberLength);
 
-        await this.expenseSQL.destroy({ where: { id: expenseId } });
+        await this.expenseSQL.destroy(
+            { where: 
+                { 
+                    id: expenseId 
+                } 
+            });
+        console.info("[EXPENSE_DELETE] Expense deleted id: " + expenseId);
     }
 
     async updateExpense(amount, producedDate, categoryId, expenseId) {
@@ -58,6 +67,7 @@ class ExpenseLogic {
                 },
                 { where: { id: expenseId } }
             );
+            console.info("[EXPENSE_UPDATE] Expense updated id: " + expenseId);
         } catch (err) {
             if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -99,7 +109,7 @@ class ExpenseLogic {
         });
     }
 
-    async getExpensesPaginated(startDate, endDate, page, pageSize) {
+    async getExpensesPaginated(familyId, startDate, endDate, page, pageSize) {
         NumberValidator.validate(page, "page", 100000);
         NumberValidator.validate(pageSize, "page size", 50);
 
@@ -119,7 +129,7 @@ class ExpenseLogic {
                     where: {
                         producedDate: {
                             [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                        },
+                        }
                     },
                     order: [["producedDate", "ASC"]],
                     include: [
@@ -130,6 +140,9 @@ class ExpenseLogic {
                         {
                             model: this.userSQL,
                             attributes: ["name"],
+                            where : {
+                                familyId: familyId,
+                            }
                         },
                     ],
                 },

@@ -52,7 +52,8 @@ class ExpenseController {
     async getExpensesPaginated(req, res, next) {
         try {
             let { startDate, endDate, page, pageSize } = req.query;
-            const expenses = await this.expenseLogic.getExpensesPaginated(startDate, endDate, page, pageSize);
+            const { familyId } = req.user;
+            const expenses = await this.expenseLogic.getExpensesPaginated(familyId, startDate, endDate, page, pageSize);
             res.status(200).json(expenses);
         } catch (err) {
             next(err);

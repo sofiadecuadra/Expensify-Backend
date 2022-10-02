@@ -10,7 +10,7 @@ class RoleError extends AuthError {
 
     body() {
         return {
-            errorType: `Role error`,
+            errorType: `ROLE_ERROR`,
             message: this.message,
         };
     }

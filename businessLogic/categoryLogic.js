@@ -53,9 +53,9 @@ class CategoryLogic {
             const command = new PutObjectCommand(params);
             await s3.send(command);
             const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
+            console.info("[S3] Uploaded: " + image);
             return image;
         } catch (err) {
-            console.log(err);
             throw new FileUploadError(categoryName);
         }
     }
@@ -68,15 +68,14 @@ class CategoryLogic {
 
             const image = await this.uploadImage(imageFile, originalname, name);
 
-            console.info("[S3] Uploaded: " + image);
-
-            await this.categorySQL.create({
+            const newCategory = await this.categorySQL.create({
                 name,
                 description,
                 image,
                 monthlyBudget,
                 familyId,
             });
+            console.info("[CATEGORY_CREATE] Category created id: " + newCategory.id);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -96,6 +95,7 @@ class CategoryLogic {
                 },
             }
         );
+        console.info("[CATEGORY_DELETE] Category deleted id: " + categoryId);
     }
 
     async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
@@ -107,7 +107,6 @@ class CategoryLogic {
             let image = undefined;
             if (!imageAlreadyUploaded) {
                 image = await this.uploadImage(imageFile, originalname, name);
-                console.info("[S3] Uploaded: " + image);
             }
 
             await this.categorySQL.update(
@@ -119,6 +118,7 @@ class CategoryLogic {
                 },
                 { where: { id: categoryId } }
             );
+            console.info("[CATEGORY_UPDATE] Category updated id: " + categoryId);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
