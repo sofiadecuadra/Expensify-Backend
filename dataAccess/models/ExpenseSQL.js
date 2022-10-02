@@ -1,10 +1,11 @@
-const DataTypes = require("sequelize/lib/data-types");
+const DataTypes = require('sequelize/lib/data-types');
 const SQLModel = require("./sqlModel");
 
 class ExpenseSQL extends SQLModel {
+
     static instance;
     constructor(sequelizeContext, categoryInstance, userInstance) {
-        (async () => {
+        (async() => {
             super();
             this.instance = await sequelizeContext.connection.define("Expense", {
                 amount: {
