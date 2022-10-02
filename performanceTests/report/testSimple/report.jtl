@@ -1,0 +1,9 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1664576026679,21082,HTTP Request,Non HTTP response code: org.apache.http.conn.HttpHostConnectException,Non HTTP response message: Connect to google.com:443 [google.com/142.250.79.142] failed: Connection timed out: connect,Thread Group 1-1,text,false,,2943,0,2,2,https://google.com/,0,0,21082
+1664576026803,21037,HTTP Request,Non HTTP response code: org.apache.http.conn.HttpHostConnectException,Non HTTP response message: Connect to google.com:443 [google.com/142.250.79.142] failed: Connection timed out: connect,Thread Group 1-2,text,false,,2943,0,2,2,https://google.com/,0,0,21037
+1664576048389,10756,HTTP Request,200,OK,Thread Group 1-2,text,true,,15843,230,2,2,https://www.google.com/,10045,0,9953
+1664576048389,10050,HTTP Request-0,301,Moved Permanently,Thread Group 1-2,text,true,,703,113,2,2,https://google.com/,10045,0,9953
+1664576058441,704,HTTP Request-1,200,OK,Thread Group 1-2,text,true,,15140,117,2,2,https://www.google.com/,703,0,268
+1664576049065,10276,HTTP Request,200,OK,Thread Group 1-1,text,true,,15874,230,1,1,https://www.google.com/,9365,0,9270
+1664576049065,9374,HTTP Request-0,301,Moved Permanently,Thread Group 1-1,text,true,,703,113,1,1,https://google.com/,9365,0,9270
+1664576058441,900,HTTP Request-1,200,OK,Thread Group 1-1,text,true,,15171,117,1,1,https://www.google.com/,641,0,189
