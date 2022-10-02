@@ -5,7 +5,7 @@ class FamilySQL extends SQLModel {
     instance;
 
     constructor(sequelizeContext) {
-        (async () => {
+        (async() => {
             super();
             this.instance = await sequelizeContext.connection.define("Family", {
                 name: {
