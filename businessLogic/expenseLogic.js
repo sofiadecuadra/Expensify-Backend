@@ -46,21 +46,32 @@ class ExpenseLogic {
     async deleteExpense(expenseId, familyId) {
         NumberValidator.validate(expenseId, "expense id", this.numberLength);
 
-        await this.expenseSQL.destroy(
-            {
-                where:
-                {
-                    id: expenseId
-                }
+        const expense = await this.expenseSQL.findOne({
+            where: {
+                id: expenseId,
+            },
+        });
+
+        if (expense) {
+            await this.expenseSQL.destroy({
+                where: {
+                    id: expenseId,
+                },
             });
-        console.info("[EXPENSE_DELETE] Expense deleted id: " + expenseId);
-        const logObject = {
-            type: "EXPENSE_DELETE",
-            familyId: familyId,
-            expenseId: expenseId,
-            date: new Date().toISOString()
+            console.info("[EXPENSE_DELETE] Expense deleted id: " + expenseId);
+            const logObject = {
+                type: "EXPENSE_DELETE",
+                familyId: familyId,
+                expenseId: expenseId,
+                amount: expense.dataValues.amount,
+                producedDate: expense.dataValues.producedDate,
+                categoryId: expense.dataValues.categoryId,
+                date: new Date().toISOString()
+            }
+            this.addLog(logObject);
+
         }
-        this.addLog(logObject);
+
     }
 
     async updateExpense(amount, producedDate, categoryId, expenseId, familyId) {
@@ -200,28 +211,51 @@ class ExpenseLogic {
         });
     }
 
-    async getLogs(familyId, startDate, endDate, page, pageSize) {
+    async getLogs(familyId, page, pageSize) {
         NumberValidator.validate(page, "page", 100000);
         NumberValidator.validate(pageSize, "page size", 50);
 
-        if (startDate && endDate) {
-            ISODateValidator.validate(startDate, "start date");
-            ISODateValidator.validate(endDate, "end date");
-        } else {
-            endDate = new Date();
-            startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
-        }
-
         const logs = await this.logs.find({
             familyId: familyId,
-            date: {
-                $gte: new Date(startDate).toISOString(),
-                $lte: new Date(endDate).toISOString()
-            }
         }, { projection: { _id: 0 } }).sort({ date: -1 }).skip(page * pageSize).limit(parseInt(pageSize)).toArray();
 
+
+        const categoriesId = new Set();
+        for (let i = 0; i < logs.length; i++) {
+            if (logs[i].categoryId) {
+                categoriesId.add(logs[i].categoryId);
+                categoriesId.add(logs[i].prevCategoryId);
+            }
+        }
+        const categoriesIdArray = Array.from(categoriesId);
+        const categories = await this.categorySQL.findAll({
+            attributes: ["id", "name"],
+            where: {
+                id: {
+                    [sequelize.Op.in]: categoriesIdArray,
+                }
+            }
+        });
+        for (let i = 0; i < logs.length; i++) {
+            if (logs[i].categoryId) {
+                const category = categories.find(category => category.dataValues.id === logs[i].categoryId);
+                logs[i].categoryName = category.dataValues.name;
+            }
+            if (logs[i].prevCategoryId) {
+                const prevCategory = categories.find(category => category.dataValues.id === logs[i].prevCategoryId);
+                logs[i].prevCategoryName = prevCategory.dataValues.name;
+            }
+            logs[i].categoryId = undefined;
+            logs[i].prevCategoryId = undefined;
+            logs[i].familyId = undefined;
+            logs[i].expenseId = undefined;
+        }
+
         return logs;
+    }
+
+    getLogCount() {
+        return this.logs.countDocuments();
     }
 
     paginate(query, { page, pageSize }) {

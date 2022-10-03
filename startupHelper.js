@@ -159,6 +159,11 @@ class StartupHelper {
             authMiddleware([Roles.Administrator]),
             expenseController.getLogs.bind(expenseController)
         );
+        routes.get(
+            "/logCount",
+            authMiddleware([Roles.Administrator]),
+            expenseController.getLogCount.bind(expenseController)
+        );
         routes.post(
             "/",
             authMiddleware([Roles.Member, Roles.Administrator]),
