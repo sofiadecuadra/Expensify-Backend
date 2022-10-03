@@ -1,6 +1,6 @@
 const UserLogic = require("../businessLogic/userLogic");
 const bcrypt = require("bcryptjs");
-const { createKey } = require("../library/jwtSupplier");
+const jwtSupplier = require("../library/jwtSupplier");
 const InviteTokenError = require("../errors/auth/InviteTokenError");
 const InputValidationError = require("../errors/inputValidationError");
 const AuthError = require("../errors/auth/AuthError");
@@ -10,11 +10,15 @@ const ValidationError = require("../errors/ValidationError");
 const HTTPRequestError = require("../errors/HttpRequestError");
 const ForeignKeyError = require("../errors/ForeignKeyError");
 
+
 describe("UserLogic", () => {
     describe("createUserFromInvite", () => {
         it("should create a user from invite", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -51,7 +55,7 @@ describe("UserLogic", () => {
                 password: encryptedPassword,
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
-            const expectedToken = await createKey(data);
+            const expectedToken = jwtSupplier.createKey(data);
             expect(response.token).toEqual(expectedToken);
             expect(response.actualRole).toEqual(role);
             expect(response.expirationDate).toBeInstanceOf(Date);
@@ -62,6 +66,9 @@ describe("UserLogic", () => {
         it("should throw token error", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => { throw new InviteTokenError() });
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -99,6 +106,9 @@ describe("UserLogic", () => {
         it("should throw token error", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -142,6 +152,9 @@ describe("UserLogic", () => {
         it("should throw invalid name error", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -183,6 +196,9 @@ describe("UserLogic", () => {
         it("should throw invalid email error", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -224,6 +240,9 @@ describe("UserLogic", () => {
         it("should throw invalid password error", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -271,6 +290,9 @@ describe("UserLogic", () => {
         it("should throw an error accordingly", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,
@@ -320,6 +342,9 @@ describe("UserLogic", () => {
         it("should throw an error accordingly", async () => {
             const encryptedPassword = "$2a$10$Pmo2cciLoefYNYnWE024ZOE8eHxyJMa/DGkSzRUNWm9yh7Oh3o54C";
             jest.spyOn(bcrypt, "hash").mockImplementation((pass, salt) => encryptedPassword);
+            const inviteData = { data: { familyId: 0 } };
+            jest.spyOn(jwtSupplier, "decryptKey").mockImplementation((token) => inviteData);
+            jest.spyOn(jwtSupplier, "createKey").mockImplementation((token) => "key")
             const user = {
                 id: 1,
                 role: 1,

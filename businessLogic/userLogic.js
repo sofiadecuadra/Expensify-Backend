@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { createKey } = require("../library/jwtSupplier");
+const jwtSupplier = require("../library/jwtSupplier");
 const ValidationError = require("../errors/ValidationError");
 const DuplicateError = require("../errors/DuplicateUserError");
 const InviteTokenError = require("../errors/auth/InviteTokenError");
@@ -7,7 +7,6 @@ const sequelize = require("sequelize");
 const WordValidator = require("../utilities/validators/wordValidator");
 const EmailValidator = require("../utilities/validators/emailValidator");
 const PasswordValidator = require("../utilities/validators/passwordValidator");
-const { decryptKey } = require("../library/jwtSupplier");
 const AuthError = require("../errors/auth/AuthError");
 
 class UserLogic {
@@ -38,7 +37,7 @@ class UserLogic {
                 return user;
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
-            const token = await createKey(data);
+            const token = await jwtSupplier.createKey(data);
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
             const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
@@ -56,10 +55,10 @@ class UserLogic {
         try {
             let inviteData = {};
             try {
-                inviteData = await decryptKey(inviteToken);
+                inviteData = await jwtSupplier.decryptKey(inviteToken);
                 if (inviteData.data.familyId != familyId) throw new InviteTokenError();
             } catch (e) {
-                throw new InviteTokenError();
+                throw e;
             }
             WordValidator.validate(name, "name", this.nameLength);
             EmailValidator.validate(email);
@@ -75,7 +74,7 @@ class UserLogic {
                 password: encryptedPassword,
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
-            const token = await createKey(data);
+            const token = await jwtSupplier.createKey(data);
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
             const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
@@ -97,7 +96,7 @@ class UserLogic {
         if (!isValidPassword) throw new AuthError("Your email and password do not match. Please try again.");
 
         const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
-        const token = await createKey(data);
+        const token = await jwtSupplier.createKey(data);
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
         const response = { token: token, role: user.role, expirationDate: expirationDate };
