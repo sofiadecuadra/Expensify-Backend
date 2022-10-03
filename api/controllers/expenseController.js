@@ -75,9 +75,19 @@ class ExpenseController {
     async getLogs(req, res, next) {
         try {
             const { familyId } = req.user;
-            let { startDate, endDate, page, pageSize } = req.query;
-            const logs = await this.expenseLogic.getLogs(familyId, startDate, endDate, page, pageSize);
+            let { page, pageSize } = req.query;
+            const logs = await this.expenseLogic.getLogs(familyId, page, pageSize);
             res.status(200).json(logs);
+        }
+        catch (err) {
+            next(err);
+        }
+    }
+
+    async getLogCount(req, res, next) {
+        try {
+            const logCount = await this.expenseLogic.getLogCount();
+            res.status(200).json({ total: logCount });
         }
         catch (err) {
             next(err);
