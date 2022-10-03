@@ -1,11 +1,10 @@
-const config = require("config");
 const express = require("express");
-const apiPort = config.get("API_PORT");
+const dotenv = require("dotenv");
+dotenv.config();
+const apiPort = process.env.API_PORT;
 const cors = require("cors");
 const errorMiddleware = require("./api/middleware/error");
 const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
-dotenv.config();
 
 class Server {
     app;
