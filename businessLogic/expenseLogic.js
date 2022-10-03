@@ -192,7 +192,7 @@ class ExpenseLogic {
         );
     }
 
-    async getExpensesCount(startDate, endDate) {
+    async getExpensesCount(familyId, startDate, endDate) {
         if (startDate && endDate) {
             ISODateValidator.validate(startDate, "start date");
             ISODateValidator.validate(endDate, "end date");
@@ -201,14 +201,22 @@ class ExpenseLogic {
             startDate = new Date();
             startDate.setDate(startDate.getDate() - 30);
         }
-        return await this.expenseSQL.findAll({
-            attributes: [[sequelize.fn("count", sequelize.col("id")), "total"]],
+        const total = await this.expenseSQL.count({
             where: {
                 producedDate: {
                     [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                },
+                }
             },
+            include: [
+                {
+                    model: this.userSQL,
+                    where: {
+                        familyId: familyId,
+                    }
+                },
+            ],
         });
+        return { total };
     }
 
     async getLogs(familyId, page, pageSize) {

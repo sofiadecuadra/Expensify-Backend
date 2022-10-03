@@ -143,10 +143,7 @@ class CategoryLogic {
     }
 
     async getCategoriesCount(familyId) {
-        return await this.categorySQL.findAll({
-            attributes: [
-                [sequelize.fn("count", sequelize.col("id")), "total"]
-            ],
+        return await this.categorySQL.count({
             where: {
                 familyId: familyId,
             },
