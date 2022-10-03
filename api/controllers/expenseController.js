@@ -64,8 +64,9 @@ class ExpenseController {
 
     async getExpensesCount(req, res, next) {
         try {
+            const { familyId } = req.user;
             let { startDate, endDate } = req.query;
-            const expenses = await this.expenseLogic.getExpensesCount(startDate, endDate);
+            const expenses = await this.expenseLogic.getExpensesCount(familyId, startDate, endDate);
             res.status(200).json(expenses);
         } catch (err) {
             next(err);
