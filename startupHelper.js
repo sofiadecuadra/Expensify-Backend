@@ -146,7 +146,7 @@ class StartupHelper {
         );
         routes.get(
             "/expenses/period",
-            authMiddleware([Roles.Administrator]),
+            authMiddleware([Roles.Administrator, Roles.Member]),
             categoryController.getCategoriesExpensesByPeriod.bind(categoryController)
         );
         return routes;
