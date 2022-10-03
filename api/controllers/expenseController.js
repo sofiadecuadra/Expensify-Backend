@@ -19,7 +19,8 @@ class ExpenseController {
     async deleteExpense(req, res, next) {
         try {
             const { expenseId } = req.params;
-            await this.expenseLogic.deleteExpense(expenseId);
+            const { familyId } = req.user;
+            await this.expenseLogic.deleteExpense(expenseId, familyId);
             res.status(200).json({ message: "Expense deleted successfully" });
         } catch (err) {
             next(err);
@@ -30,7 +31,8 @@ class ExpenseController {
         try {
             const { expenseId } = req.params;
             const { amount, producedDate, categoryId } = req.body;
-            await this.expenseLogic.updateExpense(amount, producedDate, categoryId, expenseId);
+            const { familyId } = req.user;
+            await this.expenseLogic.updateExpense(amount, producedDate, categoryId, expenseId, familyId);
             res.status(200).json({ message: "Expense updated successfully" });
         } catch (err) {
             next(err);
@@ -66,6 +68,18 @@ class ExpenseController {
             const expenses = await this.expenseLogic.getExpensesCount(startDate, endDate);
             res.status(200).json(expenses);
         } catch (err) {
+            next(err);
+        }
+    }
+
+    async getLogs(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            let { startDate, endDate, page, pageSize } = req.query;
+            const logs = await this.expenseLogic.getLogs(familyId, startDate, endDate, page, pageSize);
+            res.status(200).json(logs);
+        }
+        catch (err) {
             next(err);
         }
     }
