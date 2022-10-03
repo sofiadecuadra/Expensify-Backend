@@ -34,7 +34,8 @@ class StartupHelper {
         const SequelizeContext = require("./dataAccess/startup/SequelizeContext");
         const sequelizeContext = new SequelizeContext(dbPort);
         const mongoClient = new MongoClient(mongoDBUri);
-        const mongoLogsCollection = mongoClient.db(mongoDBName).collection(mongoDBLogsCollection);
+        const mongoDb = mongoClient.db(mongoDBName);
+        const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
         process.on('SIGINT', async () => {
             await mongoClient.close();
             process.exit(0);
@@ -47,15 +48,15 @@ class StartupHelper {
             .sync()
             .then(() => console.log("Database is connected!"))
             .catch((err) => console.error(err, "Something went wrong, database is not connected!"));
-        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection };
+        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient };
     }
 
     async initializeLogic() {
-        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection } = await this.initializeDatabase();
+        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } = await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance);
         const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance, mongoLogsCollection);
         const familyLogic = new FamilyLogic(familySQL.instance);
-        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
+        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
         return { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
     }
