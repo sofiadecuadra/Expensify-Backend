@@ -35,7 +35,7 @@ class FamilyLogic {
         const family = await this.familySQL.findOne({ where: { id: familyId } });
         const apiKey = await this.createApiKey(family.name);
         await this.familySQL.update({ apiKey }, { where: { id: familyId } });
-        console.log("[API_KEY_UPDATE] Family updated id: " + familyId);
+        console.info("[API_KEY_UPDATE] Family updated id: " + familyId);
     }
 
     async getApiKey(familyId) {

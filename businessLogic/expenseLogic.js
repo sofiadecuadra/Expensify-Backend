@@ -12,12 +12,14 @@ class ExpenseLogic {
     categorySQL;
     userSQL;
     familySQL;
+    logs;
 
-    constructor(expenseSQL, categorySQL, userSQL, familySQL) {
+    constructor(expenseSQL, categorySQL, userSQL, familySQL, logs) {
         this.expenseSQL = expenseSQL;
         this.categorySQL = categorySQL;
         this.userSQL = userSQL;
         this.familySQL = familySQL;
+        this.logs = logs;
     }
 
     async createExpense(amount, producedDate, categoryId, userId) {
@@ -41,23 +43,38 @@ class ExpenseLogic {
         }
     }
 
-    async deleteExpense(expenseId) {
+    async deleteExpense(expenseId, familyId) {
         NumberValidator.validate(expenseId, "expense id", this.numberLength);
 
         await this.expenseSQL.destroy(
-            { where: 
-                { 
-                    id: expenseId 
-                } 
+            {
+                where:
+                {
+                    id: expenseId
+                }
             });
         console.info("[EXPENSE_DELETE] Expense deleted id: " + expenseId);
+        const logObject = {
+            type: "EXPENSE_DELETE",
+            familyId: familyId,
+            expenseId: expenseId,
+            date: new Date().toISOString()
+        }
+        this.addLog(logObject);
     }
 
-    async updateExpense(amount, producedDate, categoryId, expenseId) {
+    async updateExpense(amount, producedDate, categoryId, expenseId, familyId) {
         try {
             NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
+            const previousExpense = await this.expenseSQL.findOne({
+                where: {
+                    id: expenseId,
+                }
+            });
+            if (!previousExpense) throw new ForeignKeyError(expenseId);
+
 
             await this.expenseSQL.update(
                 {
@@ -68,6 +85,19 @@ class ExpenseLogic {
                 { where: { id: expenseId } }
             );
             console.info("[EXPENSE_UPDATE] Expense updated id: " + expenseId);
+            const logObject = {
+                type: "EXPENSE_UPDATE",
+                familyId: familyId,
+                expenseId: expenseId,
+                prevAmount: previousExpense.dataValues.amount,
+                amount: amount,
+                prevProducedDate: previousExpense.dataValues.producedDate,
+                producedDate: producedDate,
+                prevCategoryId: previousExpense.dataValues.categoryId,
+                categoryId: categoryId,
+                date: new Date().toISOString()
+            }
+            this.addLog(logObject);
         } catch (err) {
             if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -140,7 +170,7 @@ class ExpenseLogic {
                         {
                             model: this.userSQL,
                             attributes: ["name"],
-                            where : {
+                            where: {
                                 familyId: familyId,
                             }
                         },
@@ -170,6 +200,30 @@ class ExpenseLogic {
         });
     }
 
+    async getLogs(familyId, startDate, endDate, page, pageSize) {
+        NumberValidator.validate(page, "page", 100000);
+        NumberValidator.validate(pageSize, "page size", 50);
+
+        if (startDate && endDate) {
+            ISODateValidator.validate(startDate, "start date");
+            ISODateValidator.validate(endDate, "end date");
+        } else {
+            endDate = new Date();
+            startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+        }
+
+        const logs = await this.logs.find({
+            familyId: familyId,
+            date: {
+                $gte: new Date(startDate).toISOString(),
+                $lte: new Date(endDate).toISOString()
+            }
+        }, { projection: { _id: 0 } }).sort({ date: -1 }).skip(page * pageSize).limit(parseInt(pageSize)).toArray();
+
+        return logs;
+    }
+
     paginate(query, { page, pageSize }) {
         const offset = parseInt(page) * parseInt(pageSize);
         const limit = parseInt(pageSize);
@@ -179,6 +233,15 @@ class ExpenseLogic {
             offset,
             limit,
         };
+    }
+
+    addLog(log) {
+        try {
+            this.logs.insertOne(log);
+        }
+        catch (e) {
+            console.error("[AUDIT_LOG_INSERT_ERROR] " + e.message);
+        }
     }
 }
 

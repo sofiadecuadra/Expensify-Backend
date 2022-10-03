@@ -2,6 +2,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 const dbPort = process.env.MYSQL_DB_PORT;
 const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
+const mongoDBUri = process.env.MONGO_DB_URI;
+const mongoDBName = process.env.MONGO_DB_NAME;
+const mongoDBLogsCollection = process.env.MONGO_DB_LOGS_COLLECTION;
+const { MongoClient } = require("mongodb");
 
 const { Router } = require("express");
 const routes = Router({ mergeParams: true });
@@ -29,6 +33,12 @@ class StartupHelper {
     async initializeDatabase() {
         const SequelizeContext = require("./dataAccess/startup/SequelizeContext");
         const sequelizeContext = new SequelizeContext(dbPort);
+        const mongoClient = new MongoClient(mongoDBUri);
+        const mongoLogsCollection = mongoClient.db(mongoDBName).collection(mongoDBLogsCollection);
+        process.on('SIGINT', async () => {
+            await mongoClient.close();
+            process.exit(0);
+        });
         const familySQL = await new FamilySQL(sequelizeContext);
         const userSQL = await new UserSQL(sequelizeContext, familySQL.instance);
         const categorySQL = await new CategorySQL(sequelizeContext, familySQL.instance);
@@ -37,13 +47,13 @@ class StartupHelper {
             .sync()
             .then(() => console.log("Database is connected!"))
             .catch((err) => console.error(err, "Something went wrong, database is not connected!"));
-        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL };
+        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection };
     }
 
     async initializeLogic() {
-        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL } = await this.initializeDatabase();
+        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection } = await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance);
-        const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance);
+        const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance, mongoLogsCollection);
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
@@ -144,6 +154,11 @@ class StartupHelper {
 
     createExpenseRoutes(expenseController) {
         const routes = Router({ mergeParams: true });
+        routes.get(
+            "/logs",
+            authMiddleware([Roles.Administrator]),
+            expenseController.getLogs.bind(expenseController)
+        );
         routes.post(
             "/",
             authMiddleware([Roles.Member, Roles.Administrator]),
@@ -174,6 +189,7 @@ class StartupHelper {
             apiKeyMiddleware(),
             expenseController.getExpensesByCategory.bind(expenseController)
         );
+
         return routes;
     }
 
