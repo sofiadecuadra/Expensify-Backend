@@ -1,8 +1,9 @@
 const sgMail = require('@sendgrid/mail');
-const config = require('config');
-const emailApiKey = config.get("EMAIL_SERVICE.api_key");
-const emailSender = config.get("EMAIL_SERVICE.sender");
-const url = config.get("URL_INVITATION")
+const dotenv = require("dotenv");
+dotenv.config();
+const emailApiKey = process.env.EMAIL_SERVICE_API_KEY;
+const emailSender = process.env.EMAIL_SENDER;
+const url = process.env.URL_INVITATION
 sgMail.setApiKey(emailApiKey);
 
 const getMessage = async (emails, inviteToken, family) => {
