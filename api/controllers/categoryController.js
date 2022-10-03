@@ -8,7 +8,7 @@ class CategoryController {
     async createCategory(req, res, next) {
         try {
             const imageFile = req.file;
-            const originalName = req.file.originalName;
+            const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { name, description, monthlyBudget } = req.body;
             const { familyId } = req.user;
             await this.categoryLogic.createCategory(

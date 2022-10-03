@@ -5,13 +5,13 @@ class FileUploadError extends HTTPRequestError {
 
     constructor(category) {
         super();
-        this.message = `Could not upload image for category' ${category}'.`;
+        this.message = `Could not upload image for category '${category}'.`;
     }
 
     body() {
         return {
-            ErrorType: `FILE_UPLOAD_ERROR`,
-            Message: this.message,
+            errorType: `FILE_UPLOAD_ERROR`,
+            message: this.message,
         };
     }
 }
