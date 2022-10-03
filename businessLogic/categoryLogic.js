@@ -143,11 +143,12 @@ class CategoryLogic {
     }
 
     async getCategoriesCount(familyId) {
-        return await this.categorySQL.count({
+        const total =  await this.categorySQL.count({
             where: {
                 familyId: familyId,
             },
         });
+        return { total };
     }
 
     async getCategoriesWithMoreExpenses(familyName, apiKey) {
