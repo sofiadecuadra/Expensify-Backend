@@ -3,8 +3,8 @@
         "name": "db",
         "user": "user",
         "password": "password",
-        "host": "my-expenses-prod.c8njidzohjqg.us-east-1.rds.amazonaws.com",
-        "host2": "localhost",
+        "host": "localhost",
+        "host2": "my-expenses-prod.c8njidzohjqg.us-east-1.rds.amazonaws.com",
         "port": "3306"
     },
     "EMAIL_SERVICE": {

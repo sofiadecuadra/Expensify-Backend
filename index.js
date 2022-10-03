@@ -1,10 +1,8 @@
-//const HealthCheckLogic = require("./businessLogic/healthCheckLogic");
-const newrelic = require('newrelic')
+//const newrelic = require('newrelic');
 
 const StartupHelper = require("./startupHelper");
 
-(async() => {
+(async () => {
     const startupHelper = new StartupHelper();
     await startupHelper.startServer();
-    //HealthCheckLogic.connection = sequelizeContext.connection;
 })();

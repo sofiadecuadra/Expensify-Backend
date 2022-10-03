@@ -1,15 +1,16 @@
-const config = require("config");
+const dotenv = require("dotenv");
+dotenv.config();
 const { QueryTypes, Sequelize } = require("sequelize");
 
 class SequelizeContext {
     connection;
 
     constructor(port) {
-        const dbHost = config.get("MYSQL_DB.host");
-        let dbPort = port ? port : config.get("MYSQL_DB.port");
-        const dbUser = config.get("MYSQL_DB.user");
-        const dbPassword = config.get("MYSQL_DB.password");
-        const dbName = config.get("MYSQL_DB.name");
+        const dbHost = process.env.MYSQL_DB_HOST;
+        const dbPort = port ? port : process.env.MYSQL_DB_PORT;
+        const dbUser = process.env.MYSQL_DB_USER;
+        const dbPassword = process.env.MYSQL_DB_PASSWORD;
+        const dbName = process.env.MYSQL_DB_NAME;
 
         this.connection = new Sequelize(`mysql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`, {
             logging: false,

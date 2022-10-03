@@ -1,5 +1,6 @@
-const config = require("config");
-const dbPort = config.get("MYSQL_DB.port");
+const dotenv = require("dotenv");
+dotenv.config();
+const dbPort = process.env.MYSQL_DB_PORT;
 const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
 
 const { Router } = require("express");
