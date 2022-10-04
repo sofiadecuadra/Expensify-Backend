@@ -22,6 +22,7 @@ class HealthCheckLogic {
                 message: "OK",
                 timestamp: Date.now(),
             };
+            console.info("[HealthCheck] " + JSON.stringify(result));
             return result;
         } catch (err) {
             throw new HealthCheckError(err.message);
