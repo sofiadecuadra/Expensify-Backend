@@ -2,7 +2,7 @@ const sgMail = require('@sendgrid/mail');
 const dotenv = require("dotenv");
 dotenv.config();
 const emailApiKey = process.env.EMAIL_SERVICE_API_KEY;
-const emailSender = process.env.EMAIL_SENDER;
+const emailSender = process.env.EMAIL_SERVICE_SENDER;
 const url = process.env.URL_INVITATION
 sgMail.setApiKey(emailApiKey);
 
@@ -24,10 +24,7 @@ const sendEmail = async (emails, inviteToken, family) => {
         .send(message)
         .then((response) => {
 
-        })
-        .catch((error) => {
-            console.error(error)
-        })
+        });
 };
 
 module.exports = sendEmail;
