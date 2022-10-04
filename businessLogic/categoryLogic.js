@@ -60,7 +60,7 @@ class CategoryLogic {
         }
     }
 
-    async createCategory(imageFile, name, description, monthlyBudget, originalname, familyId) {
+    async createCategory(userId, imageFile, name, description, monthlyBudget, originalname, familyId) {
         try {
             if (monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
@@ -75,7 +75,7 @@ class CategoryLogic {
                 monthlyBudget,
                 familyId,
             });
-            console.info("[CATEGORY_CREATE] Category created id: " + newCategory.id);
+            console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -83,7 +83,7 @@ class CategoryLogic {
         }
     }
 
-    async deleteCategory(categoryId) {
+    async deleteCategory(userId, categoryId) {
         NumberValidator.validate(categoryId, "category id", this.numberLength);
         await this.categorySQL.update({
             active: false,
@@ -92,10 +92,10 @@ class CategoryLogic {
                 id: categoryId,
             },
         });
-        console.info("[CATEGORY_DELETE] Category deleted id: " + categoryId);
+        console.info(`[USER_${userId}] [CATEGORY_DELETE] Category deleted id: ${categoryId}`);
     }
 
-    async updateCategory(imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
+    async updateCategory(userId, imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
         try {
             if (monthlyBudget == "") monthlyBudget = 0;
             NumberValidator.validate(categoryId, "category id", this.numberLength);
@@ -112,7 +112,7 @@ class CategoryLogic {
                 image: image,
                 monthlyBudget: monthlyBudget,
             }, { where: { id: categoryId } });
-            console.info("[CATEGORY_UPDATE] Category updated id: " + categoryId);
+            console.info(`[USER_${userId}] [CATEGORY_UPDATE] Category updated id: ${categoryId}`);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);

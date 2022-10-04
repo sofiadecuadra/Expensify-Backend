@@ -30,12 +30,12 @@ class FamilyLogic {
         }
     }
 
-    async updateApiKey(familyId) {
+    async updateApiKey(userId, familyId) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
         const family = await this.familySQL.findOne({ where: { id: familyId } });
         const apiKey = await this.createApiKey(family.name);
         await this.familySQL.update({ apiKey }, { where: { id: familyId } });
-        console.info("[API_KEY_UPDATE] Family updated id: " + familyId);
+        console.info(`[USER_${userId}] [API_KEY_UPDATE] Family updated id: ${familyId}`);
     }
 
     async getApiKey(familyId) {
@@ -54,6 +54,7 @@ class FamilyLogic {
         const { name } = await this.getFamily(familyId);
         const inviteToken = await this.generateInvite(familyId, name, userId, userType);
         await sendEmail(users, inviteToken, name);
+        console.info(`[USER_${userId}] [INVITATON] users invited: ${users}`);
         return inviteToken;
     }
 

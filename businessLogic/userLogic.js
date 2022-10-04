@@ -41,8 +41,8 @@ class UserLogic {
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
             const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
-            console.info("[USER_CREATE] User created id: " + user.id);
-            console.info("[SIGN_IN] User signed in id: " + user.id);
+            console.info(`[USER_${user.id}] [USER_CREATE]`);
+            console.info(`[USER_${user.id}] [SIGN_IN]`);
             return response;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
@@ -78,8 +78,8 @@ class UserLogic {
             const expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 30);
             const response = { token: token, actualRole: user.role, expirationDate: expirationDate };
-            console.info("[USER_CREATE] User created id: " + user.id);
-            console.info("[SIGN_IN] User signed in id: " + user.id);
+            console.info(`[USER_${user.id}] [USER_CREATE]`);
+            console.info(`[USER_${user.id}] [SIGN_IN]`);
             return response;
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(email);
@@ -90,17 +90,17 @@ class UserLogic {
 
     async signIn(email, password) {
         let user = await this.userSQL.findOne({ where: { email: email } });
-        if (!user) throw new AuthError("Your email and password do not match. Please try again.");
+        if (!user) { console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`); throw new AuthError('Your email and password do not match. Please try again.') };
 
         const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) throw new AuthError("Your email and password do not match. Please try again.");
+        if (!isValidPassword) { console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`); throw new AuthError('Your email and password do not match. Please try again.') };
 
         const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
         const token = await jwtSupplier.createKey(data);
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 30);
         const response = { token: token, role: user.role, expirationDate: expirationDate };
-        console.info("[SIGN_IN] User signed in id: " + user.id);
+        console.info(`[USER_${user.id}] [SIGN_IN]`);
         return response;
     }
 }

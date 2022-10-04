@@ -10,8 +10,9 @@ class CategoryController {
             const imageFile = req.file;
             const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { name, description, monthlyBudget } = req.body;
-            const { familyId } = req.user;
+            const { familyId, userId } = req.user;
             await this.categoryLogic.createCategory(
+                userId,
                 imageFile,
                 name,
                 description,
@@ -27,8 +28,9 @@ class CategoryController {
 
     async deleteCategory(req, res, next) {
         try {
+            const { userId } = req.user;
             const { categoryId } = req.params;
-            await this.categoryLogic.deleteCategory(categoryId);
+            await this.categoryLogic.deleteCategory(userId, categoryId);
             res.status(200).json({ message: "Category deleted successfully" });
         } catch (err) {
             next(err);
@@ -39,9 +41,11 @@ class CategoryController {
         try {
             const imageFile = req.file;
             const originalName = req.file.originalName;
+            const { userId } = req.user;
             const { categoryId } = req.params;
             const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
             await this.categoryLogic.updateCategory(
+                userId,
                 imageFile,
                 categoryId,
                 name,
