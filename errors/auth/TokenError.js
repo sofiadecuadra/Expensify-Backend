@@ -3,7 +3,7 @@ const AuthError = require('./AuthError');
 class TokenError extends AuthError {
     StatusCode = 401;
 
-    constructor(authorizedRoles) {
+    constructor() {
         super();
         this.message = 'Invalid token format or token expired';
     }

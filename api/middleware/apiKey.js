@@ -1,6 +1,5 @@
 const InvalidApiKeyError = require("../../errors/auth/InvalidApiKeyError");
-const RoleError = require("../../errors/auth/RoleError");
-const TokenError = require("../../errors/auth/TokenError");
+
 const { decryptKey } = require("../../library/jwtSupplier");
 
 const apiKeyMiddleware = () => async (req, res, next) => {

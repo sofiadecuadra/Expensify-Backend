@@ -12,7 +12,15 @@ const errorMiddleware = (err, req, res, next) => {
         err instanceof HealthCheckError
     ) {
         const errBody = err.body();
-        console.error("[" + errBody.errorType + "]", errBody.message);
+        let errorMessage =  `[${errBody.errorType}] ${errBody.message}`;
+        try {
+            const { userId } = req.user;
+            errorMessage = `[USER_${userId}] ` + errorMessage;
+        }
+        catch (e) {
+            // do nothing
+        }
+        console.error(errorMessage);
         return res.status(err.StatusCode).send(err.body());
     }
     else {

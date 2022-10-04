@@ -35,7 +35,7 @@ class ExpenseLogic {
                 userId,
                 registeredDate: parseDate(new Date()),
             });
-            console.info("[EXPENSE_CREATE] Expense created id: " + newExpense.id);
+            console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
         } catch (err) {
             if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -43,7 +43,7 @@ class ExpenseLogic {
         }
     }
 
-    async deleteExpense(expenseId, familyId) {
+    async deleteExpense(userId, expenseId, familyId) {
         NumberValidator.validate(expenseId, "expense id", this.numberLength);
 
         const expense = await this.expenseSQL.findOne({
@@ -58,9 +58,10 @@ class ExpenseLogic {
                     id: expenseId,
                 },
             });
-            console.info("[EXPENSE_DELETE] Expense deleted id: " + expenseId);
+            console.info(`[USER_${userId}] [EXPENSE_DELETE] Expense deleted id: ${expenseId}`);
             const logObject = {
                 type: "EXPENSE_DELETE",
+                userId: userId,
                 familyId: familyId,
                 expenseId: expenseId,
                 amount: expense.dataValues.amount,
@@ -74,7 +75,7 @@ class ExpenseLogic {
 
     }
 
-    async updateExpense(amount, producedDate, categoryId, expenseId, familyId) {
+    async updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId) {
         try {
             NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
@@ -95,9 +96,10 @@ class ExpenseLogic {
                 },
                 { where: { id: expenseId } }
             );
-            console.info("[EXPENSE_UPDATE] Expense updated id: " + expenseId);
+            console.info(`[USER_${userId}] [EXPENSE_UPDATE] Expense updated id: ${expenseId}`);
             const logObject = {
                 type: "EXPENSE_UPDATE",
+                userId: userId,
                 familyId: familyId,
                 expenseId: expenseId,
                 prevAmount: previousExpense.dataValues.amount,
@@ -226,8 +228,7 @@ class ExpenseLogic {
         const logs = await this.logs.find({
             familyId: familyId,
         }, { projection: { _id: 0 } }).sort({ date: -1 }).skip(page * pageSize).limit(parseInt(pageSize)).toArray();
-
-
+        
         const categoriesId = new Set();
         for (let i = 0; i < logs.length; i++) {
             if (logs[i].categoryId) {
@@ -244,7 +245,26 @@ class ExpenseLogic {
                 }
             }
         });
+        const userIds = new Set();
         for (let i = 0; i < logs.length; i++) {
+            if (logs[i].userId) {
+                userIds.add(logs[i].userId);
+            }
+        }
+        const userIdsArray = Array.from(userIds);
+        const users = await this.userSQL.findAll({
+            attributes: ["id", "name"],
+            where: {
+                id: {
+                    [sequelize.Op.in]: userIdsArray,
+                }
+            }
+        });
+        for (let i = 0; i < logs.length; i++) {
+            if (logs[i].userId) {
+                const user = users.find(user => user.dataValues.id === logs[i].userId);
+                logs[i].userName = user.dataValues.name;
+            }
             if (logs[i].categoryId) {
                 const category = categories.find(category => category.dataValues.id === logs[i].categoryId);
                 logs[i].categoryName = category.dataValues.name;
@@ -253,6 +273,7 @@ class ExpenseLogic {
                 const prevCategory = categories.find(category => category.dataValues.id === logs[i].prevCategoryId);
                 logs[i].prevCategoryName = prevCategory.dataValues.name;
             }
+            logs[i].userId = undefined;
             logs[i].categoryId = undefined;
             logs[i].prevCategoryId = undefined;
             logs[i].familyId = undefined;
