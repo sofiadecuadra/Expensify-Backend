@@ -7,7 +7,7 @@ The image is uploaded in DockerHub repository noeliabentancor/my-expenses-app.
 
 If any changes which need to be applied to the backend are made, use the following commands so as to build the image and push changes to DockerHub.
 
-1. `docker build --tag noeliabentancor/my-expenses-app`
+1. `docker build --tag noeliabentancor/my-expenses-app .`
 
 2. `docker push noeliabentancor/my-expenses-app`
 
