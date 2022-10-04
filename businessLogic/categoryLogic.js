@@ -19,14 +19,17 @@ const region = 'us-east-1';
 const accessKeyId = process.env.AWS_ACCESS_KEY;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 const sessionToken = process.env.AWS_SESSION_TOKEN;
+const insideVPC = process.env.INSIDE_VPC;
+
+const credentials = insideVPC ? undefined : {
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey,
+    sessionToken: sessionToken,
+};
 
 const s3 = new S3Client({
     region: region,
-    credentials: {
-        accessKeyId: accessKeyId,
-        secretAccessKey: secretAccessKey,
-        sessionToken: sessionToken,
-    },
+    credentials
 });
 
 class CategoryLogic {
@@ -147,7 +150,7 @@ class CategoryLogic {
     }
 
     async getCategoriesCount(familyId) {
-        const total =  await this.categorySQL.count({
+        const total = await this.categorySQL.count({
             where: {
                 familyId: familyId,
             },
@@ -198,7 +201,7 @@ class CategoryLogic {
                 familyId: familyId,
                 //active: true, TODO VER SE ESTO VA
             },
-        }, ],
+        },],
         group: ["categoryId"],
     });
 
