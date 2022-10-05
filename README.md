@@ -7,7 +7,7 @@ Noelia Bentancor
 Sofía Decuadra
 Agustin Ferrari
 ```
-[Deployment Configuration](!DeploymentConfiguration)
+[Deployment Configuration](#DeploymentConfiguration)
 
 # Deployment Configuration
 # <div id='DeploymentConfiguration' ></div>
