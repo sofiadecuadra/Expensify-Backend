@@ -40,6 +40,6 @@
     },
     "devDependencies": {
         "jest": "29.0.3",
-        "newrelic": "9.1.0"
+        "newrelic": "^9.1.0"
     }
 }
