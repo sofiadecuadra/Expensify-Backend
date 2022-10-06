@@ -53,7 +53,7 @@ class StartupHelper {
 
     async initializeLogic() {
         const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } = await this.initializeDatabase();
-        const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance);
+        const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
         const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance, mongoLogsCollection);
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);

@@ -2,35 +2,15 @@ const sequelize = require("sequelize");
 const parseDate = require("../utilities/dateUtils");
 const DuplicateError = require("../errors/DuplicateCategoryError");
 const ValidationError = require("../errors/ValidationError");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const dotenv = require("dotenv");
-const FileUploadError = require("../errors/FileUploadError");
 const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
 const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
-
-
+const { uploadImage } = require("../library/imageUploader");
+const dotenv = require("dotenv");
 dotenv.config();
-
 const bucketName = process.env.AWS_BUCKET_NAME;
-const region = 'us-east-1';
-const accessKeyId = process.env.AWS_ACCESS_KEY;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-const sessionToken = process.env.AWS_SESSION_TOKEN;
-const insideVPC = process.env.INSIDE_VPC;
-
-const credentials = insideVPC ? undefined : {
-    accessKeyId: accessKeyId,
-    secretAccessKey: secretAccessKey,
-    sessionToken: sessionToken,
-};
-
-const s3 = new S3Client({
-    region: region,
-    credentials
-});
 
 class CategoryLogic {
     nameLength = 20;
@@ -39,46 +19,38 @@ class CategoryLogic {
     categorySQL;
     expenseSQL;
     familySQL;
+    categoryConnection;
 
-    constructor(categorySQL, expenseSQL, familySQL) {
+    constructor(categorySQL, expenseSQL, familySQL, categoryConnection) {
         this.categorySQL = categorySQL;
         this.expenseSQL = expenseSQL;
         this.familySQL = familySQL;
+        this.categoryConnection = categoryConnection;
     }
 
-    async uploadImage(imageFile, originalName, categoryName) {
-        try {
-            const params = {
-                Bucket: bucketName,
-                Key: Date.now() + "-" + originalName,
-                Body: imageFile.buffer,
-            };
-            const command = new PutObjectCommand(params);
-            await s3.send(command);
-            const image = "https://" + bucketName + ".s3.amazonaws.com/" + params.Key;
-            console.info("[S3] Uploaded: " + image);
-            return image;
-        } catch (err) {
-            throw new FileUploadError(categoryName);
-        }
-    }
-
-    async createCategory(userId, imageFile, name, description, monthlyBudget, originalname, familyId) {
+    async createCategory(userId, imageFile, name, description, monthlyBudget, originalName, familyId) {
         try {
             if (monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const image = await this.uploadImage(imageFile, originalname, name);
-
-            const newCategory = await this.categorySQL.create({
-                name,
-                description,
-                image,
-                monthlyBudget,
-                familyId,
+            await this.categoryConnection.transaction(async (t) => {
+                const imageKey = name + "-" + Date.now() + "-" + originalName;
+                const image = "https://" + bucketName + ".s3.amazonaws.com/" + imageKey;
+                const newCategory = await this.categorySQL.create(
+                    {
+                        name,
+                        description,
+                        image,
+                        monthlyBudget,
+                        familyId,
+                    },
+                    { transaction: t }
+                );
+                await uploadImage(imageFile, imageKey, name);
+                console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
+                return newCategory;
             });
-            console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
