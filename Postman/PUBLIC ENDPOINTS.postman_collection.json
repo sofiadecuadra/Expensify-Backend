@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "1bef85a4-a518-4561-99dc-428e6b896017",
+		"name": ".PUBLIC ENDPOINTS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23156834"
+	},
+	"item": [
+		{
+			"name": "Get Categories With More Expenses Copy",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMTAtMDZUMjE6MDc6MzguMTkwWiIsIm5hbWUiOiJPUlQifSwiaWF0IjoxNjY1MDkwNDU4fQ.cQv1YVpO2iJKQLuD8km4_44fXGVUo7dqpFYwFY9YtvI",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/categories/expenses",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories",
+						"expenses"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Categories With More Expenses",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/categories/expenses",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"categories",
+								"expenses"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "438"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"1b6-1e3xZ7N5J/lMwbMDCOGyGT4xpQg\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Sep 2022 23:28:38 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"categoryId\": 4,\n        \"total\": \"1600\",\n        \"Category\": {\n            \"name\": \"Trabajo\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 2000,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    },\n    {\n        \"categoryId\": 3,\n        \"total\": \"638\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 100,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    },\n    {\n        \"categoryId\": 2,\n        \"total\": \"432\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 500,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get expenses by category Copy",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMTAtMDZUMjE6MDc6MzguMTkwWiIsIm5hbWUiOiJPUlQifSwiaWF0IjoxNjY1MDkwNDU4fQ.cQv1YVpO2iJKQLuD8km4_44fXGVUo7dqpFYwFY9YtvI",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/1?startDate=2005-09-01T18:41:40.535Z&endDate=2026-09-10T18:41:40.535Z",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"1"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2005-09-01T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2026-09-10T18:41:40.535Z"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses by category",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses/3?startDate=2004-09-01T18:41:40.535Z&endDate=2026-09-10T18:41:40.535Z",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses",
+								"3"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2004-09-01T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2026-09-10T18:41:40.535Z"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "668"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"29c-/M96bEBOFuIM/gnqPBltcKV+URM\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 24 Sep 2022 01:32:48 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 6,\n        \"amount\": 21,\n        \"registeredDate\": \"2022-09-08T23:18:50.000Z\",\n        \"producedDate\": \"2022-05-13T18:44:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 7,\n        \"amount\": 45,\n        \"registeredDate\": \"2022-09-08T23:18:50.000Z\",\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 8,\n        \"amount\": 450,\n        \"registeredDate\": \"2022-09-08T23:19:52.000Z\",\n        \"producedDate\": \"2022-09-03T19:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 9,\n        \"amount\": 23,\n        \"registeredDate\": \"2022-09-08T23:20:10.000Z\",\n        \"producedDate\": \"2022-09-01T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 10,\n        \"amount\": 99,\n        \"registeredDate\": \"2022-09-08T23:20:24.000Z\",\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    }\n]"
+				}
+			]
+		}
+	]
+}
