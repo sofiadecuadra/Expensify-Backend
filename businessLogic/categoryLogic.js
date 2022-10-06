@@ -8,6 +8,9 @@ const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
 const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 const { uploadImage } = require("../library/imageUploader");
+const dotenv = require("dotenv");
+dotenv.config();
+const bucketName = process.env.AWS_BUCKET_NAME;
 
 class CategoryLogic {
     nameLength = 20;
@@ -16,29 +19,38 @@ class CategoryLogic {
     categorySQL;
     expenseSQL;
     familySQL;
+    categoryConnection;
 
-    constructor(categorySQL, expenseSQL, familySQL) {
+    constructor(categorySQL, expenseSQL, familySQL, categoryConnection) {
         this.categorySQL = categorySQL;
         this.expenseSQL = expenseSQL;
         this.familySQL = familySQL;
+        this.categoryConnection = categoryConnection;
     }
 
-    async createCategory(userId, imageFile, name, description, monthlyBudget, originalname, familyId) {
+    async createCategory(userId, imageFile, name, description, monthlyBudget, originalName, familyId) {
         try {
             if (monthlyBudget == "") monthlyBudget = 0;
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const image = await uploadImage(imageFile, originalname, name);
-
-            const newCategory = await this.categorySQL.create({
-                name,
-                description,
-                image,
-                monthlyBudget,
-                familyId,
+            await this.categoryConnection.transaction(async (t) => {
+                const imageKey = name + "-" + Date.now() + "-" + originalName;
+                const image = "https://" + bucketName + ".s3.amazonaws.com/" + imageKey;
+                const newCategory = await this.categorySQL.create(
+                    {
+                        name,
+                        description,
+                        image,
+                        monthlyBudget,
+                        familyId,
+                    },
+                    { transaction: t }
+                );
+                await uploadImage(imageFile, imageKey, name);
+                console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
+                return newCategory;
             });
-            console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);

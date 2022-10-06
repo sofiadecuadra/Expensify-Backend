@@ -228,7 +228,7 @@ class ExpenseLogic {
         const logs = await this.logs.find({
             familyId: familyId,
         }, { projection: { _id: 0 } }).sort({ date: -1 }).skip(page * pageSize).limit(parseInt(pageSize)).toArray();
-        
+
         const categoriesId = new Set();
         for (let i = 0; i < logs.length; i++) {
             if (logs[i].categoryId) {

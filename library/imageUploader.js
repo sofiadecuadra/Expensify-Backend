@@ -22,11 +22,11 @@ const s3 = new S3Client({
     credentials
 });
 
-const uploadImage = async (imageFile, originalName, categoryName) => {
+const uploadImage = async (imageFile, imageKey, categoryName) => {
     try {
         const params = {
             Bucket: bucketName,
-            Key: Date.now() + "-" + originalName,
+            Key: imageKey,
             Body: imageFile.buffer,
         };
         const command = new PutObjectCommand(params);
