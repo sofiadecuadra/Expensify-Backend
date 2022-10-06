@@ -1,0 +1,395 @@
+{
+	"info": {
+		"_postman_id": "ae803a7b-11cb-4c8e-812f-c3c0252f2f34",
+		"name": "Family",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23156837"
+	},
+	"item": [
+		{
+			"name": "Update API KEY",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/families/apiKey",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"families",
+						"apiKey"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update API KEY",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/families/apiKey",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"families",
+								"apiKey"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "49"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"31-a+JdFHL36vPTeaumL59rTTErnDE\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 24 Sep 2022 14:41:49 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Family API KEY updated successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Create invite",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userType\": \"Administrator\",\n    \"users\" :[\n        \"agustin_ferrari@hotmail.com\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/families/invitations",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"families",
+						"invitations"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create invite",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/families/:familyId/invite/:userType/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"families",
+								":familyId",
+								"invite",
+								":userType",
+								""
+							],
+							"variable": [
+								{
+									"key": "familyId",
+									"value": "0"
+								},
+								{
+									"key": "userType",
+									"value": "administrator"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "206"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"ce-T7NiJtf25EF8fwAHAXFdWdspP0s\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 17 Sep 2022 00:08:16 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"inviteToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Validate invite",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/families/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIiwiZGF0ZSI6IjIwMjItMDktMTdUMDI6Mzk6NDIuNTQzWiJ9LCJpYXQiOjE2NjMzODIzODJ9.3IGexRO1AWFSh2XeZU38r3hxW84qXFsq6vBggzgesHQ",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"families",
+						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIiwiZGF0ZSI6IjIwMjItMDktMTdUMDI6Mzk6NDIuNTQzWiJ9LCJpYXQiOjE2NjMzODIzODJ9.3IGexRO1AWFSh2XeZU38r3hxW84qXFsq6vBggzgesHQ"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create invite",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/families/:familyId/invite/:userType/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"families",
+								":familyId",
+								"invite",
+								":userType",
+								""
+							],
+							"variable": [
+								{
+									"key": "familyId",
+									"value": "0"
+								},
+								{
+									"key": "userType",
+									"value": "administrator"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "206"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"ce-T7NiJtf25EF8fwAHAXFdWdspP0s\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 17 Sep 2022 00:08:16 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"inviteToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Api Key",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/families/apiKey",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"families",
+						"apiKey"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Api Key",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/families/apiKey",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"families",
+								"apiKey"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "209"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"d1-vTS3eOJQasB0hE89e/7QUcMZCxg\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 24 Sep 2022 14:40:17 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"apiKey\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMDktMDhUMjM6MTg6MzMuMzQyWiIsIm5hbWUiOiJmYW1pbHlOYW1lIn0sImlhdCI6MTY2MjY3OTExM30.MPmzmurx-EJQcpScnEPa7zeAcer4HHWbbBnxu9rVkL8\"\n}"
+				}
+			]
+		}
+	]
+}
