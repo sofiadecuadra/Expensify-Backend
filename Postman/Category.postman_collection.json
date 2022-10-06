@@ -1,0 +1,469 @@
+{
+	"info": {
+		"_postman_id": "404ce8d5-4936-439a-8380-9e623bebad64",
+		"name": "Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23156837"
+	},
+	"item": [
+		{
+			"name": "Create category",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "name",
+							"value": "Sport",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Used for handling sport expenses",
+							"type": "text"
+						},
+						{
+							"key": "monthlyBudget",
+							"value": "200",
+							"type": "text"
+						},
+						{
+							"key": "familyId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}/categories",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create category",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Deporte\",\n    \"description\" : \"Desc\",\n    \"image\" : \"Ruta\",\n    \"monthlyBudget\" : 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/categories",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "43"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"2b-6aRNjCaAgGT561PQXIupOm7tRzw\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Sep 2022 20:27:49 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Category created successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Get categories",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/categories",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get categories",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/categories",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "846"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"34e-1C14wAIPGECChF8iv6V1vz735lQ\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 06 Oct 2022 23:09:54 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 1,\n        \"name\": \"Music\",\n        \"description\": \"Instruments and lessons\",\n        \"image\": \"https://backend-category-dev.s3.amazonaws.com/Music-1665088337753-guitar.png\",\n        \"monthlyBudget\": 4000\n    },\n    {\n        \"id\": 2,\n        \"name\": \"Transport\",\n        \"description\": \"Bus, taxi\",\n        \"image\": \"https://backend-category-dev.s3.amazonaws.com/Transport-1665088439593-bus.png\",\n        \"monthlyBudget\": 500\n    },\n    {\n        \"id\": 3,\n        \"name\": \"Trip\",\n        \"description\": \"Plane tickets and hotel expenses\",\n        \"image\": \"https://backend-category-dev.s3.amazonaws.com/Trips-1665088572096-plane.png\",\n        \"monthlyBudget\": 40000\n    },\n    {\n        \"id\": 4,\n        \"name\": \"Sport\",\n        \"description\": \"Lessons and resources\",\n        \"image\": \"https://backend-category-dev.s3.amazonaws.com/Sport-1665088652222-sport.png\",\n        \"monthlyBudget\": 4000\n    },\n    {\n        \"id\": 5,\n        \"name\": \"Study\",\n        \"description\": \"School, books\",\n        \"image\": \"https://backend-category-dev.s3.amazonaws.com/Study-1665088784656-study.png\",\n        \"monthlyBudget\": 50000\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Delete category",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/categories/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update category",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "name",
+							"value": "Sport",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Used for handling sport expenses",
+							"type": "text"
+						},
+						{
+							"key": "monthlyBudget",
+							"value": "400",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}/categories/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Categories With More Expenses",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMDktMjVUMDE6MjI6MjYuNTM0WiIsIm5hbWUiOiJmYW1pbHl5TmFtZSJ9LCJpYXQiOjE2NjQwNjg5NDZ9.QigKs2muXRS0NCO_2DqofZfrj8mS4jkUq28d6EMkY7s",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/categories/expenses",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories",
+						"expenses"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Categories With More Expenses",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/categories/expenses",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"categories",
+								"expenses"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "438"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"1b6-1e3xZ7N5J/lMwbMDCOGyGT4xpQg\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Sep 2022 23:28:38 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"categoryId\": 4,\n        \"total\": \"1600\",\n        \"Category\": {\n            \"name\": \"Trabajo\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 2000,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    },\n    {\n        \"categoryId\": 3,\n        \"total\": \"638\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 100,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    },\n    {\n        \"categoryId\": 2,\n        \"total\": \"432\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"description\": \"Desc\",\n            \"image\": \"Ruta\",\n            \"monthlyBudget\": 500,\n            \"familyId\": 1,\n            \"active\": true\n        }\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get Categories Expenses By Period",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/categories/expenses/period?startDate=2022-09-01T18:41:40.535Z&endDate=2022-09-10T18:41:40.535Z",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"categories",
+						"expenses",
+						"period"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2022-09-01T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2022-09-10T18:41:40.535Z"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Categories Expenses By Period",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/categories/expenses/period?startDate=2022-09-01T18:41:40.535Z&endDate=2022-09-10T18:41:40.535Z",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"categories",
+								"expenses",
+								"period"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2022-09-01T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2022-09-10T18:41:40.535Z"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "126"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"7e-WlkgFjz7p5O/Q10JKIYPEFLaocY\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Sep 2022 23:57:40 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"categoryId\": 1,\n        \"total\": \"120\"\n    },\n    {\n        \"categoryId\": 2,\n        \"total\": \"399\"\n    },\n    {\n        \"categoryId\": 3,\n        \"total\": \"617\"\n    },\n    {\n        \"categoryId\": 4,\n        \"total\": \"1600\"\n    }\n]"
+				}
+			]
+		}
+	]
+}

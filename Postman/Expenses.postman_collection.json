@@ -1,0 +1,747 @@
+{
+	"info": {
+		"_postman_id": "bfdc3120-e3aa-4bf3-889d-d63135533893",
+		"name": "Expenses",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23156837"
+	},
+	"item": [
+		{
+			"name": "Create expense",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\" : 100,\r\n    \"producedDate\": \"2022-09-04T18:41:40.535Z\",\r\n    \"categoryId\" : 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/expenses",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create expense",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\" : 100,\r\n    \"producedDate\": \"2022-09-04T18:41:40.535Z\",\r\n    \"categoryId\" : 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "42"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"2a-My1d2XyMtfeNUkvwFFqp7XEvACg\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 08 Sep 2022 20:28:12 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Expense created successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete expense",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modify expense",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\" : 122,\r\n    \"producedDate\": \"2022-09-04T18:41:40.535Z\",\r\n    \"categoryId\" : 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/expenses/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get expenses by category",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "value",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMDktMDdUMjI6MDk6MjEuMjc5WiIsIm5hbWUiOiJmYW1pbHlOYW1lIn0sImlhdCI6MTY2MjU4ODU2MX0.B6jIO0HEZqsADcH2io0eMR0MHbBzZW3tRqT8ZpRmSQw",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/1?startDate=2022-09-01T18:41:40.535Z&endDate=2022-09-10T18:41:40.535Z",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"1"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2022-09-01T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2022-09-10T18:41:40.535Z"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses by category",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses/3?startDate=2004-09-01T18:41:40.535Z&endDate=2026-09-10T18:41:40.535Z",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses",
+								"3"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2004-09-01T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2026-09-10T18:41:40.535Z"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "668"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"29c-/M96bEBOFuIM/gnqPBltcKV+URM\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 24 Sep 2022 01:32:48 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 6,\n        \"amount\": 21,\n        \"registeredDate\": \"2022-09-08T23:18:50.000Z\",\n        \"producedDate\": \"2022-05-13T18:44:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 7,\n        \"amount\": 45,\n        \"registeredDate\": \"2022-09-08T23:18:50.000Z\",\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 8,\n        \"amount\": 450,\n        \"registeredDate\": \"2022-09-08T23:19:52.000Z\",\n        \"producedDate\": \"2022-09-03T19:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 9,\n        \"amount\": 23,\n        \"registeredDate\": \"2022-09-08T23:20:10.000Z\",\n        \"producedDate\": \"2022-09-01T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    },\n    {\n        \"id\": 10,\n        \"amount\": 99,\n        \"registeredDate\": \"2022-09-08T23:20:24.000Z\",\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"categoryId\": 3,\n        \"userId\": 1\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get expenses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z&page=0&pageSize=10",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						""
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2002-09-04T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2022-12-09T18:41:40.535Z"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z&page=0&pageSize=10",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2002-09-04T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2022-12-09T18:41:40.535Z"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1945"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"799-8ASEJbdbIejbDDMxa0iQXNbhlaQ\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 10 Sep 2022 00:25:37 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"amount\": 33,\n        \"id\": 6,\n        \"producedDate\": \"2022-05-12T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 21,\n        \"id\": 7,\n        \"producedDate\": \"2022-05-13T18:44:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 23,\n        \"id\": 10,\n        \"producedDate\": \"2022-09-01T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 12,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 11,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 20,\n        \"id\": 5,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    },\n    {\n        \"amount\": 45,\n        \"id\": 8,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 450,\n        \"id\": 9,\n        \"producedDate\": \"2022-09-03T19:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 300,\n        \"id\": 1,\n        \"producedDate\": \"2022-09-04T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 150,\n        \"id\": 2,\n        \"producedDate\": \"2022-09-05T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get expenses logs",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/logs/?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z&page=0&pageSize=10",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"logs",
+						""
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2002-09-04T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2022-12-09T18:41:40.535Z"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z&page=0&pageSize=10",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2002-09-04T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2022-12-09T18:41:40.535Z"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1945"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"799-8ASEJbdbIejbDDMxa0iQXNbhlaQ\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 10 Sep 2022 00:25:37 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"amount\": 33,\n        \"id\": 6,\n        \"producedDate\": \"2022-05-12T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 21,\n        \"id\": 7,\n        \"producedDate\": \"2022-05-13T18:44:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 23,\n        \"id\": 10,\n        \"producedDate\": \"2022-09-01T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 12,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 11,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 20,\n        \"id\": 5,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    },\n    {\n        \"amount\": 45,\n        \"id\": 8,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 450,\n        \"id\": 9,\n        \"producedDate\": \"2022-09-03T19:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 300,\n        \"id\": 1,\n        \"producedDate\": \"2022-09-04T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 150,\n        \"id\": 2,\n        \"producedDate\": \"2022-09-05T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get expenses count",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/count?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"count"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2002-09-04T18:41:40.535Z"
+						},
+						{
+							"key": "endDate",
+							"value": "2022-12-09T18:41:40.535Z"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses count",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses/count?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses",
+								"count"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2002-09-04T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2022-12-09T18:41:40.535Z"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "14"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"e-EOa66LSAvYc66GQ+gcMHggbYOcM\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 10 Sep 2022 02:01:37 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"total\": 13\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get expenses logs count",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/expenses/logCount",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"expenses",
+						"logCount"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get expenses",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3001/expenses?startDate=2002-09-04T18:41:40.535Z&endDate=2022-12-09T18:41:40.535Z&page=0&pageSize=10",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"expenses"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2002-09-04T18:41:40.535Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2022-12-09T18:41:40.535Z"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "1945"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"799-8ASEJbdbIejbDDMxa0iQXNbhlaQ\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 10 Sep 2022 00:25:37 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"amount\": 33,\n        \"id\": 6,\n        \"producedDate\": \"2022-05-12T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 21,\n        \"id\": 7,\n        \"producedDate\": \"2022-05-13T18:44:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 23,\n        \"id\": 10,\n        \"producedDate\": \"2022-09-01T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 12,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 99,\n        \"id\": 11,\n        \"producedDate\": \"2022-09-02T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 20,\n        \"id\": 5,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    },\n    {\n        \"amount\": 45,\n        \"id\": 8,\n        \"producedDate\": \"2022-09-03T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 450,\n        \"id\": 9,\n        \"producedDate\": \"2022-09-03T19:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Estudio\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/747/747086.png\",\n            \"description\": \"Gastos de estudio\"\n        }\n    },\n    {\n        \"amount\": 300,\n        \"id\": 1,\n        \"producedDate\": \"2022-09-04T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Transporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/5030/5030991.png\",\n            \"description\": \"Gastos de transporte\"\n        }\n    },\n    {\n        \"amount\": 150,\n        \"id\": 2,\n        \"producedDate\": \"2022-09-05T18:41:40.000Z\",\n        \"Category\": {\n            \"name\": \"Deporte\",\n            \"image\": \"https://cdn-icons-png.flaticon.com/512/2271/2271062.png\",\n            \"description\": \"Gastos de deporte\"\n        }\n    }\n]"
+				}
+			]
+		}
+	]
+}
