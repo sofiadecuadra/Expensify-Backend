@@ -5,24 +5,25 @@ services:
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'eCr4ZcQw6968HI3h^P'
-      MYSQL_ROOT_PASSWORD: 'H9IIr%#MC9yD3AZt1V'
+      MYSQL_PASSWORD: 'wjMZTZe6f6j45GA'
+      MYSQL_ROOT_PASSWORD: 'Yp8rLuqQ7MEM8Y'
     ports:
       - '3306:3306'
     expose:
       - '3306'
     volumes:
-      - my-db:/var/lib/mysql
-  mongodb:
-      image: mongo:4.4
-      restart: always
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: 'root'
-        MONGO_INITDB_ROOT_PASSWORD: 'H9IIr%#MC9yD3AZt1V'
-      ports:
-        - '27017:27017'
-      expose:
-        - '27017'
-
+  mongo:
+    image: mongo:4.4
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: 'T5wmVuJDe3JF72jfjfk45'
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    volumes:
+      - my-mongo:/data/db
 volumes:
   my-db:
+  my-mongo:

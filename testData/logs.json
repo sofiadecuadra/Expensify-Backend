@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "633f3dea9e4ac236775fa91f"
+  },
+  "type": "EXPENSE_UPDATE",
+  "userId": 1,
+  "familyId": 1,
+  "expenseId": "2",
+  "prevAmount": 200,
+  "amount": 200,
+  "prevProducedDate": {
+    "$date": {
+      "$numberLong": "1660780800000"
+    }
+  },
+  "producedDate": "2022-08-19T00:00:00.000Z",
+  "prevCategoryId": 2,
+  "categoryId": 2,
+  "date": "2022-10-06T20:43:22.280Z"
+},{
+  "_id": {
+    "$oid": "633f3e0b9e4ac236775fa920"
+  },
+  "type": "EXPENSE_DELETE",
+  "userId": 1,
+  "familyId": 1,
+  "expenseId": "2",
+  "amount": 200,
+  "producedDate": {
+    "$date": {
+      "$numberLong": "1660867200000"
+    }
+  },
+  "categoryId": 2,
+  "date": "2022-10-06T20:43:55.113Z"
+},{
+  "_id": {
+    "$oid": "633f3eab9e4ac236775fa921"
+  },
+  "type": "EXPENSE_UPDATE",
+  "userId": 1,
+  "familyId": 1,
+  "expenseId": "5",
+  "prevAmount": 500,
+  "amount": "400",
+  "prevProducedDate": {
+    "$date": {
+      "$numberLong": "1664755200000"
+    }
+  },
+  "producedDate": "2022-10-03T00:00:00.000Z",
+  "prevCategoryId": 1,
+  "categoryId": 1,
+  "date": "2022-10-06T20:46:35.229Z"
+},{
+  "_id": {
+    "$oid": "633f40e79e4ac236775fa922"
+  },
+  "type": "EXPENSE_UPDATE",
+  "userId": 1,
+  "familyId": 1,
+  "expenseId": "7",
+  "prevAmount": 4000,
+  "amount": "3000",
+  "prevProducedDate": {
+    "$date": {
+      "$numberLong": "1664668800000"
+    }
+  },
+  "producedDate": "2022-10-02T00:00:00.000Z",
+  "prevCategoryId": 3,
+  "categoryId": 3,
+  "date": "2022-10-06T20:56:07.796Z"
+},{
+  "_id": {
+    "$oid": "633f410b9e4ac236775fa923"
+  },
+  "type": "EXPENSE_DELETE",
+  "userId": 1,
+  "familyId": 1,
+  "expenseId": "14",
+  "amount": 100,
+  "producedDate": {
+    "$date": {
+      "$numberLong": "1665014400000"
+    }
+  },
+  "categoryId": 2,
+  "date": "2022-10-06T20:56:43.549Z"
+}]
