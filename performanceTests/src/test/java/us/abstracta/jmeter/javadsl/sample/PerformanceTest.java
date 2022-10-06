@@ -34,7 +34,8 @@ public class PerformanceTest {
       String authorizationHeader=Env.authorizationHeader;
       String endPointCategories=Env.endpointCategories;
       String apiKey=Env.apiKey;
-      String miliSeconndsExpected=Env.miliSecondsExpectes;
+      String miliSecondsExpected=Env.miliSecondsExpected;
+
       TestPlanStats stats = testPlan(
       rpsThreadGroup()
       .maxThreads(1250)
@@ -48,7 +49,7 @@ public class PerformanceTest {
         dashboardVisualizer(),
         htmlReporter(reportDir)).run();
         long miliseconds=stats.overall().sampleTime().perc95().toMillis();
-        long expected=Long.parseLong("300");
+        long expected=Long.parseLong(miliSecondsExpected);
         assertTrue(miliseconds<=expected);
     
 
@@ -56,25 +57,29 @@ public class PerformanceTest {
 
   }
 
-  // @Test
-  // public void testCategoriesWithMoreExpenses() throws IOException {
-  //   String reportDir = "./report/testSimple";
+  @Test
+  public void testCategoriesWithMoreExpenses() throws IOException {
+    String reportDir = Env.reportDir;
+    String authorizationHeader = Env.authorizationHeader;
+    String apiKey=Env.apiKey;
+    String endPointCategoriesExpenses=Env.endpointCategoriesExpenses;
+    String miliSecondsExpected=Env.miliSecondsExpected;
 
-  //   TestPlanStats stats = testPlan(
-  //     rpsThreadGroup()
-  //     .maxThreads(1250)
-  //     .rampTo(21, Duration.ofSeconds(1,2))
-  //     .rampToAndHold(21, Duration.ofSeconds(1), Duration.ofSeconds(60))
-  //     .children( httpSampler("https://api.expensify.ml/categories/expenses").header("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNyZWF0ZWRBdCI6IjIwMjItMTAtMDFUMTM6MDA6MDYuMDI0WiIsIm5hbWUiOiJyb290In0sImlhdCI6MTY2NDYyOTIwNn0.RfnVSgPNFD5w_olsG5b8GJhIWlSaJogVKWP0GvlTm94")),
+    TestPlanStats stats = testPlan(
+      rpsThreadGroup()
+      .maxThreads(1250)
+      .rampTo(21, Duration.ofSeconds(1,2))
+      .rampToAndHold(21, Duration.ofSeconds(1), Duration.ofSeconds(60))
+      .children( httpSampler(endPointCategoriesExpenses).header(authorizationHeader, apiKey)),
       
           
-  //       dashboardVisualizer(),
-  //       htmlReporter(reportDir)).run();
-  //       long miliseconds=stats.overall().sampleTime().perc95().toMillis();
-  //       long expected=Long.parseLong("300");
-  //       assertTrue(miliseconds<=expected);
+        dashboardVisualizer(),
+        htmlReporter(reportDir)).run();
+        long miliseconds=stats.overall().sampleTime().perc95().toMillis();
+        long expected=Long.parseLong(miliSecondsExpected);
+        assertTrue(miliseconds<=expected);
     
 
-  // } 
+  } 
   
 }
