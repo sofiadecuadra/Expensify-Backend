@@ -1,22 +1,20 @@
 # Expensify
 
-Authors
-- Noelia Bentancor
-- Sofía Decuadra
-- Agustin Ferrari
+## Authors
+- Noelia Bentancor 242970
+- Sofía Decuadra 233397
+- Agustin Ferrari 240503
 
 ## Table of contents
-- [Expensify](#expensify)
-  - [Table of contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Functional requirements](#functional-requirements)
-  - [Local setup](#local-setup)
-    - [Prerequisites:](#prerequisites)
-    - [Steps:](#steps)
-      - [Load test data (optional):](#load-test-data-optional)
-        - [MongoDB logs:](#mongodb-logs)
-        - [MySQL database:](#mysql-database)
-    - [Backend configuration](#backend-configuration)
+- [Introduction](#introduction)
+- [Functional requirements](#functional-requirements)
+- [Local setup](#local-setup)
+  - [Prerequisites:](#prerequisites)
+  - [Steps:](#steps)
+    - [Load test data (optional):](#load-test-data-optional)
+      - [MongoDB logs:](#mongodb-logs)
+      - [MySQL database:](#mysql-database)
+  - [Backend configuration](#backend-configuration)
   
 
 ## Introduction
