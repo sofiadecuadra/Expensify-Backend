@@ -1,0 +1,91 @@
+{
+	"info": {
+		"_postman_id": "2ebc3b72-0924-4a66-ad79-bd3983ea616e",
+		"name": "Healthcheck",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23156837"
+	},
+	"item": [
+		{
+			"name": "Health check",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/healthCheck",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"healthCheck"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Health check",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3001/healthCheck",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3001",
+							"path": [
+								"healthCheck"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "63"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"3f-8kb6M4A7eZtoaMUpzahGlHi9qo0\""
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 24 Sep 2022 14:57:47 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"uptime\": 5.388737291,\n    \"message\": \"OK\",\n    \"timestamp\": 1664031467643\n}"
+				}
+			]
+		}
+	]
+}
