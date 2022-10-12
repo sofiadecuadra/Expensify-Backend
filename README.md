@@ -12,7 +12,6 @@
   - [Prerequisites:](#prerequisites)
   - [Steps:](#steps)
     - [Load test data (optional):](#load-test-data-optional)
-      - [MongoDB logs:](#mongodb-logs)
       - [MySQL database:](#mysql-database)
   
 
