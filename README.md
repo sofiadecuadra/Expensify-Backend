@@ -19,8 +19,7 @@
 ## Introduction
 
   
-
-Expensify App is a monolithic app developed in the context of Software Architecture in Practice.
+Monolithic backend developed in the context of Human-Computer Interaction.
 
   
 
@@ -77,8 +76,7 @@ The aim of this app is to manage family expenses.
 
   
 
-
-  ## Local setup
+## Local setup
 
 ### Prerequisites:
 - nodejs: 16.15.0
@@ -86,16 +84,11 @@ The aim of this app is to manage family expenses.
 
 ### Steps:
 ```
-git clone https://github.com/ArqSoftPractica/Monolithic-Backend
-cd Monolithic-Backend
+git clone https://github.com/ORTISP/Expensify-Backend.git
+cd Expensify-Backend
 npm i
 docker-compose up
 ```
-#### Load test data (optional): 
-##### MongoDB logs:
-1. Connect to the MongoDB instance through MongoDB using the next URI: `mongodb://localhost:27017`
-2. Create a database named `expensify-logs` and a collection named `logs`
-3. Import data from `./testData/logs.json`
 
 ##### MySQL database:
 1. Connect to the MySQL instance through MySQL Workbench using the next credentials:	
