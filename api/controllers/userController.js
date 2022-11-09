@@ -13,13 +13,12 @@ class UserController {
             const { name, email, role, familyName, password } = req.body;
             const response = await this.userLogic.createNewUser(name, email, role, familyName, password);
             const { token, actualRole, expirationDate } = response;
-            res
-                .cookie("access_token", token, {
-                    httpOnly: true,
-                    secure: process.env.SECURE_COOKIES,
-                    expires: expirationDate,
-                    domain: process.env.FRONTEND_DOMAIN,
-                })
+            res.cookie("access_token", token, {
+                httpOnly: true,
+                secure: process.env.SECURE_COOKIES,
+                expires: expirationDate,
+                domain: process.env.FRONTEND_DOMAIN,
+            })
                 .status(200)
                 .send({ role: actualRole, expirationDate });
         } catch (err) {
@@ -32,16 +31,14 @@ class UserController {
             const { name, email, role, familyId, password, inviteToken } = req.body;
             const response = await this.userLogic.createUserFromInvite(name, email, role, familyId, password, inviteToken);
             const { token, actualRole, expirationDate } = response;
-            res
-                .cookie("access_token", token, {
-                    httpOnly: true,
-                    secure: process.env.SECURE_COOKIES,
-                    expires: expirationDate,
-                    domain: process.env.FRONTEND_DOMAIN,
-                })
+            res.cookie("access_token", token, {
+                httpOnly: true,
+                secure: process.env.SECURE_COOKIES,
+                expires: expirationDate,
+                domain: process.env.FRONTEND_DOMAIN,
+            })
                 .status(200)
                 .send({ role: actualRole, expirationDate });
-
         } catch (err) {
             next(err);
         }
@@ -52,13 +49,12 @@ class UserController {
             const { email, password } = req.body;
             const response = await this.userLogic.signIn(email, password);
             const { token, role, expirationDate } = response;
-            res
-                .cookie("access_token", token, {
-                    httpOnly: true,
-                    secure: process.env.SECURE_COOKIES,
-                    expires: expirationDate,
-                    domain: process.env.FRONTEND_DOMAIN,
-                })
+            res.cookie("access_token", token, {
+                httpOnly: true,
+                secure: process.env.SECURE_COOKIES,
+                expires: expirationDate,
+                domain: process.env.FRONTEND_DOMAIN,
+            })
                 .status(200)
                 .send({ role, expirationDate });
         } catch (err) {
@@ -67,10 +63,18 @@ class UserController {
     }
 
     async logOut(req, res, next) {
-        return res
-            .clearCookie("access_token")
-            .status(200)
-            .json({ message: "Successfully logged out." });
+        return res.clearCookie("access_token").status(200).json({ message: "Successfully logged out." });
+    }
+
+    async updateToken(req, res, next) {
+        try {
+            const { token } = req.body;
+            const { userId } = req.user;
+            await this.userLogic.updateToken(token, userId);
+            res.status(200).json({ message: "Token updated correctly" });
+        } catch (err) {
+            next(err);
+        }
     }
 }
 

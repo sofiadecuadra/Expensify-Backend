@@ -36,7 +36,7 @@ class StartupHelper {
         const mongoClient = new MongoClient(mongoDBUri);
         const mongoDb = mongoClient.db(mongoDBName);
         const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
-        process.on('SIGINT', async () => {
+        process.on("SIGINT", async () => {
             await mongoClient.close();
             process.exit(0);
         });
@@ -52,9 +52,16 @@ class StartupHelper {
     }
 
     async initializeLogic() {
-        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } = await this.initializeDatabase();
+        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } =
+            await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
-        const expenseLogic = new ExpenseLogic(expenseSQL.instance, categorySQL.instance, userSQL.instance, familySQL.instance, mongoLogsCollection);
+        const expenseLogic = new ExpenseLogic(
+            expenseSQL.instance,
+            categorySQL.instance,
+            userSQL.instance,
+            familySQL.instance,
+            mongoLogsCollection
+        );
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
@@ -62,8 +69,7 @@ class StartupHelper {
     }
 
     async initializeControllers() {
-        const { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic } =
-            await this.initializeLogic();
+        const { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic } = await this.initializeLogic();
         const categoryController = new CategoryController(categoryLogic);
         const expenseController = new ExpenseController(expenseLogic);
         const familyController = new FamilyController(familyLogic);
@@ -79,13 +85,8 @@ class StartupHelper {
     }
 
     async initializeRoutes() {
-        const {
-            categoryController,
-            expenseController,
-            familyController,
-            healthCheckController,
-            userController,
-        } = await this.initializeControllers();
+        const { categoryController, expenseController, familyController, healthCheckController, userController } =
+            await this.initializeControllers();
         const categoryRoutes = this.createCategoryRoutes(categoryController);
         routes.use("/categories", categoryRoutes);
         const expenseRoutes = this.createExpenseRoutes(expenseController);
@@ -119,27 +120,15 @@ class StartupHelper {
             upload.single("image"),
             categoryController.createCategory.bind(categoryController)
         );
-        routes.delete(
-            "/:categoryId",
-            authMiddleware([Roles.Administrator]),
-            categoryController.deleteCategory.bind(categoryController)
-        );
+        routes.delete("/:categoryId", authMiddleware([Roles.Administrator]), categoryController.deleteCategory.bind(categoryController));
         routes.put(
             "/:categoryId",
             authMiddleware([Roles.Administrator]),
             upload.single("image"),
             categoryController.updateCategory.bind(categoryController)
         );
-        routes.get(
-            "/",
-            authMiddleware([Roles.Member, Roles.Administrator]),
-            categoryController.getCategories.bind(categoryController)
-        );
-        routes.get(
-            "/expenses",
-            apiKeyMiddleware(),
-            categoryController.getCategoriesWithMoreExpenses.bind(categoryController)
-        );
+        routes.get("/", authMiddleware([Roles.Member, Roles.Administrator]), categoryController.getCategories.bind(categoryController));
+        routes.get("/expenses", apiKeyMiddleware(), categoryController.getCategoriesWithMoreExpenses.bind(categoryController));
         routes.get(
             "/count",
             authMiddleware([Roles.Member, Roles.Administrator]),
@@ -155,31 +144,11 @@ class StartupHelper {
 
     createExpenseRoutes(expenseController) {
         const routes = Router({ mergeParams: true });
-        routes.get(
-            "/logs",
-            authMiddleware([Roles.Administrator]),
-            expenseController.getLogs.bind(expenseController)
-        );
-        routes.get(
-            "/logCount",
-            authMiddleware([Roles.Administrator]),
-            expenseController.getLogCount.bind(expenseController)
-        );
-        routes.post(
-            "/",
-            authMiddleware([Roles.Member, Roles.Administrator]),
-            expenseController.createNewExpense.bind(expenseController)
-        );
-        routes.delete(
-            "/:expenseId",
-            authMiddleware([Roles.Administrator]),
-            expenseController.deleteExpense.bind(expenseController)
-        );
-        routes.put(
-            "/:expenseId",
-            authMiddleware([Roles.Administrator]),
-            expenseController.updateExpense.bind(expenseController)
-        );
+        routes.get("/logs", authMiddleware([Roles.Administrator]), expenseController.getLogs.bind(expenseController));
+        routes.get("/logCount", authMiddleware([Roles.Administrator]), expenseController.getLogCount.bind(expenseController));
+        routes.post("/", authMiddleware([Roles.Member, Roles.Administrator]), expenseController.createNewExpense.bind(expenseController));
+        routes.delete("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.deleteExpense.bind(expenseController));
+        routes.put("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.updateExpense.bind(expenseController));
         routes.get(
             "/",
             authMiddleware([Roles.Member, Roles.Administrator]),
@@ -190,32 +159,16 @@ class StartupHelper {
             authMiddleware([Roles.Member, Roles.Administrator]),
             expenseController.getExpensesCount.bind(expenseController)
         );
-        routes.get(
-            "/:categoryId",
-            apiKeyMiddleware(),
-            expenseController.getExpensesByCategory.bind(expenseController)
-        );
+        routes.get("/:categoryId", apiKeyMiddleware(), expenseController.getExpensesByCategory.bind(expenseController));
 
         return routes;
     }
 
     createFamilyRoutes(familyController) {
         const routes = Router({ mergeParams: true });
-        routes.get(
-            "/apiKey/",
-            authMiddleware([Roles.Administrator]),
-            familyController.getApiKey.bind(familyController)
-        );
-        routes.patch(
-            "/apiKey/",
-            authMiddleware([Roles.Administrator]),
-            familyController.updateApiKey.bind(familyController)
-        );
-        routes.post(
-            "/invitations/",
-            authMiddleware([Roles.Administrator]),
-            familyController.createInvite.bind(familyController)
-        );
+        routes.get("/apiKey/", authMiddleware([Roles.Administrator]), familyController.getApiKey.bind(familyController));
+        routes.patch("/apiKey/", authMiddleware([Roles.Administrator]), familyController.updateApiKey.bind(familyController));
+        routes.post("/invitations/", authMiddleware([Roles.Administrator]), familyController.createInvite.bind(familyController));
         routes.get("/:inviteToken/", familyController.validateInviteToken.bind(familyController));
         return routes;
     }
@@ -232,6 +185,7 @@ class StartupHelper {
         routes.post("/invitations", userController.createUserFromInvite.bind(userController));
         routes.post("/sign-in", userController.signIn.bind(userController));
         routes.post("/log-out", userController.logOut.bind(userController));
+        routes.put("/update-token", authMiddleware([Roles.Member, Roles.Administrator]), userController.updateToken.bind(userController));
         return routes;
     }
 }
