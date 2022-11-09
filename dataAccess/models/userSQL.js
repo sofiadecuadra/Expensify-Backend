@@ -27,6 +27,10 @@ class UserSQL extends SQLModel {
                     type: DataTypes.STRING(100),
                     required: true,
                 },
+                expoToken: {
+                    type: DataTypes.STRING(100),
+                    required: false,
+                },
             });
             this.instance.belongsTo(familyInstance, { foreignKey: { allowNull: false, name: "familyId" } });
             this.connection = sequelizeContext.connection;
