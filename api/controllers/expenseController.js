@@ -7,8 +7,11 @@ class ExpenseController {
 
     async createNewExpense(req, res, next) {
         try {
+            const imageFile = req.file;
+            const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { userId } = req.user;
             const { amount, producedDate, categoryId } = req.body;
+            console.log(req.body);
             await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId);
             res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
@@ -79,8 +82,7 @@ class ExpenseController {
             let { page, pageSize } = req.query;
             const logs = await this.expenseLogic.getLogs(familyId, page, pageSize);
             res.status(200).json(logs);
-        }
-        catch (err) {
+        } catch (err) {
             next(err);
         }
     }
@@ -89,8 +91,7 @@ class ExpenseController {
         try {
             const logCount = await this.expenseLogic.getLogCount();
             res.status(200).json({ total: logCount });
-        }
-        catch (err) {
+        } catch (err) {
             next(err);
         }
     }
