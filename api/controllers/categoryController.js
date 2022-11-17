@@ -11,15 +11,7 @@ class CategoryController {
             const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { name, description, monthlyBudget } = req.body;
             const { familyId, userId } = req.user;
-            await this.categoryLogic.createCategory(
-                userId,
-                imageFile,
-                name,
-                description,
-                monthlyBudget,
-                originalName,
-                familyId
-            );
+            await this.categoryLogic.createCategory(userId, imageFile, name, description, monthlyBudget, originalName, familyId);
             res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             next(err);
@@ -40,7 +32,7 @@ class CategoryController {
     async updateCategory(req, res, next) {
         try {
             const imageFile = req.file;
-            const originalName = req.file.originalName;
+            const originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
             const { userId } = req.user;
             const { categoryId } = req.params;
             const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
@@ -52,7 +44,8 @@ class CategoryController {
                 description,
                 originalName,
                 monthlyBudget,
-                imageAlreadyUploaded);
+                imageAlreadyUploaded
+            );
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             next(err);
