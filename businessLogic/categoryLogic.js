@@ -60,33 +60,42 @@ class CategoryLogic {
 
     async deleteCategory(userId, categoryId) {
         NumberValidator.validate(categoryId, "category id", this.numberLength);
-        await this.categorySQL.update({
-            active: false,
-        }, {
-            where: {
-                id: categoryId,
+        await this.categorySQL.update(
+            {
+                active: false,
             },
-        });
+            {
+                where: {
+                    id: categoryId,
+                },
+            }
+        );
         console.info(`[USER_${userId}] [CATEGORY_DELETE] Category deleted id: ${categoryId}`);
     }
 
     async updateCategory(userId, imageFile, categoryId, name, description, originalname, monthlyBudget, imageAlreadyUploaded) {
         try {
             if (monthlyBudget == "") monthlyBudget = 0;
+
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             WordValidator.validate(name, "name", this.nameLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
             let image = undefined;
             if (!imageAlreadyUploaded) {
-                image = await this.uploadImage(imageFile, originalname, name);
+                const imageKey = name + "-" + Date.now() + "-" + originalname;
+                console.log(name, originalname, name);
+                image = await uploadImage(imageFile, imageKey, name);
             }
 
-            await this.categorySQL.update({
-                name: name,
-                description: description,
-                image: image,
-                monthlyBudget: monthlyBudget,
-            }, { where: { id: categoryId } });
+            await this.categorySQL.update(
+                {
+                    name: name,
+                    description: description,
+                    image: image,
+                    monthlyBudget: monthlyBudget,
+                },
+                { where: { id: categoryId } }
+            );
             console.info(`[USER_${userId}] [CATEGORY_UPDATE] Category updated id: ${categoryId}`);
         } catch (err) {
             if (err instanceof sequelize.UniqueConstraintError) throw new DuplicateError(name);
@@ -110,13 +119,16 @@ class CategoryLogic {
             NumberValidator.validate(pageSize, "page size", 50);
 
             return await this.categorySQL.findAll(
-                this.paginate({
-                    attributes: ["id", "name", "description", "image", "monthlyBudget"],
-                    where: {
-                        familyId: familyId,
-                        active: true,
+                this.paginate(
+                    {
+                        attributes: ["id", "name", "description", "image", "monthlyBudget"],
+                        where: {
+                            familyId: familyId,
+                            active: true,
+                        },
                     },
-                }, { page, pageSize })
+                    { page, pageSize }
+                )
             );
         }
     }
@@ -150,8 +162,7 @@ class CategoryLogic {
                 apiKey: apiKey,
             },
         });
-        if (!family)
-            throw new InvalidApiKeyError(familyName);
+        if (!family) throw new InvalidApiKeyError(familyName);
 
         const categories = await this.expenseSQL.findAll({
             ...this.groupByCategory(this.categorySQL, family.dataValues.id),
@@ -178,14 +189,16 @@ class CategoryLogic {
     groupByCategory = (categoryInstance, familyId) => ({
         attributes: ["categoryId", [sequelize.fn("sum", sequelize.col("amount")), "total"]],
 
-        include: [{
-            model: categoryInstance,
-            attributes: ["name"],
-            where: {
-                familyId: familyId,
-                //active: true, TODO VER SE ESTO VA
+        include: [
+            {
+                model: categoryInstance,
+                attributes: ["name"],
+                where: {
+                    familyId: familyId,
+                    //active: true, TODO VER SE ESTO VA
+                },
             },
-        },],
+        ],
         group: ["categoryId"],
     });
 
