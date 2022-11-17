@@ -121,6 +121,18 @@ class CategoryLogic {
         }
     }
 
+    async getCategoryById(familyId, categoryId) {
+        NumberValidator.validate(categoryId, "category id", this.numberLength);
+        return await this.categorySQL.findOne({
+            attributes: ["id", "name", "description", "image", "monthlyBudget"],
+            where: {
+                id: categoryId,
+                familyId: familyId,
+                active: true,
+            },
+        });
+    }
+
     async getCategoriesCount(familyId) {
         const total = await this.categorySQL.count({
             where: {
