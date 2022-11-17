@@ -36,7 +36,7 @@ class StartupHelper {
         const mongoClient = new MongoClient(mongoDBUri);
         const mongoDb = mongoClient.db(mongoDBName);
         const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
-        process.on("SIGINT", async () => {
+        process.on("SIGINT", async() => {
             await mongoClient.close();
             process.exit(0);
         });
@@ -53,7 +53,7 @@ class StartupHelper {
 
     async initializeLogic() {
         const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } =
-            await this.initializeDatabase();
+        await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
         const expenseLogic = new ExpenseLogic(
             expenseSQL.instance,
@@ -86,7 +86,7 @@ class StartupHelper {
 
     async initializeRoutes() {
         const { categoryController, expenseController, familyController, healthCheckController, userController } =
-            await this.initializeControllers();
+        await this.initializeControllers();
         const categoryRoutes = this.createCategoryRoutes(categoryController);
         routes.use("/categories", categoryRoutes);
         const expenseRoutes = this.createExpenseRoutes(expenseController);
@@ -147,7 +147,17 @@ class StartupHelper {
         const routes = Router({ mergeParams: true });
         routes.get("/logs", authMiddleware([Roles.Administrator]), expenseController.getLogs.bind(expenseController));
         routes.get("/logCount", authMiddleware([Roles.Administrator]), expenseController.getLogCount.bind(expenseController));
-        routes.post("/", authMiddleware([Roles.Member, Roles.Administrator]), expenseController.createNewExpense.bind(expenseController));
+
+        const multer = require("multer");
+
+        const storage = multer.memoryStorage();
+        const upload = multer({ storage: storage });
+        routes.post(
+            "/",
+            authMiddleware([Roles.Member, Roles.Administrator]),
+            upload.single("image"),
+            expenseController.createNewExpense.bind(expenseController)
+        );
         routes.delete("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.deleteExpense.bind(expenseController));
         routes.put("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.updateExpense.bind(expenseController));
         routes.get(
