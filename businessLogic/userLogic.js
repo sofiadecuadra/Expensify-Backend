@@ -26,14 +26,11 @@ class UserLogic {
             WordValidator.validate(name, "name", this.nameLength);
             EmailValidator.validate(email);
             PasswordValidator.validate(password);
-            const user = await this.userConnection.transaction(async (t) => {
+            const user = await this.userConnection.transaction(async(t) => {
                 const family = await this.familyLogic.createNewFamily(familyName, { transaction: t });
                 const salt = await bcrypt.genSalt(10);
                 const encryptedPassword = await bcrypt.hash(password.toString(), salt);
-                const user = await this.userSQL.create(
-                    { name, email, role, familyId: family.dataValues.id, password: encryptedPassword },
-                    { transaction: t }
-                );
+                const user = await this.userSQL.create({ name, email, role, familyId: family.dataValues.id, password: encryptedPassword }, { transaction: t });
                 return user;
             });
             const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
@@ -90,6 +87,7 @@ class UserLogic {
 
     async signIn(email, password) {
         let user = await this.userSQL.findOne({ where: { email: email } });
+
         if (!user) {
             console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`);
             throw new AuthError("Your email and password do not match. Please try again.");

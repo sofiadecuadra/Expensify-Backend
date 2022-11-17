@@ -12,7 +12,7 @@ class ExpenseController {
             const { userId } = req.user;
             const { amount, producedDate, categoryId } = req.body;
             console.log(req.body);
-            await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId);
+            await this.expenseLogic.createExpense(amount, producedDate, categoryId, originalName, userId);
             res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
             next(err);
@@ -96,7 +96,7 @@ class ExpenseController {
         }
     }
 
-    
+
 }
 
 module.exports = ExpenseController;

@@ -25,19 +25,24 @@ class ExpenseLogic {
         this.expo = new Expo();
     }
 
-    async createExpense(amount, producedDate, categoryId, userId) {
+    async createExpense(amount, producedDate, categoryId, userId, originalName) {
         try {
             NumberValidator.validate(amount, "expense amount", this.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
             NumberValidator.validate(categoryId, "category id", this.numberLength);
-
-            const newExpense = await this.expenseSQL.create({
-                amount,
-                producedDate: parseDate(producedDate),
-                categoryId,
-                userId,
-                registeredDate: parseDate(new Date()),
+            await this.categoryConnection.transaction(async(t) => {
+                const imageKey = Date.now() + "-" + originalName;
+                const image = "https://" + bucketName + ".s3.amazonaws.com/" + imageKey;
+                const newCategory = await this.categorySQL.create({
+                    amount,
+                    producedDate,
+                    categoryId,
+                    userId,
+                    image,
+                }, { transaction: t });
             });
+            await uploadImage(imageFile, imageKey, name);
+
             this.checkMonthlyLimit(categoryId, userId);
             console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
         } catch (err) {
@@ -89,14 +94,11 @@ class ExpenseLogic {
             });
             if (!previousExpense) throw new ForeignKeyError(expenseId);
 
-            await this.expenseSQL.update(
-                {
-                    amount,
-                    producedDate: parseDate(producedDate),
-                    categoryId,
-                },
-                { where: { id: expenseId } }
-            );
+            await this.expenseSQL.update({
+                amount,
+                producedDate: parseDate(producedDate),
+                categoryId,
+            }, { where: { id: expenseId } });
             console.info(`[USER_${userId}] [EXPENSE_UPDATE] Expense updated id: ${expenseId}`);
             const logObject = {
                 type: "EXPENSE_UPDATE",
@@ -134,14 +136,12 @@ class ExpenseLogic {
         NumberValidator.validate(categoryId, "category id", this.numberLength);
 
         return await this.expenseSQL.findAll({
-            include: [
-                {
-                    model: this.categorySQL,
-                    where: {
-                        familyId: family.dataValues.id,
-                    },
+            include: [{
+                model: this.categorySQL,
+                where: {
+                    familyId: family.dataValues.id,
                 },
-            ],
+            }, ],
             where: {
                 categoryId: categoryId,
                 producedDate: {
@@ -165,31 +165,29 @@ class ExpenseLogic {
         }
 
         return await this.expenseSQL.findAll(
-            this.paginate(
-                {
-                    attributes: ["amount", "id", "producedDate", "registeredDate"],
-                    where: {
-                        producedDate: {
-                            [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+            this.paginate({
+                attributes: ["amount", "id", "producedDate", "registeredDate"],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+                    },
+                },
+                order: [
+                    ["producedDate", "ASC"]
+                ],
+                include: [{
+                        model: this.categorySQL,
+                        attributes: ["name", "image", "description", "id"],
+                    },
+                    {
+                        model: this.userSQL,
+                        attributes: ["name"],
+                        where: {
+                            familyId: familyId,
                         },
                     },
-                    order: [["producedDate", "ASC"]],
-                    include: [
-                        {
-                            model: this.categorySQL,
-                            attributes: ["name", "image", "description", "id"],
-                        },
-                        {
-                            model: this.userSQL,
-                            attributes: ["name"],
-                            where: {
-                                familyId: familyId,
-                            },
-                        },
-                    ],
-                },
-                { page, pageSize }
-            )
+                ],
+            }, { page, pageSize })
         );
     }
 
@@ -208,14 +206,12 @@ class ExpenseLogic {
                     [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
                 },
             },
-            include: [
-                {
-                    model: this.userSQL,
-                    where: {
-                        familyId: familyId,
-                    },
+            include: [{
+                model: this.userSQL,
+                where: {
+                    familyId: familyId,
                 },
-            ],
+            }, ],
         });
         return { total };
     }
@@ -225,12 +221,9 @@ class ExpenseLogic {
         NumberValidator.validate(pageSize, "page size", 50);
 
         const logs = await this.logs
-            .find(
-                {
-                    familyId: familyId,
-                },
-                { projection: { _id: 0 } }
-            )
+            .find({
+                familyId: familyId,
+            }, { projection: { _id: 0 } })
             .sort({ date: -1 })
             .skip(page * pageSize)
             .limit(parseInt(pageSize))

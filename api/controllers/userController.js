@@ -14,11 +14,11 @@ class UserController {
             const response = await this.userLogic.createNewUser(name, email, role, familyName, password);
             const { token, actualRole, expirationDate } = response;
             res.cookie("access_token", token, {
-                httpOnly: true,
-                secure: process.env.SECURE_COOKIES,
-                expires: expirationDate,
-                domain: process.env.FRONTEND_DOMAIN,
-            })
+                    httpOnly: true,
+                    secure: process.env.SECURE_COOKIES,
+                    expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
+                })
                 .status(200)
                 .send({ role: actualRole, expirationDate });
         } catch (err) {
@@ -32,11 +32,11 @@ class UserController {
             const response = await this.userLogic.createUserFromInvite(name, email, role, familyId, password, inviteToken);
             const { token, actualRole, expirationDate } = response;
             res.cookie("access_token", token, {
-                httpOnly: true,
-                secure: process.env.SECURE_COOKIES,
-                expires: expirationDate,
-                domain: process.env.FRONTEND_DOMAIN,
-            })
+                    httpOnly: true,
+                    secure: process.env.SECURE_COOKIES,
+                    expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
+                })
                 .status(200)
                 .send({ role: actualRole, expirationDate });
         } catch (err) {
@@ -45,16 +45,19 @@ class UserController {
     }
 
     async signIn(req, res, next) {
+
         try {
+            console.log(req);
             const { email, password } = req.body;
             const response = await this.userLogic.signIn(email, password);
             const { token, role, expirationDate } = response;
+            console.log(token);
             res.cookie("access_token", token, {
-                httpOnly: true,
-                secure: process.env.SECURE_COOKIES,
-                expires: expirationDate,
-                domain: process.env.FRONTEND_DOMAIN,
-            })
+                    httpOnly: true,
+                    secure: process.env.SECURE_COOKIES,
+                    expires: expirationDate,
+                    domain: process.env.FRONTEND_DOMAIN,
+                })
                 .status(200)
                 .send({ role, expirationDate });
         } catch (err) {
