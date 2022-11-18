@@ -24,6 +24,10 @@ class ExpenseSQL extends SQLModel {
                     type: DataTypes.STRING(150),
                     allowNull: false,
                 },
+                description: {
+                    type: DataTypes.STRING(150),
+                    allowNull: false,
+                },
             });
             this.instance.belongsTo(categoryInstance, { foreignKey: { allowNull: false, name: "categoryId" } });
             this.instance.belongsTo(userInstance, { foreignKey: { allowNull: false, name: "userId" } });

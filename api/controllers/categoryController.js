@@ -63,17 +63,6 @@ class CategoryController {
         }
     }
 
-    async getCategoryById(req, res, next) {
-        try {
-            const { familyId } = req.user;
-            const { categoryId } = req.params;
-            const category = await this.categoryLogic.getCategoryById(familyId, categoryId);
-            res.status(200).json(category);
-        } catch (err) {
-            next(err);
-        }
-    }
-
     async getCategoriesWithMoreExpenses(req, res, next) {
         try {
             const { familyName, apiKey } = req;
