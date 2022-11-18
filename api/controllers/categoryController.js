@@ -93,6 +93,17 @@ class CategoryController {
             next(err);
         }
     }
+
+    async getCategoryExpensesByMonth(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            const { categoryId } = req.params;
+            const categories = await this.categoryLogic.getCategoryExpensesByMonth(categoryId, familyId);
+            res.status(200).json(categories);
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = CategoryController;

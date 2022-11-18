@@ -133,6 +133,22 @@ class CategoryLogic {
         }
     }
 
+    async getCategoryExpensesByMonth(categoryId, familyId) {
+        NumberValidator.validate(categoryId, "category id", this.numberLength);
+        NumberValidator.validate(familyId, "family id", this.numberLength);
+        const expenses = await this.expenseSQL.findAll({
+            attributes: [
+                [sequelize.fn("MONTH", sequelize.col("producedDate")), "month"],
+                [sequelize.fn("sum", sequelize.col("amount")), "total"],
+            ],
+            where: {
+                categoryId: categoryId,
+            },
+            group: [sequelize.fn("MONTH", sequelize.col("producedDate"))],
+        });
+        return expenses;
+    }
+
     async getCategoriesCount(familyId) {
         const total = await this.categorySQL.count({
             where: {
