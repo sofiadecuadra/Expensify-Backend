@@ -313,6 +313,74 @@ class ExpenseLogic {
         }
     }
 
+    async getExpensesByMonth(familyId, fromDate, toDate) {
+        ISODateValidator.validate(fromDate, "from date");
+        ISODateValidator.validate(toDate, "to date");
+
+        //if period is smaller than 1 month, return separated by weeks
+        const period = Math.abs(parseDate(toDate).getTime() - parseDate(fromDate).getTime());
+        const days = Math.ceil(period / (1000 * 60 * 60 * 24));
+        if (days < 30) {
+            const expenses = await this.expenseSQL.findAll({
+                attributes: [
+                    [sequelize.fn("sum", sequelize.col("amount")), "amount"],
+                    [sequelize.fn("WEEK", sequelize.col("producedDate")), "date"],
+                ],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(fromDate), parseDate(toDate)],
+                    },
+                },
+                group: [sequelize.fn("WEEK", sequelize.col("producedDate"))],
+                include: [
+                    {
+                        model: this.userSQL,
+                        attributes: [],
+                        where: {
+                            familyId: familyId,
+                        },
+                    },
+                ],
+            });
+
+            return expenses.map((expense) => {
+                return {
+                    amount: expense.dataValues.amount,
+                    week: expense.dataValues.date,
+                };
+            });
+        } else {
+            const expenses = await this.expenseSQL.findAll({
+                attributes: [
+                    [sequelize.fn("sum", sequelize.col("amount")), "amount"],
+                    [sequelize.fn("MONTH", sequelize.col("producedDate")), "date"],
+                ],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(fromDate), parseDate(toDate)],
+                    },
+                },
+                group: [sequelize.fn("MONTH", sequelize.col("producedDate"))],
+                include: [
+                    {
+                        model: this.userSQL,
+                        attributes: [],
+                        where: {
+                            familyId: familyId,
+                        },
+                    },
+                ],
+            });
+
+            return expenses.map((expense) => {
+                return {
+                    amount: expense.dataValues.amount,
+                    month: expense.dataValues.date,
+                };
+            });
+        }
+    }
+
     async checkMonthlyLimit(categoryId, userId) {
         //create this query with sequelize
         const query = `SELECT SUM(amount) > c.monthlyBudget, SUM(amount) as Total, c.monthlyBudget, c.name  FROM Expenses e, Categories c WHERE categoryId = '${categoryId}' AND e.categoryId = c.id GROUP BY c.id, c.name;`;

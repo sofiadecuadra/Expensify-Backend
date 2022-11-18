@@ -96,7 +96,16 @@ class ExpenseController {
         }
     }
 
-    
+    async getExpensesByMonth(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            let { startDate, endDate } = req.query;
+            const expenses = await this.expenseLogic.getExpensesByMonth(familyId, startDate, endDate);
+            res.status(200).json(expenses);
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = ExpenseController;
