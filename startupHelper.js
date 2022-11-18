@@ -36,7 +36,7 @@ class StartupHelper {
         const mongoClient = new MongoClient(mongoDBUri);
         const mongoDb = mongoClient.db(mongoDBName);
         const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
-        process.on("SIGINT", async() => {
+        process.on("SIGINT", async () => {
             await mongoClient.close();
             process.exit(0);
         });
@@ -53,7 +53,7 @@ class StartupHelper {
 
     async initializeLogic() {
         const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } =
-        await this.initializeDatabase();
+            await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
         const expenseLogic = new ExpenseLogic(
             expenseSQL.instance,
@@ -86,7 +86,7 @@ class StartupHelper {
 
     async initializeRoutes() {
         const { categoryController, expenseController, familyController, healthCheckController, userController } =
-        await this.initializeControllers();
+            await this.initializeControllers();
         const categoryRoutes = this.createCategoryRoutes(categoryController);
         routes.use("/categories", categoryRoutes);
         const expenseRoutes = this.createExpenseRoutes(expenseController);
@@ -169,7 +169,13 @@ class StartupHelper {
             authMiddleware([Roles.Member, Roles.Administrator]),
             expenseController.getExpensesCount.bind(expenseController)
         );
+        routes.get(
+            "/month",
+            authMiddleware([Roles.Member, Roles.Administrator]),
+            expenseController.getExpensesByMonth.bind(expenseController)
+        );
         routes.get("/:categoryId", apiKeyMiddleware(), expenseController.getExpensesByCategory.bind(expenseController));
+
         return routes;
     }
 
