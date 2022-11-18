@@ -183,6 +183,7 @@ class CategoryLogic {
                 },
             },
         });
+        console.log(familyId);
         return categories;
     }
 
