@@ -346,7 +346,7 @@ class ExpenseLogic {
             return expenses.map((expense) => {
                 return {
                     amount: expense.dataValues.amount,
-                    date: expense.dataValues.date,
+                    week: expense.dataValues.date,
                 };
             });
         } else {
@@ -375,7 +375,7 @@ class ExpenseLogic {
             return expenses.map((expense) => {
                 return {
                     amount: expense.dataValues.amount,
-                    date: expense.dataValues.date,
+                    month: expense.dataValues.date,
                 };
             });
         }
