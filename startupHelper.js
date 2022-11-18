@@ -135,6 +135,11 @@ class StartupHelper {
             categoryController.getCategoriesCount.bind(categoryController)
         );
         routes.get(
+            "/:categoryId/expenses",
+            authMiddleware([Roles.Member, Roles.Administrator]),
+            categoryController.getCategoryExpensesByMonth.bind(categoryController)
+        );
+        routes.get(
             "/expenses/period",
             authMiddleware([Roles.Administrator, Roles.Member]),
             categoryController.getCategoriesExpensesByPeriod.bind(categoryController)
@@ -159,11 +164,7 @@ class StartupHelper {
         );
         routes.delete("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.deleteExpense.bind(expenseController));
         routes.put("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.updateExpense.bind(expenseController));
-        routes.get(
-            "/",
-            authMiddleware([Roles.Member, Roles.Administrator]),
-            expenseController.getExpenses.bind(expenseController)
-        );
+        routes.get("/", authMiddleware([Roles.Member, Roles.Administrator]), expenseController.getExpenses.bind(expenseController));
         routes.get(
             "/count",
             authMiddleware([Roles.Member, Roles.Administrator]),
