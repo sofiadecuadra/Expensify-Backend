@@ -128,11 +128,6 @@ class StartupHelper {
             categoryController.updateCategory.bind(categoryController)
         );
         routes.get("/", authMiddleware([Roles.Member, Roles.Administrator]), categoryController.getCategories.bind(categoryController));
-        routes.get(
-            "/:categoryId",
-            authMiddleware([Roles.Member, Roles.Administrator]),
-            categoryController.getCategoryById.bind(categoryController)
-        );
         routes.get("/expenses", apiKeyMiddleware(), categoryController.getCategoriesWithMoreExpenses.bind(categoryController));
         routes.get(
             "/count",
@@ -167,7 +162,7 @@ class StartupHelper {
         routes.get(
             "/",
             authMiddleware([Roles.Member, Roles.Administrator]),
-            expenseController.getExpensesPaginated.bind(expenseController)
+            expenseController.getExpenses.bind(expenseController)
         );
         routes.get(
             "/count",
