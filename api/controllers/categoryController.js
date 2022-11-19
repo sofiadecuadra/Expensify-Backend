@@ -31,11 +31,16 @@ class CategoryController {
 
     async updateCategory(req, res, next) {
         try {
-            const imageFile = req.file;
-            const originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
+            const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
+            let imageFile = undefined;
+            let originalName = undefined;
+            
+            if (!imageAlreadyUploaded) {
+                imageFile = req.file;
+                originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
+            }
             const { userId } = req.user;
             const { categoryId } = req.params;
-            const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
             await this.categoryLogic.updateCategory(
                 userId,
                 imageFile,
