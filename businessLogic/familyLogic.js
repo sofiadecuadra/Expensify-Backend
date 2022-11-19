@@ -1,9 +1,7 @@
 const { createKey, decryptKey } = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
-const sendEmail = require("../library/emailSender");
 const WordValidator = require("../utilities/validators/wordValidator");
-const NumberValidator = require("../utilities/validators/numberValidator");
 const EmailValidator = require("../utilities/validators/emailValidator");
 const InArrayValidator = require("../utilities/validators/inArrayValidator");
 const Roles = require("../library/roles");
@@ -36,8 +34,6 @@ class FamilyLogic {
         });
         const { name } = await this.getFamily(familyId);
         const inviteToken = await this.generateInvite(familyId, name, userId, userType);
-        //await sendEmail(users, inviteToken, name);
-        //console.info(`[USER_${userId}] [INVITATON] users invited: ${users}`);
         return inviteToken;
     }
 
