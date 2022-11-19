@@ -47,7 +47,7 @@ class CategoryLogic {
                     },
                     { transaction: t }
                 );
-                await uploadImage(imageFile, imageKey, name);
+                await uploadImage(imageFile, imageKey);
                 console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
                 return newCategory;
             });
@@ -84,7 +84,7 @@ class CategoryLogic {
             if (!imageAlreadyUploaded) {
                 const imageKey = name + "-" + Date.now() + "-" + originalname;
                 console.log(name, originalname, name);
-                image = await uploadImage(imageFile, imageKey, name);
+                image = await uploadImage(imageFile, imageKey);
             }
 
             await this.categorySQL.update(

@@ -60,7 +60,8 @@ class StartupHelper {
             categorySQL.instance,
             userSQL.instance,
             familySQL.instance,
-            mongoLogsCollection
+            mongoLogsCollection,
+            sequelizeContext.connection
         );
         const familyLogic = new FamilyLogic(familySQL.instance);
         const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);
@@ -163,7 +164,12 @@ class StartupHelper {
             expenseController.createNewExpense.bind(expenseController)
         );
         routes.delete("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.deleteExpense.bind(expenseController));
-        routes.put("/:expenseId", authMiddleware([Roles.Administrator]), expenseController.updateExpense.bind(expenseController));
+        routes.put(
+            "/:expenseId",
+            authMiddleware([Roles.Member, Roles.Administrator]),
+            upload.single("image"),
+            expenseController.updateExpense.bind(expenseController)
+        );
         routes.get("/", authMiddleware([Roles.Member, Roles.Administrator]), expenseController.getExpenses.bind(expenseController));
         routes.get(
             "/count",

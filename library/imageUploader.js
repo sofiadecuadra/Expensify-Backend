@@ -22,7 +22,7 @@ const s3 = new S3Client({
     credentials
 });
 
-const uploadImage = async (imageFile, imageKey, categoryName) => {
+const uploadImage = async (imageFile, imageKey) => {
     try {
         const params = {
             Bucket: bucketName,
@@ -35,7 +35,7 @@ const uploadImage = async (imageFile, imageKey, categoryName) => {
         console.info("[S3] Uploaded: " + image);
         return image;
     } catch (err) {
-        throw new FileUploadError(categoryName);
+        throw new FileUploadError();
     }
 }
 

@@ -11,8 +11,7 @@ class ExpenseController {
             const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { userId } = req.user;
             const { amount, producedDate, categoryId, description } = req.body;
-            console.log(req.body);
-            await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId, description);
+            await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId, description, imageFile, originalName);
             res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
             next(err);
@@ -32,10 +31,23 @@ class ExpenseController {
 
     async updateExpense(req, res, next) {
         try {
+            const imageFile = req.file;
+            const originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
             const { expenseId } = req.params;
-            const { amount, producedDate, categoryId, description } = req.body;
+            const { amount, producedDate, categoryId, description, imageAlreadyUploaded } = req.body;
             const { userId, familyId } = req.user;
-            await this.expenseLogic.updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId, description);
+            await this.expenseLogic.updateExpense(
+                userId,
+                amount,
+                producedDate,
+                categoryId,
+                expenseId,
+                familyId,
+                description,
+                imageFile,
+                originalName,
+                imageAlreadyUploaded
+                );
             res.status(200).json({ message: "Expense updated successfully" });
         } catch (err) {
             next(err);
@@ -64,7 +76,7 @@ class ExpenseController {
             next(err);
         }
     }
-    
+
     async getExpensesCount(req, res, next) {
         try {
             const { familyId } = req.user;
