@@ -15,12 +15,10 @@ const CategoryLogic = require("./businessLogic/categoryLogic");
 const ExpenseLogic = require("./businessLogic/expenseLogic");
 const FamilyLogic = require("./businessLogic/familyLogic");
 const UserLogic = require("./businessLogic/userLogic");
-const HealthCheckLogic = require("./businessLogic/healthCheckLogic");
 const CategoryController = require("./api/controllers/categoryController");
 const ExpenseController = require("./api/controllers/expenseController");
 const FamilyController = require("./api/controllers/familyController");
 const UserController = require("./api/controllers/userController");
-const HealthCheckController = require("./api/controllers/healthCheckController");
 
 class StartupHelper {
     databaseConnection;
@@ -50,38 +48,32 @@ class StartupHelper {
             sequelizeContext.connection
         );
         const familyLogic = new FamilyLogic(familySQL.instance);
-        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
-        return { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
+        return { categoryLogic, expenseLogic, familyLogic, userLogic };
     }
 
     async initializeControllers() {
-        const { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic } = await this.initializeLogic();
+        const { categoryLogic, expenseLogic, familyLogic, userLogic } = await this.initializeLogic();
         const categoryController = new CategoryController(categoryLogic);
         const expenseController = new ExpenseController(expenseLogic);
         const familyController = new FamilyController(familyLogic);
-        const healthCheckController = new HealthCheckController(healthCheckLogic);
         const userController = new UserController(userLogic);
         return {
             categoryController,
             expenseController,
             familyController,
-            healthCheckController,
             userController,
         };
     }
 
     async initializeRoutes() {
-        const { categoryController, expenseController, familyController, healthCheckController, userController } =
-            await this.initializeControllers();
+        const { categoryController, expenseController, familyController, userController } = await this.initializeControllers();
         const categoryRoutes = this.createCategoryRoutes(categoryController);
         routes.use("/categories", categoryRoutes);
         const expenseRoutes = this.createExpenseRoutes(expenseController);
         routes.use("/expenses", expenseRoutes);
         const familyRoutes = this.createFamilyRoutes(familyController);
         routes.use("/families", familyRoutes);
-        const healthCheckRoutes = this.createHealthCheckRoutes(healthCheckController);
-        routes.use("/healthCheck", healthCheckRoutes);
         const userRoutes = this.createUserRoutes(userController);
         routes.use("/users", userRoutes);
         return routes;
@@ -135,9 +127,6 @@ class StartupHelper {
 
     createExpenseRoutes(expenseController) {
         const routes = Router({ mergeParams: true });
-        routes.get("/logs", authMiddleware([Roles.Administrator]), expenseController.getLogs.bind(expenseController));
-        routes.get("/logCount", authMiddleware([Roles.Administrator]), expenseController.getLogCount.bind(expenseController));
-
         const multer = require("multer");
 
         const storage = multer.memoryStorage();
@@ -174,12 +163,6 @@ class StartupHelper {
         const routes = Router({ mergeParams: true });
         routes.post("/invitations/", authMiddleware([Roles.Administrator]), familyController.createInvite.bind(familyController));
         routes.get("/:inviteToken/", familyController.validateInviteToken.bind(familyController));
-        return routes;
-    }
-
-    createHealthCheckRoutes(healthCheckController) {
-        const routes = Router({ mergeParams: true });
-        routes.get("/", healthCheckController.healthCheck.bind(healthCheckController));
         return routes;
     }
 
