@@ -2,7 +2,6 @@ const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const ForeignKeyError = require("../errors/ForeignKeyError");
 const { ValidationError } = require("sequelize");
