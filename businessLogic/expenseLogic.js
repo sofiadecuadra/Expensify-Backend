@@ -7,6 +7,8 @@ const ParagraphValidator = require("../utilities/validators/paragraphValidator")
 const ForeignKeyError = require("../errors/ForeignKeyError");
 const { ValidationError } = require("sequelize");
 const { Expo } = require("expo-server-sdk");
+const { uploadImage } = require("../library/imageUploader");
+const bucketName = process.env.AWS_BUCKET_NAME;
 
 class ExpenseLogic {
     numberLength = 1000000000;
@@ -17,33 +19,45 @@ class ExpenseLogic {
     familySQL;
     logs;
     expo;
+    expenseConnection;
 
-    constructor(expenseSQL, categorySQL, userSQL, familySQL, logs) {
+    constructor(expenseSQL, categorySQL, userSQL, familySQL, logs, expenseConnection) {
         this.expenseSQL = expenseSQL;
         this.categorySQL = categorySQL;
         this.userSQL = userSQL;
         this.familySQL = familySQL;
         this.logs = logs;
         this.expo = new Expo();
+        this.expenseConnection = expenseConnection;
     }
 
-    async createExpense(amount, producedDate, categoryId, userId, description) {
+    async createExpense(amount, producedDate, categoryId, userId, description, imageFile, originalName) {
         try {
             NumberValidator.validate(amount, "expense amount", this.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
             NumberValidator.validate(categoryId, "category id", this.numberLength);
             ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const newExpense = await this.expenseSQL.create({
-                amount,
-                producedDate: parseDate(producedDate),
-                categoryId,
-                userId,
-                registeredDate: parseDate(new Date()),
-                description,
+            await this.expenseConnection.transaction(async (t) => {
+                const imageKey = userId + "-" + Date.now() + "-" + originalName;
+                const image = "https://" + bucketName + ".s3.amazonaws.com/" + imageKey;
+                const newExpense = await this.expenseSQL.create(
+                    {
+                        amount,
+                        producedDate: parseDate(producedDate),
+                        categoryId,
+                        userId,
+                        image,
+                        registeredDate: parseDate(new Date()),
+                        description,
+                    },
+                    { transaction: t }
+                );
+                await uploadImage(imageFile, imageKey);
+                this.checkMonthlyLimit(categoryId, userId);
+                console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
+                return newExpense;
             });
-            this.checkMonthlyLimit(categoryId, userId);
-            console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
         } catch (err) {
             if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
@@ -81,12 +95,18 @@ class ExpenseLogic {
         }
     }
 
-    async updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId, description) {
+    async updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId, description, imageFile, originalName, imageAlreadyUploaded) {
         try {
             NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
             ParagraphValidator.validate(description, "description", this.descriptionLength);
+            let image = undefined;
+
+            if (!imageAlreadyUploaded) {
+                const imageKey = userId + "-" + Date.now() + "-" + originalName;
+                image = await uploadImage(imageFile, imageKey);
+            }
 
             const previousExpense = await this.expenseSQL.findOne({
                 where: {
@@ -101,6 +121,7 @@ class ExpenseLogic {
                     producedDate: parseDate(producedDate),
                     categoryId,
                     description,
+                    image,
                 },
                 { where: { id: expenseId } }
             );
@@ -168,53 +189,53 @@ class ExpenseLogic {
             ISODateValidator.validate(endDate, "end date");
             return await this.expenseSQL.findAll(
                 this.paginate(
-                {
-                    attributes: ["amount", "id", "producedDate", "image", "registeredDate", "description"],
-                    where: {
-                        producedDate: {
-                            [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                        },
-                    },
-                    order: [["producedDate", "ASC"]],
-                    include: [
-                        {
-                            model: this.categorySQL,
-                            attributes: ["name", "image", "description", "id"],
-                        },
-                        {
-                            model: this.userSQL,
-                            attributes: ["name"],
-                            where: {
-                                familyId: familyId,
+                    {
+                        attributes: ["amount", "id", "producedDate", "image", "registeredDate", "description"],
+                        where: {
+                            producedDate: {
+                                [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
                             },
                         },
-                    ],
-                },
-                { page, pageSize }
+                        order: [["producedDate", "ASC"]],
+                        include: [
+                            {
+                                model: this.categorySQL,
+                                attributes: ["name", "image", "description", "id"],
+                            },
+                            {
+                                model: this.userSQL,
+                                attributes: ["name"],
+                                where: {
+                                    familyId: familyId,
+                                },
+                            },
+                        ],
+                    },
+                    { page, pageSize }
                 ),
             )
         }
         else {
             return await this.expenseSQL.findAll(
                 this.paginate(
-                {
-                    attributes: ["amount", "id", "producedDate", "image", "registeredDate"],
-                    order: [["producedDate", "ASC"]],
-                    include: [
-                        {
-                            model: this.categorySQL,
-                            attributes: ["name", "image", "description", "id"],
-                        },
-                        {
-                            model: this.userSQL,
-                            attributes: ["name"],
-                            where: {
-                                familyId: familyId,
+                    {
+                        attributes: ["amount", "id", "producedDate", "image", "registeredDate"],
+                        order: [["producedDate", "ASC"]],
+                        include: [
+                            {
+                                model: this.categorySQL,
+                                attributes: ["name", "image", "description", "id"],
                             },
-                        },
-                    ],
-                },
-                { page, pageSize }
+                            {
+                                model: this.userSQL,
+                                attributes: ["name"],
+                                where: {
+                                    familyId: familyId,
+                                },
+                            },
+                        ],
+                    },
+                    { page, pageSize }
                 ),
             )
         }
