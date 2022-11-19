@@ -25,7 +25,6 @@ const ExpenseController = require("./api/controllers/expenseController");
 const FamilyController = require("./api/controllers/familyController");
 const UserController = require("./api/controllers/userController");
 const HealthCheckController = require("./api/controllers/healthCheckController");
-const apiKeyMiddleware = require("./api/middleware/apiKey");
 
 class StartupHelper {
     databaseConnection;
@@ -181,7 +180,6 @@ class StartupHelper {
             authMiddleware([Roles.Member, Roles.Administrator]),
             expenseController.getExpensesByMonth.bind(expenseController)
         );
-        routes.get("/:categoryId", apiKeyMiddleware(), expenseController.getExpensesByCategory.bind(expenseController));
 
         return routes;
     }
