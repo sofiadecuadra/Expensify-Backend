@@ -36,23 +36,21 @@ class StartupHelper {
             .sync()
             .then(() => console.log("Database is connected!"))
             .catch((err) => console.error(err, "Something went wrong, database is not connected!"));
-        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient };
+        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL };
     }
 
     async initializeLogic() {
-        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } =
-            await this.initializeDatabase();
+        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL } = await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
         const expenseLogic = new ExpenseLogic(
             expenseSQL.instance,
             categorySQL.instance,
             userSQL.instance,
             familySQL.instance,
-            mongoLogsCollection,
             sequelizeContext.connection
         );
         const familyLogic = new FamilyLogic(familySQL.instance);
-        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);
+        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
         return { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
     }

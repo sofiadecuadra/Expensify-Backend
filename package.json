@@ -15,7 +15,6 @@
     "bugs": {
         "url": "https://github.com/ArqSoftPractica/Monolithic-Backend/issues"
     },
-    "newrelic": "latest",
     "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
     "dependencies": {
         "@aws-sdk/client-s3": "3.171.0",
