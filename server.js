@@ -23,7 +23,6 @@ class Server {
         this.app.use(express.json());
         this.app.use(cookieParser());
 
-
         this.app.use(cors({ credentials: true, origin: process.env.FRONTEND_ORIGIN }));
         this.app.use("/", routes);
         this.app.use(errorMiddleware);

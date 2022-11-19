@@ -1,11 +1,11 @@
-const HTTPRequestError = require('./HttpRequestError');
+const HTTPRequestError = require("./HttpRequestError");
 
 class ForeignKeyError extends HTTPRequestError {
     StatusCode = 404;
 
-    constructor(id) {
+    constructor(id, object) {
         super();
-        this.message = `The category with id '${id}' was not found. Please try again.`;
+        this.message = `The ${object} with id '${id}' was not found. Please try again.`;
     }
 
     body() {

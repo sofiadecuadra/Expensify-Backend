@@ -257,7 +257,7 @@ describe("Create user from invite", () => {
                 // Fail test if above expression doesn't throw anything.
                 expect(true).toBe(false);
             } catch (e) {
-                const foreignKeyError = new ForeignKeyError("1");
+                const foreignKeyError = new ForeignKeyError("1", "category");
                 expect(e).toBeInstanceOf(InputValidationError);
                 expect(e.message).toBe("Please enter a password between 4 and 64 characters (letters, numbers or symbols)!");
                 expect(e.body()).toEqual({
