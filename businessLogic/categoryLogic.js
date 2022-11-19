@@ -6,7 +6,6 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 const { uploadImage } = require("../library/imageUploader");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -156,24 +155,6 @@ class CategoryLogic {
             },
         });
         return { total };
-    }
-
-    async getCategoriesWithMoreExpenses(familyName, apiKey) {
-        const family = await this.familySQL.findOne({
-            attributes: ["id"],
-            where: {
-                name: familyName,
-                apiKey: apiKey,
-            },
-        });
-        if (!family) throw new InvalidApiKeyError(familyName);
-
-        const categories = await this.expenseSQL.findAll({
-            ...this.groupByCategory(this.categorySQL, family.dataValues.id),
-            order: sequelize.literal("total DESC"),
-            limit: 3,
-        });
-        return categories;
     }
 
     async getCategoriesExpensesByPeriod(familyId, startDate, endDate) {

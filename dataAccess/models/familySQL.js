@@ -5,16 +5,11 @@ class FamilySQL extends SQLModel {
     instance;
 
     constructor(sequelizeContext) {
-        (async() => {
+        (async () => {
             super();
             this.instance = await sequelizeContext.connection.define("Family", {
                 name: {
                     type: DataTypes.STRING(50),
-                    allowNull: false,
-                    unique: true,
-                },
-                apiKey: {
-                    type: DataTypes.STRING(300),
                     allowNull: false,
                     unique: true,
                 },

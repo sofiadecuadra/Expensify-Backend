@@ -34,7 +34,7 @@ class CategoryController {
             const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
             let imageFile = undefined;
             let originalName = undefined;
-            
+
             if (!imageAlreadyUploaded) {
                 imageFile = req.file;
                 originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
@@ -63,16 +63,6 @@ class CategoryController {
             let { page, pageSize } = req.query;
             const categories = await this.categoryLogic.getCategories(familyId, page, pageSize);
             res.status(200).json(categories);
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    async getCategoriesWithMoreExpenses(req, res, next) {
-        try {
-            const { familyName, apiKey } = req;
-            const categories = await this.categoryLogic.getCategoriesWithMoreExpenses(familyName, apiKey);
-            res.json(categories);
         } catch (err) {
             next(err);
         }

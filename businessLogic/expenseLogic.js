@@ -2,7 +2,6 @@ const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const ForeignKeyError = require("../errors/ForeignKeyError");
 const { ValidationError } = require("sequelize");
@@ -95,7 +94,18 @@ class ExpenseLogic {
         }
     }
 
-    async updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId, description, imageFile, originalName, imageAlreadyUploaded) {
+    async updateExpense(
+        userId,
+        amount,
+        producedDate,
+        categoryId,
+        expenseId,
+        familyId,
+        description,
+        imageFile,
+        originalName,
+        imageAlreadyUploaded
+    ) {
         try {
             NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
@@ -147,38 +157,6 @@ class ExpenseLogic {
         }
     }
 
-    async getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey) {
-        const family = await this.familySQL.findOne({
-            attributes: ["id"],
-            where: {
-                name: familyName,
-                apiKey: apiKey,
-            },
-        });
-        if (!family) throw new InvalidApiKeyError(familyName);
-
-        ISODateValidator.validate(startDate, "start date");
-        ISODateValidator.validate(endDate, "end date");
-        NumberValidator.validate(categoryId, "category id", this.numberLength);
-
-        return await this.expenseSQL.findAll({
-            include: [
-                {
-                    model: this.categorySQL,
-                    where: {
-                        familyId: family.dataValues.id,
-                    },
-                },
-            ],
-            where: {
-                categoryId: categoryId,
-                producedDate: {
-                    [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                },
-            },
-        });
-    }
-
     async getExpenses(familyId, startDate, endDate, page, pageSize) {
         NumberValidator.validate(familyId, "family id", this.numberLength);
         NumberValidator.validate(page, "page", 100000);
@@ -212,10 +190,9 @@ class ExpenseLogic {
                         ],
                     },
                     { page, pageSize }
-                ),
-            )
-        }
-        else {
+                )
+            );
+        } else {
             return await this.expenseSQL.findAll(
                 this.paginate(
                     {
@@ -236,8 +213,8 @@ class ExpenseLogic {
                         ],
                     },
                     { page, pageSize }
-                ),
-            )
+                )
+            );
         }
     }
 

@@ -2,10 +2,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const dbPort = process.env.MYSQL_DB_PORT;
 const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
-const mongoDBUri = process.env.MONGO_DB_URI;
-const mongoDBName = process.env.MONGO_DB_NAME;
-const mongoDBLogsCollection = process.env.MONGO_DB_LOGS_COLLECTION;
-const { MongoClient } = require("mongodb");
 
 const { Router } = require("express");
 const routes = Router({ mergeParams: true });
@@ -25,7 +21,6 @@ const ExpenseController = require("./api/controllers/expenseController");
 const FamilyController = require("./api/controllers/familyController");
 const UserController = require("./api/controllers/userController");
 const HealthCheckController = require("./api/controllers/healthCheckController");
-const apiKeyMiddleware = require("./api/middleware/apiKey");
 
 class StartupHelper {
     databaseConnection;
@@ -33,13 +28,6 @@ class StartupHelper {
     async initializeDatabase() {
         const SequelizeContext = require("./dataAccess/startup/SequelizeContext");
         const sequelizeContext = new SequelizeContext(dbPort);
-        const mongoClient = new MongoClient(mongoDBUri);
-        const mongoDb = mongoClient.db(mongoDBName);
-        const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
-        process.on("SIGINT", async () => {
-            await mongoClient.close();
-            process.exit(0);
-        });
         const familySQL = await new FamilySQL(sequelizeContext);
         const userSQL = await new UserSQL(sequelizeContext, familySQL.instance);
         const categorySQL = await new CategorySQL(sequelizeContext, familySQL.instance);
@@ -48,23 +36,21 @@ class StartupHelper {
             .sync()
             .then(() => console.log("Database is connected!"))
             .catch((err) => console.error(err, "Something went wrong, database is not connected!"));
-        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient };
+        return { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL };
     }
 
     async initializeLogic() {
-        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL, mongoLogsCollection, mongoClient } =
-            await this.initializeDatabase();
+        const { sequelizeContext, familySQL, userSQL, categorySQL, expenseSQL } = await this.initializeDatabase();
         const categoryLogic = new CategoryLogic(categorySQL.instance, expenseSQL.instance, familySQL.instance, sequelizeContext.connection);
         const expenseLogic = new ExpenseLogic(
             expenseSQL.instance,
             categorySQL.instance,
             userSQL.instance,
             familySQL.instance,
-            mongoLogsCollection,
             sequelizeContext.connection
         );
         const familyLogic = new FamilyLogic(familySQL.instance);
-        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection, mongoClient);
+        const healthCheckLogic = new HealthCheckLogic(sequelizeContext.connection);
         const userLogic = new UserLogic(userSQL.instance, sequelizeContext.connection, familyLogic);
         return { categoryLogic, expenseLogic, familyLogic, healthCheckLogic, userLogic };
     }
@@ -129,7 +115,6 @@ class StartupHelper {
             categoryController.updateCategory.bind(categoryController)
         );
         routes.get("/", authMiddleware([Roles.Member, Roles.Administrator]), categoryController.getCategories.bind(categoryController));
-        routes.get("/expenses", apiKeyMiddleware(), categoryController.getCategoriesWithMoreExpenses.bind(categoryController));
         routes.get(
             "/count",
             authMiddleware([Roles.Member, Roles.Administrator]),
@@ -181,15 +166,12 @@ class StartupHelper {
             authMiddleware([Roles.Member, Roles.Administrator]),
             expenseController.getExpensesByMonth.bind(expenseController)
         );
-        routes.get("/:categoryId", apiKeyMiddleware(), expenseController.getExpensesByCategory.bind(expenseController));
 
         return routes;
     }
 
     createFamilyRoutes(familyController) {
         const routes = Router({ mergeParams: true });
-        routes.get("/apiKey/", authMiddleware([Roles.Administrator]), familyController.getApiKey.bind(familyController));
-        routes.patch("/apiKey/", authMiddleware([Roles.Administrator]), familyController.updateApiKey.bind(familyController));
         routes.post("/invitations/", authMiddleware([Roles.Administrator]), familyController.createInvite.bind(familyController));
         routes.get("/:inviteToken/", familyController.validateInviteToken.bind(familyController));
         return routes;

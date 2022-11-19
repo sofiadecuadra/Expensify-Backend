@@ -34,7 +34,7 @@ class ExpenseController {
             const { amount, producedDate, categoryId, description, imageAlreadyUploaded } = req.body;
             let imageFile = undefined;
             let originalName = undefined;
-            
+
             if (!imageAlreadyUploaded) {
                 imageFile = req.file;
                 originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
@@ -52,20 +52,8 @@ class ExpenseController {
                 imageFile,
                 originalName,
                 imageAlreadyUploaded
-                );
+            );
             res.status(200).json({ message: "Expense updated successfully" });
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    async getExpensesByCategory(req, res, next) {
-        try {
-            const { categoryId } = req.params;
-            const { startDate, endDate } = req.query;
-            const { familyName, apiKey } = req;
-            const expenses = await this.expenseLogic.getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey);
-            res.status(200).json(expenses);
         } catch (err) {
             next(err);
         }
