@@ -6,7 +6,7 @@ const ParagraphValidator = require("../utilities/validators/paragraphValidator")
 const ForeignKeyError = require("../errors/ForeignKeyError");
 const { ValidationError } = require("sequelize");
 const { Expo } = require("expo-server-sdk");
-const { uploadImage } = require("../library/imageUploader");
+const imageUploader = require("../library/imageUploader");
 const bucketName = process.env.AWS_BUCKET_NAME;
 
 class ExpenseLogic {
@@ -50,7 +50,7 @@ class ExpenseLogic {
                     },
                     { transaction: t }
                 );
-                await uploadImage(imageFile, imageKey);
+                await imageUploader.uploadImage(imageFile, imageKey);
                 this.checkMonthlyLimit(categoryId, userId);
                 console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
                 return newExpense;

@@ -34,7 +34,7 @@ describe("Create new expense", () => {
                 req.user.userId,
                 req.body.description,
                 req.file,
-                req.file.originalName
+                req.file.originalName ? req.file.originalName : req.file.originalname
             );
         };
         await test({
