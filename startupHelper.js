@@ -2,10 +2,6 @@ const dotenv = require("dotenv");
 dotenv.config();
 const dbPort = process.env.MYSQL_DB_PORT;
 const { FamilySQL, CategorySQL, ExpenseSQL, UserSQL } = require("./dataAccess/models");
-const mongoDBUri = process.env.MONGO_DB_URI;
-const mongoDBName = process.env.MONGO_DB_NAME;
-const mongoDBLogsCollection = process.env.MONGO_DB_LOGS_COLLECTION;
-const { MongoClient } = require("mongodb");
 
 const { Router } = require("express");
 const routes = Router({ mergeParams: true });
@@ -32,13 +28,6 @@ class StartupHelper {
     async initializeDatabase() {
         const SequelizeContext = require("./dataAccess/startup/SequelizeContext");
         const sequelizeContext = new SequelizeContext(dbPort);
-        const mongoClient = new MongoClient(mongoDBUri);
-        const mongoDb = mongoClient.db(mongoDBName);
-        const mongoLogsCollection = mongoDb.collection(mongoDBLogsCollection);
-        process.on("SIGINT", async () => {
-            await mongoClient.close();
-            process.exit(0);
-        });
         const familySQL = await new FamilySQL(sequelizeContext);
         const userSQL = await new UserSQL(sequelizeContext, familySQL.instance);
         const categorySQL = await new CategorySQL(sequelizeContext, familySQL.instance);
