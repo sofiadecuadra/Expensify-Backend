@@ -135,9 +135,6 @@ class StartupHelper {
 
     createExpenseRoutes(expenseController) {
         const routes = Router({ mergeParams: true });
-        routes.get("/logs", authMiddleware([Roles.Administrator]), expenseController.getLogs.bind(expenseController));
-        routes.get("/logCount", authMiddleware([Roles.Administrator]), expenseController.getLogCount.bind(expenseController));
-
         const multer = require("multer");
 
         const storage = multer.memoryStorage();

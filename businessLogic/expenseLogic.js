@@ -16,16 +16,14 @@ class ExpenseLogic {
     categorySQL;
     userSQL;
     familySQL;
-    logs;
     expo;
     expenseConnection;
 
-    constructor(expenseSQL, categorySQL, userSQL, familySQL, logs, expenseConnection) {
+    constructor(expenseSQL, categorySQL, userSQL, familySQL, expenseConnection) {
         this.expenseSQL = expenseSQL;
         this.categorySQL = categorySQL;
         this.userSQL = userSQL;
         this.familySQL = familySQL;
-        this.logs = logs;
         this.expo = new Expo();
         this.expenseConnection = expenseConnection;
     }
@@ -245,80 +243,6 @@ class ExpenseLogic {
         return { total };
     }
 
-    async getLogs(familyId, page, pageSize) {
-        NumberValidator.validate(page, "page", 100000);
-        NumberValidator.validate(pageSize, "page size", 50);
-
-        const logs = await this.logs
-            .find(
-                {
-                    familyId: familyId,
-                },
-                { projection: { _id: 0 } }
-            )
-            .sort({ date: -1 })
-            .skip(page * pageSize)
-            .limit(parseInt(pageSize))
-            .toArray();
-
-        const categoriesId = new Set();
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].categoryId) {
-                categoriesId.add(logs[i].categoryId);
-                categoriesId.add(logs[i].prevCategoryId);
-            }
-        }
-        const categoriesIdArray = Array.from(categoriesId);
-        const categories = await this.categorySQL.findAll({
-            attributes: ["id", "name"],
-            where: {
-                id: {
-                    [sequelize.Op.in]: categoriesIdArray,
-                },
-            },
-        });
-        const userIds = new Set();
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].userId) {
-                userIds.add(logs[i].userId);
-            }
-        }
-        const userIdsArray = Array.from(userIds);
-        const users = await this.userSQL.findAll({
-            attributes: ["id", "name"],
-            where: {
-                id: {
-                    [sequelize.Op.in]: userIdsArray,
-                },
-            },
-        });
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].userId) {
-                const user = users.find((user) => user.dataValues.id === logs[i].userId);
-                logs[i].userName = user.dataValues.name;
-            }
-            if (logs[i].categoryId) {
-                const category = categories.find((category) => category.dataValues.id === logs[i].categoryId);
-                logs[i].categoryName = category.dataValues.name;
-            }
-            if (logs[i].prevCategoryId) {
-                const prevCategory = categories.find((category) => category.dataValues.id === logs[i].prevCategoryId);
-                logs[i].prevCategoryName = prevCategory.dataValues.name;
-            }
-            logs[i].userId = undefined;
-            logs[i].categoryId = undefined;
-            logs[i].prevCategoryId = undefined;
-            logs[i].familyId = undefined;
-            logs[i].expenseId = undefined;
-        }
-
-        return logs;
-    }
-
-    getLogCount() {
-        return this.logs.countDocuments();
-    }
-
     paginate(query, { page, pageSize }) {
         const offset = parseInt(page) * parseInt(pageSize);
         const limit = parseInt(pageSize);
@@ -328,14 +252,6 @@ class ExpenseLogic {
             offset,
             limit,
         };
-    }
-
-    addLog(log) {
-        try {
-            this.logs.insertOne(log);
-        } catch (e) {
-            console.error("[AUDIT_LOG_INSERT_ERROR] " + e.message);
-        }
     }
 
     async getExpensesByMonth(familyId, fromDate, toDate) {
