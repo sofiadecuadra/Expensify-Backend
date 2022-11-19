@@ -158,24 +158,6 @@ class CategoryLogic {
         return { total };
     }
 
-    async getCategoriesWithMoreExpenses(familyName, apiKey) {
-        const family = await this.familySQL.findOne({
-            attributes: ["id"],
-            where: {
-                name: familyName,
-                apiKey: apiKey,
-            },
-        });
-        if (!family) throw new InvalidApiKeyError(familyName);
-
-        const categories = await this.expenseSQL.findAll({
-            ...this.groupByCategory(this.categorySQL, family.dataValues.id),
-            order: sequelize.literal("total DESC"),
-            limit: 3,
-        });
-        return categories;
-    }
-
     async getCategoriesExpensesByPeriod(familyId, startDate, endDate) {
         ISODateValidator.validate(startDate, "start date");
         ISODateValidator.validate(endDate, "end date");
