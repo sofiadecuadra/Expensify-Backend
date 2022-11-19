@@ -6,7 +6,6 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
 const { uploadImage } = require("../library/imageUploader");
 const dotenv = require("dotenv");
 dotenv.config();

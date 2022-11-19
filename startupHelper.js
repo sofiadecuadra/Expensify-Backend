@@ -185,8 +185,6 @@ class StartupHelper {
 
     createFamilyRoutes(familyController) {
         const routes = Router({ mergeParams: true });
-        routes.get("/apiKey/", authMiddleware([Roles.Administrator]), familyController.getApiKey.bind(familyController));
-        routes.patch("/apiKey/", authMiddleware([Roles.Administrator]), familyController.updateApiKey.bind(familyController));
         routes.post("/invitations/", authMiddleware([Roles.Administrator]), familyController.createInvite.bind(familyController));
         routes.get("/:inviteToken/", familyController.validateInviteToken.bind(familyController));
         return routes;
