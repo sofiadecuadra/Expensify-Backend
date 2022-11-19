@@ -31,10 +31,15 @@ class ExpenseController {
 
     async updateExpense(req, res, next) {
         try {
-            const imageFile = req.file;
-            const originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
-            const { expenseId } = req.params;
             const { amount, producedDate, categoryId, description, imageAlreadyUploaded } = req.body;
+            let imageFile = undefined;
+            let originalName = undefined;
+            
+            if (!imageAlreadyUploaded) {
+                imageFile = req.file;
+                originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
+            }
+            const { expenseId } = req.params;
             const { userId, familyId } = req.user;
             await this.expenseLogic.updateExpense(
                 userId,
