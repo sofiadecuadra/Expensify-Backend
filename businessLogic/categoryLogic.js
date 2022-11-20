@@ -6,7 +6,7 @@ const WordValidator = require("../utilities/validators/wordValidator");
 const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const { uploadImage } = require("../library/imageUploader");
+const imageUploader = require("../library/imageUploader");
 const dotenv = require("dotenv");
 dotenv.config();
 const bucketName = process.env.AWS_BUCKET_NAME;
@@ -46,7 +46,7 @@ class CategoryLogic {
                     },
                     { transaction: t }
                 );
-                await uploadImage(imageFile, imageKey);
+                await imageUploader.uploadImage(imageFile, imageKey);
                 console.info(`[USER_${userId}] [CATEGORY_CREATE] Category created id: ${newCategory.id}`);
                 return newCategory;
             });
@@ -83,7 +83,7 @@ class CategoryLogic {
             if (!imageAlreadyUploaded) {
                 const imageKey = name + "-" + Date.now() + "-" + originalname;
                 console.log(name, originalname, name);
-                image = await uploadImage(imageFile, imageKey);
+                image = await imageUploader.uploadImage(imageFile, imageKey);
             }
 
             await this.categorySQL.update(
