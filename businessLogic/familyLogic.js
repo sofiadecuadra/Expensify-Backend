@@ -1,4 +1,4 @@
-const { createKey, decryptKey } = require("../library/jwtSupplier");
+const jwtSupplier = require("../library/jwtSupplier");
 const DuplicateError = require("../errors/DuplicateFamilyError");
 const sequelize = require("sequelize");
 const WordValidator = require("../utilities/validators/wordValidator");
@@ -38,7 +38,7 @@ class FamilyLogic {
     }
 
     async validateInviteToken(inviteToken) {
-        const decryptedToken = await decryptKey(inviteToken);
+        const decryptedToken = await jwtSupplier.decryptKey(inviteToken);
         return decryptedToken;
     }
 
@@ -49,7 +49,7 @@ class FamilyLogic {
 
     async generateInvite(familyId, familyName, userId, userType) {
         const data = { familyId, familyName, userId, userType, date: new Date() };
-        const invite = await createKey({ data });
+        const invite = await jwtSupplier.createKey({ data });
         return invite;
     }
 }
