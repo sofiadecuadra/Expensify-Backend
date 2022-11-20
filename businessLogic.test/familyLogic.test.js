@@ -27,12 +27,14 @@ describe("create new family", () => {
         });
         it("should throw an error if the family name is not unique", async () => {
             const familySQL = {
-                create: jest.fn().mockRejectedValue(new sequelize.UniqueConstraintError),
+                create: jest.fn().mockRejectedValue(new sequelize.UniqueConstraintError()),
             };
             const familyLogic = new FamilyLogic(familySQL);
             let transaction = undefined;
 
-            await expect(familyLogic.createNewFamily("test", transaction)).rejects.toThrow("A family named 'test' already exists. Please try again.");
+            await expect(familyLogic.createNewFamily("test", transaction)).rejects.toThrow(
+                "A family named 'test' already exists. Please try again."
+            );
             expect(familySQL.create).toHaveBeenCalled();
         });
         it("should throw an error if an error ocurred", async () => {
@@ -42,7 +44,9 @@ describe("create new family", () => {
             const familyLogic = new FamilyLogic(familySQL);
             let transaction = undefined;
 
-            await expect(familyLogic.createNewFamily("test", transaction)).rejects.toThrow("An error ocurred while creating the family. Please try again.");
+            await expect(familyLogic.createNewFamily("test", transaction)).rejects.toThrow(
+                "An error ocurred while creating the family. Please try again."
+            );
             expect(familySQL.create).toHaveBeenCalled();
         });
         it("should throw an error if the family name is not valid", async () => {
@@ -58,13 +62,33 @@ describe("create new family", () => {
 
             try {
                 await familyLogic.createNewFamily("te", transaction);
-            }
-            catch (err) {
+            } catch (err) {
                 expect(err).toBeInstanceOf(InputValidationError);
-                expect(err.message).toBe("Please enter a non-empty family name containing only letters, numbers or spaces with maximum length of 20!");
+                expect(err.message).toBe(
+                    "Please enter a non-empty family name containing only letters, numbers or spaces with maximum length of 20!"
+                );
                 expect(err.body()).toEqual({
                     errorType: `INPUT_VALIDATION_ERROR`,
                     message: "Please enter a non-empty family name containing only letters, numbers or spaces with maximum length of 20!",
+                });
+            }
+        });
+
+        it("should throw duplicate family error", async () => {
+            const familySQL = {
+                create: jest.fn().mockRejectedValue(new sequelize.UniqueConstraintError()),
+            };
+            const familyLogic = new FamilyLogic(familySQL);
+            let transaction = undefined;
+
+            try {
+                await familyLogic.createNewFamily("test", transaction);
+            } catch (err) {
+                expect(err).toBeInstanceOf(DuplicateError);
+                expect(err.message).toBe("A family named 'test' already exists. Please try again.");
+                expect(err.body()).toEqual({
+                    errorType: `DUPLICATE_FAMILY_ERROR`,
+                    message: "A family named 'test' already exists. Please try again.",
                 });
             }
         });
@@ -80,8 +104,8 @@ describe("create invite", () => {
             };
             const user = {
                 id: 1,
-                email: "test@gmail.com"
-            }
+                email: "test@gmail.com",
+            };
             const familySQL = {
                 findOne: jest.fn().mockReturnValue(family),
             };
@@ -98,8 +122,8 @@ describe("create invite", () => {
             };
             const user = {
                 id: 1,
-                email: "test@gmail.com"
-            }
+                email: "test@gmail.com",
+            };
             const familySQL = {
                 findOne: jest.fn().mockReturnValue(family),
             };
@@ -107,8 +131,7 @@ describe("create invite", () => {
 
             try {
                 await familyLogic.createInvite("Mem", ["test1@gmail.com", "test2@gmail.com"], user.id, family.id);
-            }
-            catch (err) {
+            } catch (err) {
                 expect(err).toBeInstanceOf(InputValidationError);
                 expect(err.message).toBe("Please enter a valid user type from the list [Member,Administrator]!");
                 expect(err.body()).toEqual({
@@ -124,8 +147,8 @@ describe("create invite", () => {
             };
             const user = {
                 id: 1,
-                email: "test@gmail.com"
-            }
+                email: "test@gmail.com",
+            };
             const familySQL = {
                 findOne: jest.fn().mockReturnValue(family),
             };
@@ -133,8 +156,7 @@ describe("create invite", () => {
 
             try {
                 await familyLogic.createInvite("Member", ["tes", "te"], user.id, family.id);
-            }
-            catch (err) {
+            } catch (err) {
                 expect(err).toBeInstanceOf(InputValidationError);
                 expect(err.message).toBe("Please enter a valid email!");
                 expect(err.body()).toEqual({
@@ -142,7 +164,7 @@ describe("create invite", () => {
                     message: "Please enter a valid email!",
                 });
             }
-        })
+        });
     });
 });
 describe("validate invite token", () => {
@@ -158,11 +180,12 @@ describe("validate invite token", () => {
                 create: jest.fn().mockReturnValue(family),
             };
             const familyLogic = new FamilyLogic(familySQL);
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0";
+            const token =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImZhbWlseUlkIjoiMCIsInVzZXJJZCI6MSwidXNlclR5cGUiOiJhZG1pbmlzdHJhdG9yIn0sImlhdCI6MTY2MzM3MzI5Nn0.ebI5zDTODdFEpfphVtC1VcwnSW9LMimPCvTkY0D44e0";
 
             const result = await familyLogic.validateInviteToken(token);
 
             expect(result).toEqual(inviteDate);
         });
     });
-})
+});
