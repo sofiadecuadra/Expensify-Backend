@@ -68,8 +68,15 @@ class ExpenseLogic {
         const expense = await this.expenseSQL.findOne({
             where: {
                 id: expenseId,
-                familyId: familyId,
             },
+            include: [
+                {
+                    model: this.categorySQL,
+                    where: {
+                        familyId: familyId,
+                    },
+                },
+            ],
         });
 
         if (expense) {
