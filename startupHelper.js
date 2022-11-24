@@ -172,7 +172,7 @@ class StartupHelper {
         routes.post("/invitations", userController.createUserFromInvite.bind(userController));
         routes.post("/sign-in", userController.signIn.bind(userController));
         routes.post("/log-out", userController.logOut.bind(userController));
-        routes.put("/update-token", authMiddleware([Roles.Member, Roles.Administrator]), userController.updateToken.bind(userController));
+        routes.put("/token", authMiddleware([Roles.Member, Roles.Administrator]), userController.updateToken.bind(userController));
         return routes;
     }
 }
