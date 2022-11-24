@@ -904,16 +904,25 @@ describe("Check monthly limit", () => {
     it("Should check monthly limit and send notification", async () => {
         const categoryId = 1;
         const userId = 1;
+        let queryCount = 0;
         const expenseSQL = {
             sequelize: {
-                query: jest.fn().mockResolvedValue([
-                    {
-                        "SUM(amount) > c.monthlyBudget": true,
-                        Total: 100,
-                        monthlyBudget: 50,
-                        name: "categoryName",
-                    },
-                ]),
+                query: jest.fn().mockImplementation(() => {
+                    return queryCount++ === 0
+                        ? [
+                              {
+                                  "SUM(amount) > c.monthlyBudget": true,
+                                  Total: 100,
+                                  monthlyBudget: 50,
+                                  name: "categoryName",
+                              },
+                          ]
+                        : [
+                              {
+                                  expoToken: "token",
+                              },
+                          ];
+                }),
             },
         };
         const categorySQL = {
@@ -938,7 +947,7 @@ describe("Check monthly limit", () => {
             sendPushNotificationsAsync: (message) => {
                 expect(message).toEqual([
                     {
-                        to: "test",
+                        to: "token",
                         sound: "default",
                         title: "Monthly budget exceeded",
                         body: "Monthly budget exceeded by $" + 50 + ".00 for category " + "categoryName",
@@ -946,6 +955,64 @@ describe("Check monthly limit", () => {
                         priority: "high",
                     },
                 ]);
+                return "receipt";
+            },
+        };
+
+        await expenseLogic.checkMonthlyLimit(categoryId, userId);
+
+        expect(expenseSQL.sequelize.query).toBeCalledWith(
+            `SELECT SUM(amount) > c.monthlyBudget, SUM(amount) as Total, c.monthlyBudget, c.name  FROM Expenses e, Categories c WHERE categoryId = '${categoryId}' AND e.categoryId = c.id GROUP BY c.id, c.name;`,
+            { type: sequelize.QueryTypes.SELECT }
+        );
+    });
+
+    it("Should check monthly limit and don't send notification", async () => {
+        const categoryId = 1;
+        const userId = 1;
+        let queryCount = 0;
+        const expenseSQL = {
+            sequelize: {
+                query: jest.fn().mockImplementation(() => {
+                    queryCount++;
+                    return queryCount == 0
+                        ? [
+                              {
+                                  "SUM(amount) > c.monthlyBudget": true,
+                                  Total: 100,
+                                  monthlyBudget: 50,
+                                  name: "categoryName",
+                              },
+                          ]
+                        : [
+                              {
+                                  expoToken: undefined,
+                              },
+                          ];
+                }),
+            },
+        };
+        const categorySQL = {
+            findOne: jest.fn().mockResolvedValue({
+                dataValues: {
+                    monthlyBudget: 50,
+                    name: "categoryName",
+                },
+            }),
+        };
+        const userSQL = {
+            findOne: jest.fn().mockResolvedValue({
+                dataValues: {
+                    expoToken: "test",
+                },
+            }),
+        };
+        const familySQL = {};
+        const expenseConnection = {};
+        const expenseLogic = new ExpenseLogic(expenseSQL, categorySQL, userSQL, familySQL, expenseConnection);
+        expenseLogic.expo = {
+            sendPushNotificationsAsync: (message) => {
+                expect(message).toEqual([]);
                 return "receipt";
             },
         };
