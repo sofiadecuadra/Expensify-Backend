@@ -10,10 +10,10 @@
 - [Functional requirements](#functional-requirements)
 - [Local setup](#local-setup)
   - [Prerequisites:](#prerequisites)
+  - [Environment file](#env-file)
   - [Steps:](#steps)
     - [Load test data (optional):](#load-test-data-optional)
-      - [MySQL database:](#mysql-database)
-  
+      - [MySQL database:](#mysql-database)  
 
 ## Introduction
 
@@ -81,6 +81,12 @@ The aim of this app is to manage family expenses.
 - nodejs: 16.15.0
 - docker
 
+### Environment file
+
+The repository has an example of an environment file, which is located in the root directory.
+
+Must create .env file.
+
 ### Steps:
 ```
 git clone https://github.com/ORTISP/Expensify-Backend.git
@@ -88,7 +94,6 @@ cd Expensify-Backend
 npm i
 docker-compose up
 ```
-
 ##### MySQL database:
 1. Connect to the MySQL instance through MySQL Workbench using the next credentials:	
 ```
