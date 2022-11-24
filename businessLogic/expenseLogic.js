@@ -8,6 +8,7 @@ const { Expo } = require("expo-server-sdk");
 const imageUploader = require("../library/imageUploader");
 const ValidationError = require("../errors/ValidationError");
 const bucketName = process.env.AWS_BUCKET_NAME;
+const Roles = require("../library/roles");
 
 class ExpenseLogic {
     numberLength = 1000000000;
@@ -325,24 +326,26 @@ class ExpenseLogic {
                 id: categoryId,
             },
         });
-        const user = await this.userSQL.findOne({
-            attributes: ["expoToken"],
-            where: {
-                id: userId,
-            },
-        });
-        if (user.dataValues.expoToken) {
-            const message = {
-                to: user.dataValues.expoToken,
-                sound: "default",
-                title: "Monthly budget exceeded",
-                body: "Monthly budget exceeded by $" + difference + " for category " + category.dataValues.name,
-                data: { data: { categoryId } },
-                priority: "high",
-            };
-            const res = await this.expo.sendPushNotificationsAsync([message]);
-            console.log("[EXPO_NOTIFICATION_RECEIPT] ", res);
+
+        const query = `SELECT expoToken FROM Users WHERE role = '${Roles.Administrator.id}' AND familyId = (SELECT familyId FROM Users WHERE id = '${userId}');`;
+        const res = await this.expenseSQL.sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        const tokens = res.map((user) => user.expoToken);
+        const messages = [];
+        for (const token of tokens) {
+            if (token) {
+                let a = 1;
+                messages.push({
+                    to: token,
+                    sound: "default",
+                    title: "Monthly budget exceeded",
+                    body: "Monthly budget exceeded by $" + difference + " for category " + category.dataValues.name,
+                    data: { data: { categoryId } },
+                    priority: "high",
+                });
+            }
         }
+        const notificationRes = await this.expo.sendPushNotificationsAsync(messages);
+        console.log("[EXPO_NOTIFICATION_RECEIPT] ", notificationRes);
     }
 }
 
