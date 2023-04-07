@@ -15,20 +15,18 @@
     "bugs": {
         "url": "https://github.com/ArqSoftPractica/Monolithic-Backend/issues"
     },
-    "newrelic": "latest",
     "homepage": "https://github.com/ArqSoftPractica/Monolithic-Backend#readme",
     "dependencies": {
         "@aws-sdk/client-s3": "3.171.0",
-        "@sendgrid/mail": "7.7.0",
         "aws": "0.0.3-2",
         "aws-sdk": "2.1217.0",
         "bcryptjs": "2.4.3",
         "cookie-parser": "1.4.6",
         "cors": "2.8.5",
         "dotenv": "16.0.2",
+        "expo-server-sdk": "^3.7.0",
         "express": "4.18.1",
         "jsonwebtoken": "8.5.1",
-        "mongodb": "4.10.0",
         "multer": "1.4.5-lts.1",
         "multiparty": "4.2.3",
         "mysql2": "2.3.3",
@@ -39,7 +37,6 @@
         "react-error-overlay": "6.0.9"
     },
     "devDependencies": {
-        "jest": "29.0.3",
-        "newrelic": "^9.1.0"
+        "jest": "29.0.3"
     }
 }

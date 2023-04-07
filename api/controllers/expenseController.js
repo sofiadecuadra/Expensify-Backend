@@ -7,9 +7,11 @@ class ExpenseController {
 
     async createNewExpense(req, res, next) {
         try {
+            const imageFile = req.file;
+            const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { userId } = req.user;
-            const { amount, producedDate, categoryId } = req.body;
-            await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId);
+            const { amount, producedDate, categoryId, description } = req.body;
+            await this.expenseLogic.createExpense(amount, producedDate, categoryId, userId, description, imageFile, originalName);
             res.status(201).json({ message: "Expense created successfully" });
         } catch (err) {
             next(err);
@@ -29,33 +31,39 @@ class ExpenseController {
 
     async updateExpense(req, res, next) {
         try {
+            const { amount, producedDate, categoryId, description, imageAlreadyUploaded } = req.body;
+            let imageFile = undefined;
+            let originalName = undefined;
+
+            if (!imageAlreadyUploaded) {
+                imageFile = req.file;
+                originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
+            }
             const { expenseId } = req.params;
-            const { amount, producedDate, categoryId } = req.body;
             const { userId, familyId } = req.user;
-            await this.expenseLogic.updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId);
+            await this.expenseLogic.updateExpense(
+                userId,
+                amount,
+                producedDate,
+                categoryId,
+                expenseId,
+                familyId,
+                description,
+                imageFile,
+                originalName,
+                imageAlreadyUploaded
+            );
             res.status(200).json({ message: "Expense updated successfully" });
         } catch (err) {
             next(err);
         }
     }
 
-    async getExpensesByCategory(req, res, next) {
-        try {
-            const { categoryId } = req.params;
-            const { startDate, endDate } = req.query;
-            const { familyName, apiKey } = req;
-            const expenses = await this.expenseLogic.getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey);
-            res.status(200).json(expenses);
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    async getExpensesPaginated(req, res, next) {
+    async getExpenses(req, res, next) {
         try {
             let { startDate, endDate, page, pageSize } = req.query;
             const { familyId } = req.user;
-            const expenses = await this.expenseLogic.getExpensesPaginated(familyId, startDate, endDate, page, pageSize);
+            const expenses = await this.expenseLogic.getExpenses(familyId, startDate, endDate, page, pageSize);
             res.status(200).json(expenses);
         } catch (err) {
             next(err);
@@ -73,24 +81,13 @@ class ExpenseController {
         }
     }
 
-    async getLogs(req, res, next) {
+    async getExpensesByMonth(req, res, next) {
         try {
             const { familyId } = req.user;
-            let { page, pageSize } = req.query;
-            const logs = await this.expenseLogic.getLogs(familyId, page, pageSize);
-            res.status(200).json(logs);
-        }
-        catch (err) {
-            next(err);
-        }
-    }
-
-    async getLogCount(req, res, next) {
-        try {
-            const logCount = await this.expenseLogic.getLogCount();
-            res.status(200).json({ total: logCount });
-        }
-        catch (err) {
+            let { startDate, endDate } = req.query;
+            const expenses = await this.expenseLogic.getExpensesByMonth(familyId, startDate, endDate);
+            res.status(200).json(expenses);
+        } catch (err) {
             next(err);
         }
     }

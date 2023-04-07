@@ -2,42 +2,62 @@ const parseDate = require("../utilities/dateUtils");
 const sequelize = require("sequelize");
 const NumberValidator = require("../utilities/validators/numberValidator");
 const ISODateValidator = require("../utilities/validators/dateISOValidator");
-const InvalidApiKeyError = require("../errors/auth/InvalidApiKeyError");
+const ParagraphValidator = require("../utilities/validators/paragraphValidator");
 const ForeignKeyError = require("../errors/ForeignKeyError");
-const { ValidationError } = require("sequelize");
+const { Expo } = require("expo-server-sdk");
+const imageUploader = require("../library/imageUploader");
+const ValidationError = require("../errors/ValidationError");
+const bucketName = process.env.AWS_BUCKET_NAME;
+const Roles = require("../library/roles");
 
 class ExpenseLogic {
     numberLength = 1000000000;
+    descriptionLength = 100;
     expenseSQL;
     categorySQL;
     userSQL;
     familySQL;
-    logs;
+    expo;
+    expenseConnection;
 
-    constructor(expenseSQL, categorySQL, userSQL, familySQL, logs) {
+    constructor(expenseSQL, categorySQL, userSQL, familySQL, expenseConnection) {
         this.expenseSQL = expenseSQL;
         this.categorySQL = categorySQL;
         this.userSQL = userSQL;
         this.familySQL = familySQL;
-        this.logs = logs;
+        this.expo = new Expo();
+        this.expenseConnection = expenseConnection;
     }
 
-    async createExpense(amount, producedDate, categoryId, userId) {
+    async createExpense(amount, producedDate, categoryId, userId, description, imageFile, originalName) {
         try {
             NumberValidator.validate(amount, "expense amount", this.numberLength);
             ISODateValidator.validate(producedDate, "produced date");
             NumberValidator.validate(categoryId, "category id", this.numberLength);
+            ParagraphValidator.validate(description, "description", this.descriptionLength);
 
-            const newExpense = await this.expenseSQL.create({
-                amount,
-                producedDate: parseDate(producedDate),
-                categoryId,
-                userId,
-                registeredDate: parseDate(new Date()),
+            await this.expenseConnection.transaction(async (t) => {
+                const imageKey = userId + "-" + Date.now() + "-" + originalName;
+                const image = "https://" + bucketName + ".s3.amazonaws.com/" + imageKey;
+                const newExpense = await this.expenseSQL.create(
+                    {
+                        amount,
+                        producedDate: parseDate(producedDate),
+                        categoryId,
+                        userId,
+                        image,
+                        registeredDate: parseDate(new Date()),
+                        description,
+                    },
+                    { transaction: t }
+                );
+                await imageUploader.uploadImage(imageFile, imageKey);
+                this.checkMonthlyLimit(categoryId, userId);
+                console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
+                return newExpense;
             });
-            console.info(`[USER_${userId}] [EXPENSE_CREATE] Expense created id: ${newExpense.id}`);
         } catch (err) {
-            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
+            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId, "category");
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
             else throw err;
         }
@@ -50,6 +70,14 @@ class ExpenseLogic {
             where: {
                 id: expenseId,
             },
+            include: [
+                {
+                    model: this.categorySQL,
+                    where: {
+                        familyId: familyId,
+                    },
+                },
+            ],
         });
 
         if (expense) {
@@ -59,139 +87,118 @@ class ExpenseLogic {
                 },
             });
             console.info(`[USER_${userId}] [EXPENSE_DELETE] Expense deleted id: ${expenseId}`);
-            const logObject = {
-                type: "EXPENSE_DELETE",
-                userId: userId,
-                familyId: familyId,
-                expenseId: expenseId,
-                amount: expense.dataValues.amount,
-                producedDate: expense.dataValues.producedDate,
-                categoryId: expense.dataValues.categoryId,
-                date: new Date().toISOString()
-            }
-            this.addLog(logObject);
-
         }
-
     }
 
-    async updateExpense(userId, amount, producedDate, categoryId, expenseId, familyId) {
+    async updateExpense(
+        userId,
+        amount,
+        producedDate,
+        categoryId,
+        expenseId,
+        familyId,
+        description,
+        imageFile,
+        originalName,
+        imageAlreadyUploaded
+    ) {
         try {
             NumberValidator.validate(expenseId, "expense id", this.numberLength);
             NumberValidator.validate(amount, "expense amount", 1000000000);
             ISODateValidator.validate(producedDate, "produced date");
+            ParagraphValidator.validate(description, "description", this.descriptionLength);
+            let image = undefined;
+
+            if (!imageAlreadyUploaded) {
+                const imageKey = userId + "-" + Date.now() + "-" + originalName;
+                image = await imageUploader.uploadImage(imageFile, imageKey);
+            }
+
             const previousExpense = await this.expenseSQL.findOne({
                 where: {
                     id: expenseId,
-                }
+                    //TODO FILTRAR POR FAMILIA JOIN CON CATEGORY
+                },
             });
-            if (!previousExpense) throw new ForeignKeyError(expenseId);
-
+            if (!previousExpense) throw new ForeignKeyError(expenseId, "expense");
 
             await this.expenseSQL.update(
                 {
                     amount,
                     producedDate: parseDate(producedDate),
                     categoryId,
+                    description,
+                    image,
                 },
                 { where: { id: expenseId } }
             );
             console.info(`[USER_${userId}] [EXPENSE_UPDATE] Expense updated id: ${expenseId}`);
-            const logObject = {
-                type: "EXPENSE_UPDATE",
-                userId: userId,
-                familyId: familyId,
-                expenseId: expenseId,
-                prevAmount: previousExpense.dataValues.amount,
-                amount: amount,
-                prevProducedDate: previousExpense.dataValues.producedDate,
-                producedDate: producedDate,
-                prevCategoryId: previousExpense.dataValues.categoryId,
-                categoryId: categoryId,
-                date: new Date().toISOString()
-            }
-            this.addLog(logObject);
         } catch (err) {
-            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId);
+            if (err instanceof sequelize.ForeignKeyConstraintError) throw new ForeignKeyError(categoryId, "category");
             else if (err instanceof sequelize.ValidationError) throw new ValidationError(err.errors);
             else throw err;
         }
     }
 
-    async getExpensesByCategory(categoryId, startDate, endDate, familyName, apiKey) {
-        const family = await this.familySQL.findOne({
-            attributes: ["id"],
-            where: {
-                name: familyName,
-                apiKey: apiKey,
-            },
-        });
-        if (!family)
-            throw new InvalidApiKeyError(familyName);
-
-        ISODateValidator.validate(startDate, "start date");
-        ISODateValidator.validate(endDate, "end date");
-        NumberValidator.validate(categoryId, "category id", this.numberLength);
-
-        return await this.expenseSQL.findAll({
-            include: [
-                {
-                    model: this.categorySQL,
-                    where: {
-                        familyId: family.dataValues.id,
-                    }
-                },
-            ],
-            where: {
-                categoryId: categoryId,
-                producedDate: {
-                    [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                },
-            },
-
-        });
-    }
-
-    async getExpensesPaginated(familyId, startDate, endDate, page, pageSize) {
+    async getExpenses(familyId, startDate, endDate, page, pageSize) {
+        NumberValidator.validate(familyId, "family id", this.numberLength);
         NumberValidator.validate(page, "page", 100000);
         NumberValidator.validate(pageSize, "page size", 50);
 
         if (startDate && endDate) {
             ISODateValidator.validate(startDate, "start date");
             ISODateValidator.validate(endDate, "end date");
-        } else {
-            endDate = new Date();
-            startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
-        }
-
-        return await this.expenseSQL.findAll(
-            this.paginate(
-                {
-                    attributes: ["amount", "id", "producedDate", "registeredDate"],
-                    where: {
-                        producedDate: {
-                            [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                        }
+            return await this.expenseSQL.findAll(
+                this.paginate(
+                    {
+                        attributes: ["amount", "id", "producedDate", "image", "registeredDate", "description"],
+                        where: {
+                            producedDate: {
+                                [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
+                            },
+                        },
+                        order: [["producedDate", "ASC"]],
+                        include: [
+                            {
+                                model: this.categorySQL,
+                                attributes: ["name", "image", "description", "id"],
+                            },
+                            {
+                                model: this.userSQL,
+                                attributes: ["name"],
+                                where: {
+                                    familyId: familyId,
+                                },
+                            },
+                        ],
                     },
-                    order: [["producedDate", "ASC"]],
-                    include: [
-                        {
-                            model: this.categorySQL,
-                            attributes: ["name", "image", "description", "id"],
-                        },
-                        {
-                            model: this.userSQL,
-                            attributes: ["name"],
-                            where: {
-                                familyId: familyId,
-                            }
-                        },
-                    ],
-                },
-                { page, pageSize }
-            )
-        );
+                    { page, pageSize }
+                )
+            );
+        } else {
+            return await this.expenseSQL.findAll(
+                this.paginate(
+                    {
+                        attributes: ["amount", "id", "producedDate", "image", "registeredDate"],
+                        order: [["producedDate", "ASC"]],
+                        include: [
+                            {
+                                model: this.categorySQL,
+                                attributes: ["name", "image", "description", "id"],
+                            },
+                            {
+                                model: this.userSQL,
+                                attributes: ["name"],
+                                where: {
+                                    familyId: familyId,
+                                },
+                            },
+                        ],
+                    },
+                    { page, pageSize }
+                )
+            );
+        }
     }
 
     async getExpensesCount(familyId, startDate, endDate) {
@@ -207,84 +214,18 @@ class ExpenseLogic {
             where: {
                 producedDate: {
                     [sequelize.Op.between]: [parseDate(startDate), parseDate(endDate)],
-                }
+                },
             },
             include: [
                 {
                     model: this.userSQL,
                     where: {
                         familyId: familyId,
-                    }
+                    },
                 },
             ],
         });
         return { total };
-    }
-
-    async getLogs(familyId, page, pageSize) {
-        NumberValidator.validate(page, "page", 100000);
-        NumberValidator.validate(pageSize, "page size", 50);
-
-        const logs = await this.logs.find({
-            familyId: familyId,
-        }, { projection: { _id: 0 } }).sort({ date: -1 }).skip(page * pageSize).limit(parseInt(pageSize)).toArray();
-
-        const categoriesId = new Set();
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].categoryId) {
-                categoriesId.add(logs[i].categoryId);
-                categoriesId.add(logs[i].prevCategoryId);
-            }
-        }
-        const categoriesIdArray = Array.from(categoriesId);
-        const categories = await this.categorySQL.findAll({
-            attributes: ["id", "name"],
-            where: {
-                id: {
-                    [sequelize.Op.in]: categoriesIdArray,
-                }
-            }
-        });
-        const userIds = new Set();
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].userId) {
-                userIds.add(logs[i].userId);
-            }
-        }
-        const userIdsArray = Array.from(userIds);
-        const users = await this.userSQL.findAll({
-            attributes: ["id", "name"],
-            where: {
-                id: {
-                    [sequelize.Op.in]: userIdsArray,
-                }
-            }
-        });
-        for (let i = 0; i < logs.length; i++) {
-            if (logs[i].userId) {
-                const user = users.find(user => user.dataValues.id === logs[i].userId);
-                logs[i].userName = user.dataValues.name;
-            }
-            if (logs[i].categoryId) {
-                const category = categories.find(category => category.dataValues.id === logs[i].categoryId);
-                logs[i].categoryName = category.dataValues.name;
-            }
-            if (logs[i].prevCategoryId) {
-                const prevCategory = categories.find(category => category.dataValues.id === logs[i].prevCategoryId);
-                logs[i].prevCategoryName = prevCategory.dataValues.name;
-            }
-            logs[i].userId = undefined;
-            logs[i].categoryId = undefined;
-            logs[i].prevCategoryId = undefined;
-            logs[i].familyId = undefined;
-            logs[i].expenseId = undefined;
-        }
-
-        return logs;
-    }
-
-    getLogCount() {
-        return this.logs.countDocuments();
     }
 
     paginate(query, { page, pageSize }) {
@@ -298,13 +239,113 @@ class ExpenseLogic {
         };
     }
 
-    addLog(log) {
-        try {
-            this.logs.insertOne(log);
+    async getExpensesByMonth(familyId, fromDate, toDate) {
+        ISODateValidator.validate(fromDate, "from date");
+        ISODateValidator.validate(toDate, "to date");
+
+        //if period is smaller than 1 month, return separated by weeks
+        const period = Math.abs(parseDate(toDate).getTime() - parseDate(fromDate).getTime());
+        const days = Math.ceil(period / (1000 * 60 * 60 * 24));
+        if (days < 30) {
+            const expenses = await this.expenseSQL.findAll({
+                attributes: [
+                    [sequelize.fn("sum", sequelize.col("amount")), "amount"],
+                    [sequelize.fn("WEEK", sequelize.col("producedDate")), "date"],
+                ],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(fromDate), parseDate(toDate)],
+                    },
+                },
+                group: [sequelize.fn("WEEK", sequelize.col("producedDate"))],
+                include: [
+                    {
+                        model: this.userSQL,
+                        attributes: [],
+                        where: {
+                            familyId: familyId,
+                        },
+                    },
+                ],
+            });
+
+            return expenses.map((expense) => {
+                return {
+                    amount: expense.dataValues.amount,
+                    week: expense.dataValues.date,
+                };
+            });
+        } else {
+            const expenses = await this.expenseSQL.findAll({
+                attributes: [
+                    [sequelize.fn("sum", sequelize.col("amount")), "amount"],
+                    [sequelize.fn("MONTH", sequelize.col("producedDate")), "date"],
+                ],
+                where: {
+                    producedDate: {
+                        [sequelize.Op.between]: [parseDate(fromDate), parseDate(toDate)],
+                    },
+                },
+                group: [sequelize.fn("MONTH", sequelize.col("producedDate"))],
+                include: [
+                    {
+                        model: this.userSQL,
+                        attributes: [],
+                        where: {
+                            familyId: familyId,
+                        },
+                    },
+                ],
+            });
+
+            return expenses.map((expense) => {
+                return {
+                    amount: expense.dataValues.amount,
+                    month: expense.dataValues.date,
+                };
+            });
         }
-        catch (e) {
-            console.error("[AUDIT_LOG_INSERT_ERROR] " + e.message);
+    }
+
+    async checkMonthlyLimit(categoryId, userId) {
+        const query = `SELECT SUM(amount) > c.monthlyBudget, SUM(amount) as Total, c.monthlyBudget, c.name  FROM Expenses e, Categories c WHERE categoryId = '${categoryId}' AND e.categoryId = c.id GROUP BY c.id, c.name;`;
+        const res = await this.expenseSQL.sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        if (res[0]["SUM(amount) > c.monthlyBudget"]) {
+            const difference = (res[0]["Total"] - res[0]["monthlyBudget"]).toFixed(2);
+            console.log("[MONTHLY_BUDGET_ALERT] Monthly limit exceeded by $" + difference + " for category " + categoryId);
+            if (difference > 0.5) {
+                this.sendPushNotification(categoryId, difference, userId);
+            }
         }
+    }
+
+    async sendPushNotification(categoryId, difference, userId) {
+        const category = await this.categorySQL.findOne({
+            attributes: ["name"],
+            where: {
+                id: categoryId,
+            },
+        });
+
+        const query = `SELECT expoToken FROM Users WHERE role = '${Roles.Administrator.id}' AND familyId = (SELECT familyId FROM Users WHERE id = '${userId}');`;
+        const res = await this.expenseSQL.sequelize.query(query, { type: sequelize.QueryTypes.SELECT });
+        const tokens = res.map((user) => user.expoToken);
+        const messages = [];
+        for (const token of tokens) {
+            if (token) {
+                let a = 1;
+                messages.push({
+                    to: token,
+                    sound: "default",
+                    title: "Monthly budget exceeded",
+                    body: "Monthly budget exceeded by $" + difference + " for category " + category.dataValues.name,
+                    data: { data: { categoryId } },
+                    priority: "high",
+                });
+            }
+        }
+        const notificationRes = await this.expo.sendPushNotificationsAsync(messages);
+        console.log("[EXPO_NOTIFICATION_RECEIPT] ", notificationRes);
     }
 }
 

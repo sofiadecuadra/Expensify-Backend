@@ -3,9 +3,9 @@ const HTTPRequestError = require('./HttpRequestError');
 class FileUploadError extends HTTPRequestError {
     StatusCode = 500;
 
-    constructor(category) {
+    constructor() {
         super();
-        this.message = `Could not upload image for category '${category}'.`;
+        this.message = `Could not upload image`;
     }
 
     body() {

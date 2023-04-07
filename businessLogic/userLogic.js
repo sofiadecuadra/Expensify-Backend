@@ -90,10 +90,16 @@ class UserLogic {
 
     async signIn(email, password) {
         let user = await this.userSQL.findOne({ where: { email: email } });
-        if (!user) { console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`); throw new AuthError('Your email and password do not match. Please try again.') };
+        if (!user) {
+            console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`);
+            throw new AuthError("Your email and password do not match. Please try again.");
+        }
 
         const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) { console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`); throw new AuthError('Your email and password do not match. Please try again.') };
+        if (!isValidPassword) {
+            console.info(`[EMAIL_${email}] [SIGN_IN_ATTEMPT]`);
+            throw new AuthError("Your email and password do not match. Please try again.");
+        }
 
         const data = { userId: user.id, role: user.role, email: user.email, familyId: user.familyId };
         const token = await jwtSupplier.createKey(data);
@@ -102,6 +108,17 @@ class UserLogic {
         const response = { token: token, role: user.role, expirationDate: expirationDate };
         console.info(`[USER_${user.id}] [SIGN_IN]`);
         return response;
+    }
+
+    async updateToken(token, userId) {
+        const user = await this.userSQL.findOne({ where: { id: userId } });
+        if (!user) {
+            console.info(`[USER_${userId}] [UPDATE_TOKEN] User not found`);
+            throw new AuthError("User not found.");
+        }
+        user.expoToken = token;
+        await user.save();
+        console.info(`[USER_${userId}] [UPDATE_TOKEN] User token updated correctly`);
     }
 }
 

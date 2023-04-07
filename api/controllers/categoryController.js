@@ -11,15 +11,7 @@ class CategoryController {
             const originalName = req.file.originalName ? req.file.originalName : req.file.originalname;
             const { name, description, monthlyBudget } = req.body;
             const { familyId, userId } = req.user;
-            await this.categoryLogic.createCategory(
-                userId,
-                imageFile,
-                name,
-                description,
-                monthlyBudget,
-                originalName,
-                familyId
-            );
+            await this.categoryLogic.createCategory(userId, imageFile, name, description, monthlyBudget, originalName, familyId);
             res.status(201).json({ message: "Category created successfully" });
         } catch (err) {
             next(err);
@@ -39,11 +31,16 @@ class CategoryController {
 
     async updateCategory(req, res, next) {
         try {
-            const imageFile = req.file;
-            const originalName = req.file.originalName;
+            const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
+            let imageFile = undefined;
+            let originalName = undefined;
+
+            if (!imageAlreadyUploaded) {
+                imageFile = req.file;
+                originalName = req.file?.originalName ? req.file.originalName : req.file.originalname;
+            }
             const { userId } = req.user;
             const { categoryId } = req.params;
-            const { name, description, monthlyBudget, imageAlreadyUploaded } = req.body;
             await this.categoryLogic.updateCategory(
                 userId,
                 imageFile,
@@ -52,7 +49,8 @@ class CategoryController {
                 description,
                 originalName,
                 monthlyBudget,
-                imageAlreadyUploaded);
+                imageAlreadyUploaded
+            );
             res.status(200).json({ message: "Category updated successfully" });
         } catch (err) {
             next(err);
@@ -65,16 +63,6 @@ class CategoryController {
             let { page, pageSize } = req.query;
             const categories = await this.categoryLogic.getCategories(familyId, page, pageSize);
             res.status(200).json(categories);
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    async getCategoriesWithMoreExpenses(req, res, next) {
-        try {
-            const { familyName, apiKey } = req;
-            const categories = await this.categoryLogic.getCategoriesWithMoreExpenses(familyName, apiKey);
-            res.json(categories);
         } catch (err) {
             next(err);
         }
@@ -95,6 +83,17 @@ class CategoryController {
         try {
             const { familyId } = req.user;
             const categories = await this.categoryLogic.getCategoriesCount(familyId);
+            res.status(200).json(categories);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getCategoryExpensesByMonth(req, res, next) {
+        try {
+            const { familyId } = req.user;
+            const { categoryId } = req.params;
+            const categories = await this.categoryLogic.getCategoryExpensesByMonth(categoryId, familyId);
             res.status(200).json(categories);
         } catch (err) {
             next(err);
